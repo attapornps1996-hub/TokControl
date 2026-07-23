@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+out/
+build/
+release/
+pandy-app-win32-x64/
+
+# Local data & logs
+database.db
+*.sqlite
+*.log

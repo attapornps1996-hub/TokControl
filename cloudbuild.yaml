@@ -1,0 +1,30 @@
+steps:
+  # 1. Build Docker image ใน Google Cloud Build
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/pandy-app-502306/pandy-backend:$SHORT_SHA', '.']
+
+  # 2. Push image ไปยัง Container Registry ของโปรเจกต์
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/pandy-app-502306/pandy-backend:$SHORT_SHA']
+
+  # 3. สั่ง Deploy ขึ้น Google Cloud Run อัตโนมัติ
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'pandy-backend'
+      - '--image'
+      - 'gcr.io/pandy-app-502306/pandy-backend:$SHORT_SHA'
+      - '--region'
+      - 'asia-southeast1' # ใช้งานเซิร์ฟเวอร์สิงคโปร์เพื่อความเร็วและดีเลย์ต่ำสุดในไทย
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'NODE_ENV=production,PORT=8080'
+      - '--port'
+      - '8080'
+
+images:
+  - 'gcr.io/pandy-app-502306/pandy-backend:$SHORT_SHA'

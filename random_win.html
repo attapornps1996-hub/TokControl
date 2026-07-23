@@ -1,0 +1,2283 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandy App - Random Win Wheel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #9d00ff;
+            --purple-glow: #bc58ff;
+            --green: #00ff88;
+            --red: #ff4d4d;
+            --white: #ffffff;
+            --bg: #0b0b12;
+            --card: #161625;
+            --border: #2a2a3a;
+            --input-bg: #000;
+        }
+
+        body {
+            margin: 0; font-family: 'Inter', 'Kanit', sans-serif;
+            background: var(--bg); color: white;
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        /* --- Panel Layout (แบบกาชา) --- */
+        .wheel-app-layout {
+            display: flex; flex-direction: column;
+            width: 100%; height: 100vh; box-sizing: border-box;
+            padding: 24px 28px; gap: 20px; overflow: hidden;
+            background: radial-gradient(circle at 20% 30%, #0d0a1e 0%, #050507 100%);
+        }
+        .wheel-page-header { flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px; }
+        .wheel-page-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #fff; font-family: 'Kanit', sans-serif; }
+        .wheel-page-header p { margin: 4px 0 0; font-size: 0.85rem; color: #888; font-family: 'Kanit', sans-serif; }
+        .wheel-two-col { display: flex; gap: 24px; flex: 1; min-height: 0; align-items: stretch; }
+        .wheel-settings-col { flex: 1; min-width: 360px; max-width: 460px; display: flex; flex-direction: column; }
+        .wheel-preview-col { flex: 1.4; min-width: 0; display: flex; flex-direction: column; }
+        .settings-card {
+            background: var(--card); border-radius: 24px; padding: 20px;
+            border: 1px solid rgba(157, 0, 255, 0.25); box-sizing: border-box;
+            display: flex; flex-direction: column; height: 100%; overflow: hidden;
+            box-shadow: 0 0 30px rgba(157, 0, 255, 0.08);
+        }
+        .wheel-tab-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .wheel-tab-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #888;
+            padding: 10px 6px; border-radius: 10px; cursor: pointer; font-size: 0.72rem;
+            font-weight: 800; font-family: 'Kanit', sans-serif; transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .wheel-tab-btn:hover { background: rgba(188,19,254,0.1); color: #fff; }
+        .wheel-tab-btn.active { background: rgba(188,19,254,0.15); border-color: #bc13fe; color: #fff; box-shadow: 0 0 12px rgba(188,19,254,0.2); }
+        .wheel-settings-scroll { flex: 1; overflow-y: auto; padding-right: 4px; }
+        .wheel-settings-section { display: none; }
+        .wheel-settings-section.active { display: block; }
+        .preview-box {
+            flex: 1; background: rgba(0,0,0,0.4); border: 1.5px solid rgba(255,255,255,0.05);
+            border-radius: 18px; display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden; min-height: 420px;
+        }
+        .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); transition: .3s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: #fff; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background: #bc13fe; border-color: #fff; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .field-label { font-size: 0.7rem; color: #aaa; margin-bottom: 8px; display: block; font-weight: 800; letter-spacing: 1px; font-family: 'Kanit', sans-serif; }
+
+        .gacha-section {
+            background: radial-gradient(circle at center, #1c1c30 0%, transparent 100%);
+            width: 100%; padding: 40px 20px;
+            display: flex; flex-direction: column; align-items: center;
+            position: relative; box-sizing: border-box;
+        }
+
+        .center-pointer {
+            width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent;
+            border-top: 28px solid white; filter: drop-shadow(0 0 10px var(--white));
+            z-index: 100; position: absolute; top: 45px; left: 50%; transform: translateX(-50%);
+        }
+
+        .slot-viewport {
+            position: relative; width: 100%; max-width: 800px; height: 180px; background: #000;
+            border: 2px solid var(--border); border-radius: 20px;
+            overflow: hidden; display: flex; align-items: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .slot-container { display: flex; position: absolute; left: 0; will-change: transform; padding: 0; margin: 0; }
+
+        .slot-item {
+            min-width: 160px; max-width: 160px; height: 140px; margin: 0 10px;
+            background: rgba(0, 0, 0, 0.6); 
+            border: 2px solid var(--item-color);
+            border-radius: 15px; display: flex; justify-content: center; align-items: center;
+            font-weight: 800; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-sizing: border-box;
+            /* Default variables that will be overridden inline */
+            --item-color: #ffffff;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.8), 0 0 12px var(--item-color);
+        }
+
+        @keyframes victoryPulseCustom {
+            0% { transform: scale(1.08); box-shadow: 0 0 20px rgba(255,255,255,0.1); opacity: 1; }
+            50% { transform: scale(1.2); box-shadow: inset 0 0 15px var(--item-color), 0 0 50px var(--item-color); border-color: var(--item-color); background: rgba(255,255,255,0.1); opacity: 1; }
+            100% { transform: scale(1.15); box-shadow: inset 0 0 15px var(--item-color), 0 0 30px var(--item-color); border-color: var(--item-color); background: rgba(255,255,255,0.05); opacity: 1;}
+        }
+
+        .winner-highlight { 
+            z-index: 10;
+            opacity: 1 !important;
+            animation: victoryPulseCustom 0.6s forwards;
+        }
+
+        .main-ui { display: none; }
+
+        /* --- OBS Overlay Mode --- */
+        body.overlay-mode {
+            background: transparent !important;
+            min-height: 100vh; overflow: hidden;
+        }
+        body.overlay-mode #wheelAppLayout,
+        body.overlay-mode #toast-container,
+        body.overlay-mode #custom-modal { display: none !important; }
+
+        #overlayRoot {
+            position: fixed; inset: 0; display: flex;
+            align-items: center; justify-content: center;
+            background: transparent; pointer-events: none;
+        }
+        #overlayRoot .wheel-stage {
+            opacity: 0; transform: scale(0.88) translateY(24px);
+            transition: opacity 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                        transform 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+        #overlayRoot.wheel-visible .wheel-stage {
+            opacity: 1; transform: scale(1) translateY(0);
+            visibility: visible;
+        }
+        #overlayRoot.summary-mode .wheel-stage {
+            opacity: 0 !important;
+            visibility: hidden;
+            transform: scale(0.92) translateY(20px) !important;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+        }
+        #overlayRoot.summary-mode .wheel-result-summary {
+            background: rgba(0, 0, 0, 0.82);
+        }
+        .wheel-result-summary {
+            position: absolute; inset: 0; display: flex;
+            align-items: center; justify-content: center;
+            background: rgba(0, 0, 0, 0.62);
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.45s ease;
+            z-index: 30;
+        }
+        .wheel-result-summary.visible {
+            opacity: 1;
+        }
+        .wheel-result-summary-card {
+            background: linear-gradient(145deg, rgba(26, 16, 48, 0.98), rgba(13, 8, 24, 0.98));
+            border: 2px solid var(--purple-glow);
+            border-radius: 24px;
+            padding: 28px 36px;
+            min-width: 300px;
+            max-width: 520px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(157, 0, 255, 0.35), inset 0 0 30px rgba(255, 255, 255, 0.03);
+            transform: scale(0.88) translateY(16px);
+            transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .wheel-result-summary.visible .wheel-result-summary-card {
+            transform: scale(1) translateY(0);
+        }
+        .wheel-result-summary-title {
+            font-size: 1.35rem; font-weight: 800; color: #fff;
+            margin-bottom: 18px; letter-spacing: 1px;
+            font-family: 'Kanit', sans-serif;
+        }
+        .wheel-result-summary-item {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 16px; padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-family: 'Kanit', sans-serif;
+        }
+        .wheel-result-summary-item:last-child { border-bottom: none; }
+        body.overlay-mode .gacha-section {
+            background: transparent !important; border: none !important; padding: 0;
+        }
+        body.overlay-mode .btn-spin { display: none !important; }
+        body.overlay-mode .center-pointer { top: calc(50% - 110px); }
+        .slot-viewport { box-shadow: none; }
+        .wheel-capture-tray {
+            display: none; flex-wrap: wrap; gap: 8px; justify-content: center;
+            min-height: 44px; margin-top: 14px; margin-bottom: 4px; padding: 0 10px;
+        }
+        .wheel-capture-tray.active { display: flex; }
+        .wheel-capture-chip {
+            padding: 5px 12px; border-radius: 10px; border: 2px solid;
+            font-weight: 800; font-size: 0.82rem; font-family: 'Kanit', sans-serif;
+            background: rgba(0,0,0,0.55); animation: chipPop 0.35s ease;
+        }
+        @keyframes chipPop {
+            from { transform: scale(0.4); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .obs-copy-area { background: #1c1c30; border: 1px solid var(--purple); border-radius: 12px; padding: 15px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;}
+        .wheel-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        
+        ::-webkit-scrollbar { height: 8px; width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+
+        .tab { background: #1e1e30; border: 1px solid var(--border); color: #777; padding: 10px 20px; border-radius: 10px; cursor: pointer; white-space: nowrap; transition: 0.2s;}
+        .tab:hover { background: #2a2a3a; }
+        .tab.active { background: var(--purple); color: white; border-color: var(--purple-glow); }
+
+        .config-card { background: var(--card); border-radius: 24px; padding: 30px; border: 1px solid var(--border); box-sizing: border-box;}
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;}
+        .wheel-name-input { background: transparent; border: none; color: white; font-size: 1.6rem; font-weight: 700; outline: none; width: 60%; min-width: 200px; border-bottom: 1px solid transparent; transition: 0.2s;}
+        .wheel-name-input:focus { border-bottom: 1px solid var(--purple); }
+
+        .input-style { background:#000; border:1px solid var(--border); color:white; padding:8px; border-radius:8px; text-align:center; outline:none; transition: border-color 0.2s; }
+        .input-style:focus { border-color: var(--purple); }
+
+        .btn-spin { background: var(--purple); border: none; color: white; padding: 16px 80px; font-size: 1.5rem; font-weight: 800; border-radius: 16px; cursor: pointer; box-shadow: 0 6px 0 #5a0094; margin-top: 30px; transition: 0.1s; text-transform: uppercase; letter-spacing: 1px;}
+        .btn-spin:active { transform: translateY(3px); box-shadow: 0 3px 0 #5a0094; }
+        .btn-spin:disabled { opacity: 0.4; filter: grayscale(1); cursor: not-allowed; transform: translateY(0); box-shadow: 0 6px 0 #333;}
+
+        .btn-sm { background: #2a2a3a; border: 1px solid var(--border); color: white; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; font-family: inherit;}
+        .btn-sm:hover { background: var(--purple); border-color: var(--purple-glow); }
+
+        .table-container { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; min-width: 850px;}
+        th { text-align: left; color: #888; font-size: 0.85rem; padding-bottom: 5px; font-weight: 600; padding-left: 10px;}
+        td { background: rgba(0,0,0,0.2); padding: 12px 10px; vertical-align: middle; }
+        td:first-child { border-radius: 15px 0 0 15px; }
+        td:last-child { border-radius: 0 15px 15px 0; text-align: center; }
+
+        .image-gallery {
+            display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; max-width: 250px;
+            scrollbar-width: thin;
+        }
+        .image-gallery::-webkit-scrollbar { height: 4px; }
+        
+        .color-picker-wrapper {
+            position: relative;
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+            cursor: pointer;
+        }
+        .color-picker-wrapper input[type="color"] {
+            position: absolute; top: -10px; left: -10px; width: 60px; height: 60px;
+            cursor: pointer; border: none; padding: 0; background: none;
+        }
+
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;}
+        .toast { padding: 15px 25px; border-radius: 10px; color: white; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.5); opacity: 0; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: auto;}
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background: var(--purple); border: 1px solid var(--purple-glow); }
+        .toast.error { background: var(--red); border: 1px solid #ff8888; }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10000; opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+            padding: 30px; width: 90%; max-width: 400px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8); transform: translateY(20px); transition: 0.3s;
+        }
+        .modal-overlay.show .modal-content { transform: translateY(0); border-color: var(--purple); }
+        .modal-title { margin-top: 0; margin-bottom: 20px; font-size: 1.2rem; }
+        .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
+        .ui-select-hidden { position:absolute !important; width:1px !important; height:1px !important; opacity:0 !important; pointer-events:none !important; overflow:hidden !important; clip:rect(0,0,0,0) !important; border:0 !important; padding:0 !important; margin:0 !important; }
+        .ui-btn-select-wrap { width:100%; }
+        .ui-btn-select-group { display:flex; flex-wrap:wrap; gap:8px; width:100%; }
+        .ui-btn-select-group.compact { gap:6px; max-height:220px; overflow-y:auto; padding:4px 2px; }
+        .ui-btn-select-option { display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05); color:#aaa; font-weight:700; font-size:0.78rem; cursor:pointer; font-family:'Inter','Kanit',sans-serif; transition:0.18s; text-align:center; line-height:1.3; }
+        button.ui-btn-select-option:hover:not(:disabled):not(.active) { color:#ddd; border-color:rgba(255,255,255,0.22); background:rgba(255,255,255,0.09); }
+        button.ui-btn-select-option.active,
+        button.ui-btn-select-option[aria-pressed="true"] { border-color:var(--purple) !important; background:linear-gradient(135deg,rgba(157,0,255,0.45),rgba(0,255,136,0.15)) !important; color:#fff !important; box-shadow:0 0 16px rgba(157,0,255,0.5), inset 0 0 0 1px rgba(255,255,255,0.12) !important; transform:translateY(-1px); }
+        button.ui-btn-select-option.compact { padding:6px 10px; font-size:0.7rem; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+    <div id="overlayRoot" style="display:none;">
+        <div id="wheelResultSummary" class="wheel-result-summary">
+            <div class="wheel-result-summary-card">
+                <div class="wheel-result-summary-title">🎉 ผลการสุ่ม</div>
+                <div id="wheelResultSummaryBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="wheelAppLayout" class="wheel-app-layout">
+        <div class="wheel-page-header">
+            <h2>วงล้อ (Lucky Draw)</h2>
+            <p>ตั้งค่าและสุ่มวงล้อสำหรับไลฟ์ของคุณ</p>
+        </div>
+
+        <div class="wheel-two-col">
+            <!-- LEFT: Settings Panel -->
+            <div class="wheel-settings-col">
+                <div class="settings-card">
+                    <div class="wheel-tab-grid">
+                        <button class="wheel-tab-btn active" id="wheelTab-general" type="button" onclick="switchWheelSettingsTab('general')"><span>🎰</span><span>General</span></button>
+                        <button class="wheel-tab-btn" id="wheelTab-wheels" type="button" onclick="switchWheelSettingsTab('wheels')"><span>🔮</span><span>Wheels</span></button>
+                        <button class="wheel-tab-btn" id="wheelTab-sound" type="button" onclick="switchWheelSettingsTab('sound')"><span>🔊</span><span>Sound</span></button>
+                    </div>
+                    <div class="wheel-settings-scroll">
+
+                        <!-- TAB: General -->
+                        <div class="wheel-settings-section active" id="wheelSec-general">
+                            <div style="margin-bottom: 18px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                                <span class="field-label" style="color:#f1c40f;">🎲 จำนวนใบต่อการหมุน 1 ครั้ง</span>
+                                <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
+                                    <input type="number" id="draws-per-spin" class="input-style" value="1" min="1" max="20" style="width:72px; font-weight:bold;" oninput="updateDrawsPerSpin(this.value)">
+                                    <span style="font-size:0.78rem; color:#888; font-family:'Kanit',sans-serif; line-height:1.4;">สุ่ม 1 ครั้ง จับการ์ดทีละใบจนครบ (ตั้งค่าเพิ่มได้ที่ Gift Rules วงล้อ)</span>
+                                </div>
+                            </div>
+                            <div id="wheel-queue-status" style="display:none; margin-bottom: 18px; background: rgba(157,0,255,0.08); padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(157,0,255,0.25);">
+                                <div style="font-size:0.82rem; color:#bc13fe; font-family:'Kanit',sans-serif; font-weight:700;">
+                                    ⏳ คิวรอสุ่ม: <span id="wheel-queue-count">0</span> รายการ
+                                </div>
+                                <div id="wheel-queue-active" style="display:none; font-size:0.75rem; color:#888; margin-top:4px; font-family:'Kanit',sans-serif;">กำลังสุ่ม...</div>
+                            </div>
+                            <div style="margin-bottom: 18px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                                <span class="field-label" style="color:#00d4ff;">👁️ การแสดงผลตอนสุ่ม (Overlay / Preview)</span>
+                                <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+                                    <label style="display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:0.82rem; color:#ccc; font-family:'Kanit',sans-serif; cursor:pointer;">
+                                        <span>แสดงตัวเลขตอนกำลังหมุน</span>
+                                        <label class="switch" style="flex-shrink:0;">
+                                            <input type="checkbox" id="disp-spinShowValue" onchange="toggleDisplaySetting('spinShowValue', this.checked)">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </label>
+                                    <label style="display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:0.82rem; color:#ccc; font-family:'Kanit',sans-serif; cursor:pointer;">
+                                        <span>แสดงภาพตอนกำลังหมุน</span>
+                                        <label class="switch" style="flex-shrink:0;">
+                                            <input type="checkbox" id="disp-spinShowImage" onchange="toggleDisplaySetting('spinShowImage', this.checked)">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </label>
+                                    <label style="display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:0.82rem; color:#ccc; font-family:'Kanit',sans-serif; cursor:pointer;">
+                                        <span>แสดงตัวเลขเมื่อหยุด (เปิดเผยผล)</span>
+                                        <label class="switch" style="flex-shrink:0;">
+                                            <input type="checkbox" id="disp-revealShowValue" onchange="toggleDisplaySetting('revealShowValue', this.checked)">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </label>
+                                    <label style="display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:0.82rem; color:#ccc; font-family:'Kanit',sans-serif; cursor:pointer;">
+                                        <span>แสดงภาพเมื่อหยุด (เปิดเผยผล)</span>
+                                        <label class="switch" style="flex-shrink:0;">
+                                            <input type="checkbox" id="disp-revealShowImage" onchange="toggleDisplaySetting('revealShowImage', this.checked)">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </label>
+                                    <label style="display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:0.82rem; color:#ccc; font-family:'Kanit',sans-serif; cursor:pointer;">
+                                        <span>แสดงแถบการ์ดที่จับแล้ว</span>
+                                        <label class="switch" style="flex-shrink:0;">
+                                            <input type="checkbox" id="disp-showCaptureTray" onchange="toggleDisplaySetting('showCaptureTray', this.checked)">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </label>
+                                    <label style="display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:0.82rem; color:#ccc; font-family:'Kanit',sans-serif; cursor:pointer;">
+                                        <span>แสดงความคืบหน้า (จับ X/Y)</span>
+                                        <label class="switch" style="flex-shrink:0;">
+                                            <input type="checkbox" id="disp-showPickProgress" onchange="toggleDisplaySetting('showPickProgress', this.checked)">
+                                            <span class="slider"></span>
+                                        </label>
+                                    </label>
+                                </div>
+                                <div style="font-size:0.72rem; color:#666; margin-top:10px; font-family:'Kanit',sans-serif; line-height:1.4;">ปิดตัวเลขตอนหมุน = แสดง ??? | ปิดภาพตอนหมุน = ซ่อนรูปเงาดำ</div>
+                            </div>
+                            <div style="margin-bottom: 18px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                                <span class="field-label" style="color:#ff0050;">🤖 สุ่มอัตโนมัติเมื่อได้ของขวัญ</span>
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                                    <span style="font-size:0.8rem; color:#aaa; font-family:'Kanit',sans-serif;">Auto Spin on Gift</span>
+                                    <label class="switch">
+                                        <input type="checkbox" id="wheelAutoDrawToggle" onchange="toggleWheelAutoDraw(this.checked)">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                                <button class="btn-sm" style="width:100%; background:rgba(188,19,254,0.15); border-color:#bc13fe; color:#bc13fe;" onclick="openWheelGiftRules()">🎁 ตั้งค่าแอคชั่นของขวัญ (Gift Rules)</button>
+                                <button class="btn-sm" id="wheelWinLinkBtnPage" style="width:100%; margin-top:8px; background:rgba(241,196,15,0.12); border-color:#f1c40f; color:#f1c40f;" onclick="toggleWheelWinLinkFromPage()">🔗 เชื่อมต่อตัวนับ WIN</button>
+                            </div>
+                            <div class="obs-copy-area">
+                                <div style="font-size: 0.85rem; color: #aaa; font-family:'Kanit',sans-serif;"><strong>Overlay URL:</strong> OBS 1920×1080</div>
+                                <button class="btn-sm" style="background:var(--purple); border:none;" onclick="copyOverlayURL()">🔗 Copy</button>
+                            </div>
+                            <div style="margin-bottom: 15px; background: rgba(0,0,0,0.25); padding: 14px; border-radius: 12px; border: 1px solid var(--border);">
+                                <span class="field-label">💾 Profile Preset</span>
+                                <select id="profile-select" class="input-style" style="width:100%; text-align:left; cursor:pointer; margin-bottom:8px;" onchange="switchProfile(this.value)"></select>
+                                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+                                    <button class="btn-sm" onclick="promptNewProfile()">➕ New</button>
+                                    <button class="btn-sm" onclick="promptRenameProfile()">✏️ Rename</button>
+                                    <button class="btn-sm" style="border-color:var(--red); color:var(--red); background:none;" onclick="confirmDeleteProfile()">🗑️ Delete</button>
+                                </div>
+                                <div style="display:flex; gap:6px;">
+                                    <button class="btn-sm" onclick="exportProfile()" style="flex:1; background:#1c1c30;">📥 Export</button>
+                                    <button class="btn-sm" onclick="document.getElementById('import-upload').click()" style="flex:1; background:#1c1c30;">📤 Import</button>
+                                    <input type="file" id="import-upload" accept=".json" style="display:none;" onchange="importProfile(this)">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB: Wheels -->
+                        <div class="wheel-settings-section" id="wheelSec-wheels">
+                            <div class="wheel-tabs" id="tabs-container"></div>
+                            <div class="config-card" style="padding:16px; margin-bottom:12px;">
+                                <div class="header-row" style="margin-bottom:12px;">
+                                    <input type="text" id="wheel-title" class="wheel-name-input" placeholder="Wheel Name" oninput="updateWheelName(this.value)" style="font-size:1.1rem;">
+                                    <button onclick="addRow()" style="background:var(--purple); border:none; color:white; padding:8px 14px; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.85rem;">+ Add</button>
+                                </div>
+                                <div style="display:flex; gap:10px; align-items:center; margin-bottom:14px; background:rgba(0,0,0,0.3); padding:10px 14px; border-radius:10px; flex-wrap:wrap;">
+                                    <span style="font-size:0.8rem; color:#888; font-weight:600;">Duration (Sec):</span>
+                                    <input type="text" id="spin-duration" value="6" class="input-style" style="width:50px; font-weight:bold;" onfocus="this.value=''" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+                                    <button onclick="deleteCurrentWheel()" style="margin-left:auto; background:none; border:1px solid var(--red); color:var(--red); padding:6px 12px; border-radius:8px; font-size:0.8rem; cursor:pointer;">🗑️ Delete Wheel</button>
+                                </div>
+                                <div class="table-container">
+                                    <table style="min-width:600px;">
+                                        <thead>
+                                            <tr>
+                                                <th>Mode</th>
+                                                <th style="text-align:center;">Color</th>
+                                                <th>Images</th>
+                                                <th>Value</th>
+                                                <th>Prob.</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB: Sound -->
+                        <div class="wheel-settings-section" id="wheelSec-sound">
+                            <div style="margin-bottom:14px; background:rgba(0,0,0,0.2); padding:14px; border-radius:12px; border:1px solid var(--border);">
+                                <label style="display:block; margin-bottom:8px; color:#aaa; font-size:0.85rem;">Master Volume: <span id="vol-display" style="color:white; font-weight:bold;">50%</span></label>
+                                <input type="range" id="vol-slider" min="0" max="100" value="50" oninput="updateVolume(this.value)" style="width:100%; accent-color:var(--purple);">
+                            </div>
+                            <div style="margin-bottom:14px; background:rgba(0,0,0,0.2); padding:14px; border-radius:12px; border:1px solid var(--border);">
+                                <label style="display:block; margin-bottom:8px; color:#aaa; font-size:0.85rem;">Tick Sound (Spinning)</label>
+                                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                    <input type="file" id="tick-upload" accept="audio/*" style="display:none;" onchange="handleAudioUpload(this, 'tickSound')">
+                                    <button onclick="document.getElementById('tick-upload').click()" class="btn-sm">📁 Upload</button>
+                                    <button onclick="playTick(0)" class="btn-sm" style="background:#1c1c30;">▶️ Test</button>
+                                    <button onclick="clearAudio('tickSound')" class="btn-sm" style="border-color:var(--red); color:var(--red); background:none;">Reset</button>
+                                </div>
+                                <div id="tick-status" style="font-size:0.75rem; color:#888; margin-top:8px;">Using Default</div>
+                            </div>
+                            <div style="background:rgba(0,0,0,0.2); padding:14px; border-radius:12px; border:1px solid var(--border);">
+                                <label style="display:block; margin-bottom:8px; color:#aaa; font-size:0.85rem;">Victory Sound (Result)</label>
+                                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                    <input type="file" id="victory-upload" accept="audio/*" style="display:none;" onchange="handleAudioUpload(this, 'victorySound')">
+                                    <button onclick="document.getElementById('victory-upload').click()" class="btn-sm">📁 Upload</button>
+                                    <button onclick="playVictory()" class="btn-sm" style="background:#1c1c30;">▶️ Test</button>
+                                    <button onclick="clearAudio('victorySound')" class="btn-sm" style="border-color:var(--red); color:var(--red); background:none;">Reset</button>
+                                </div>
+                                <div id="victory-status" style="font-size:0.75rem; color:#888; margin-top:8px;">Using Default</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Wheel Preview -->
+            <div class="wheel-preview-col">
+                <div class="preview-box" id="wheelPreviewHost"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wheel Stage (moved to preview or overlay) -->
+    <div id="wheelStage" class="wheel-stage gacha-section" style="display:none;">
+        <div class="center-pointer"></div>
+        <div class="slot-viewport" id="viewport">
+            <div id="slot-container" class="slot-container"></div>
+        </div>
+        <div id="wheelCaptureTray" class="wheel-capture-tray"></div>
+        <button id="spinBtn" class="btn-spin" onclick="spin()">SPIN WHEEL</button>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title" class="modal-title">Title</h3>
+            <input type="text" id="modal-input" class="input-style" style="width: 100%; box-sizing: border-box; display: none;" placeholder="Enter name...">
+            <div id="modal-text" style="color: #aaa; font-size: 0.95rem; display: none;"></div>
+            <div class="modal-buttons">
+                <button class="btn-sm" style="background: none; border-color: #666;" onclick="closeModal()">Cancel</button>
+                <button class="btn-sm" style="background: var(--purple); border-color: var(--purple-glow);" id="modal-confirm-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const isOverlayMode = new URLSearchParams(window.location.search).has('overlay');
+        const overlayToken = new URLSearchParams(window.location.search).get('token') || '';
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let wheelSocket = null;
+        let wheelDrawQueue = [];
+        let isWheelSpinning = false;
+        let wheelQueueProcessing = false;
+        let overlayBatchQueue = [];
+        let overlaySpinProcessing = false;
+        let overlayCompletedBatchCount = 0;
+        let lastOverlaySessionId = null;
+        let wheelSpinGeneration = 0;
+        let overlaySequenceGen = 0;
+        const WHEEL_RESULT_HOLD_MS = 800;
+        const WHEEL_SUMMARY_HOLD_MS = 4500;
+        const WHEEL_SPIN_GAP_MS = 600;
+        const WHEEL_SESSION_RESULT_HOLD_MS = 1400;
+        const WHEEL_CONTROL_JOB_GAP_MS = 400;
+        const WHEEL_QUEUE_JOB_GAP_MS = WHEEL_RESULT_HOLD_MS + 420 + WHEEL_SUMMARY_HOLD_MS + WHEEL_RESULT_HOLD_MS;
+        const WHEEL_PICK_GAP_MS = 400;
+        let activeSessionWinMode = null;
+        let wheelHideTimer = null;
+        
+        let defaultSettings = {
+            volume: 50, tickSound: null, victorySound: null, autoDrawOnGift: false, drawsPerSpin: 1,
+            spinShowValue: false, spinShowImage: true, revealShowValue: true, revealShowImage: true,
+            showCaptureTray: true, showPickProgress: true
+        };
+        // Added color property to default item
+        let defaultWheels = [{ id: Date.now(), name: "Main Wheel", items: [{ mode: '+', val: "100", prob: 100, images: [], color: "#00ff88" }] }];
+        let defaultProfile = { id: 'prof_' + Date.now(), name: 'Default Profile', wheels: defaultWheels, settings: defaultSettings };
+
+        let profiles = JSON.parse(localStorage.getItem('gacha_v8_profiles')) || null;
+        let activeProfileId = localStorage.getItem('gacha_v8_active_profile') || null;
+
+        // Migration and initialization
+        if (!profiles) {
+            profiles = [defaultProfile];
+            activeProfileId = defaultProfile.id;
+            try {
+                localStorage.setItem('gacha_v8_profiles', JSON.stringify(profiles));
+                localStorage.setItem('gacha_v8_active_profile', activeProfileId);
+            } catch(e) {}
+        }
+
+        let activeProfile = profiles.find(p => p.id === activeProfileId) || profiles[0];
+        activeProfileId = activeProfile.id;
+        if (!activeProfile.settings.drawsPerSpin) activeProfile.settings.drawsPerSpin = 1;
+
+        let wheels = activeProfile.wheels;
+        let globalSettings = activeProfile.settings;
+        let activeWheelId = wheels[0] ? wheels[0].id : null;
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            
+            void toast.offsetWidth; // Reflow
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function saveProfiles() {
+            try {
+                localStorage.setItem('gacha_v8_profiles', JSON.stringify(profiles));
+                localStorage.setItem('gacha_v8_active_profile', activeProfileId);
+            } catch (e) {
+                showToast("Storage Full! Cannot save profile.", "error");
+            }
+        }
+
+        function saveData() { saveProfiles(); renderTabs(); }
+        function saveSettings() { saveProfiles(); renderSettings(); }
+
+        let modalConfirmCallback = null;
+        function openModal({ title, showInput = false, text = '', confirmText = 'Confirm', onConfirm }) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-input').style.display = showInput ? 'block' : 'none';
+            document.getElementById('modal-input').value = '';
+            document.getElementById('modal-text').style.display = text ? 'block' : 'none';
+            document.getElementById('modal-text').textContent = text;
+            document.getElementById('modal-confirm-btn').textContent = confirmText;
+            
+            modalConfirmCallback = onConfirm;
+            document.getElementById('custom-modal').classList.add('show');
+            if(showInput) document.getElementById('modal-input').focus();
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.remove('show');
+            modalConfirmCallback = null;
+        }
+
+        document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+            if (modalConfirmCallback) {
+                const val = document.getElementById('modal-input').value.trim();
+                modalConfirmCallback(val);
+            }
+            closeModal();
+        });
+
+        function renderProfiles() {
+            const select = document.getElementById('profile-select');
+            select.innerHTML = profiles.map(p => `<option value="${p.id}" ${p.id === activeProfileId ? 'selected' : ''}>${p.name}</option>`).join('');
+            if (select._refreshBtnSelect) select._refreshBtnSelect();
+        }
+
+        function switchProfile(id) {
+            activeProfileId = id;
+            activeProfile = profiles.find(p => p.id === activeProfileId);
+            wheels = activeProfile.wheels;
+            globalSettings = activeProfile.settings;
+            activeWheelId = wheels[0] ? wheels[0].id : null;
+            
+            saveProfiles(); renderProfiles(); renderTabs(); renderRows(); renderSettings();
+            showToast(`Switched to ${activeProfile.name}`);
+        }
+
+        function promptNewProfile() {
+            openModal({
+                title: "Create New Profile", showInput: true, confirmText: "Create",
+                onConfirm: (val) => {
+                    if(!val) return;
+                    const newProf = { 
+                        id: 'prof_' + Date.now(), name: val, 
+                        wheels: JSON.parse(JSON.stringify(defaultWheels)),
+                        settings: JSON.parse(JSON.stringify(defaultSettings))
+                    };
+                    profiles.push(newProf);
+                    switchProfile(newProf.id);
+                }
+            });
+        }
+
+        function promptRenameProfile() {
+            openModal({
+                title: "Rename Profile", showInput: true, confirmText: "Save",
+                onConfirm: (val) => {
+                    if(!val) return;
+                    activeProfile.name = val;
+                    saveProfiles(); renderProfiles(); showToast("Profile renamed");
+                }
+            });
+        }
+
+        function confirmDeleteProfile() {
+            if (profiles.length <= 1) { showToast("Cannot delete the last remaining profile.", "error"); return; }
+            openModal({
+                title: "Delete Profile?", text: `Are you sure you want to delete "${activeProfile.name}"? This cannot be undone.`, confirmText: "Delete",
+                onConfirm: () => {
+                    profiles = profiles.filter(p => p.id !== activeProfileId);
+                    switchProfile(profiles[0].id);
+                }
+            });
+        }
+
+        function exportProfile() {
+            try {
+                const blob = new Blob([JSON.stringify(activeProfile, null, 2)], {type: "application/json"});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a'); a.href = url;
+                a.download = `Gacha_${activeProfile.name.replace(/[^a-zA-Z0-9]/g, '_')}_Preset.json`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                URL.revokeObjectURL(url); showToast("Profile Exported Successfully!");
+            } catch (err) { showToast("Failed to export profile.", "error"); }
+        }
+
+        function importProfile(input) {
+            const file = input.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (!imported.wheels || !imported.settings) throw new Error("Invalid format");
+                    
+                    // Legacy support: ensure color property exists
+                    imported.wheels.forEach(w => w.items.forEach(i => { if(!i.color) i.color = i.mode==='+'?'#00ff88':i.mode==='-'?'#ff4d4d':'#ffffff'; }));
+
+                    imported.id = 'prof_' + Date.now();
+                    imported.name = imported.name + " (Imported)";
+                    profiles.push(imported); switchProfile(imported.id);
+                    showToast("Profile Imported Successfully!");
+                } catch (err) { showToast("Failed to import: Invalid JSON file format", "error"); }
+            }
+            reader.readAsText(file); input.value = "";
+        }
+
+        function switchWheelSettingsTab(tab) {
+            document.querySelectorAll('.wheel-tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.wheel-settings-section').forEach(s => s.classList.remove('active'));
+            const btn = document.getElementById('wheelTab-' + tab);
+            const sec = document.getElementById('wheelSec-' + tab);
+            if (btn) btn.classList.add('active');
+            if (sec) sec.classList.add('active');
+        }
+
+        function toggleWheelAutoDraw(val) {
+            globalSettings.autoDrawOnGift = !!val;
+            localStorage.setItem('wheel_auto_draw_on_gift', val ? '1' : '0');
+            saveSettings();
+            showToast(val ? 'เปิดสุ่มวงล้ออัตโนมัติเมื่อได้ของขวัญ' : 'ปิดสุ่มวงล้ออัตโนมัติ');
+        }
+
+        function openWheelGiftRules() {
+            try { window.parent.openGiftMappingModal('wheel'); } catch (e) { showToast('เปิดหน้าตั้งค่าของขวัญไม่ได้', 'error'); }
+        }
+
+        function toggleWheelWinLinkFromPage() {
+            try { window.parent.postMessage({ type: 'pandy_toggle_wheel_win_link' }, '*'); } catch (e) {}
+        }
+
+        function updateWheelWinLinkBtnPage(linked) {
+            const btn = document.getElementById('wheelWinLinkBtnPage');
+            if (!btn) return;
+            btn.textContent = linked ? '✅ เชื่อมต่อตัวนับ WIN แล้ว' : '🔗 เชื่อมต่อตัวนับ WIN';
+            btn.style.background = linked ? 'rgba(46,204,113,0.15)' : 'rgba(241,196,15,0.12)';
+            btn.style.borderColor = linked ? '#2ecc71' : '#f1c40f';
+            btn.style.color = linked ? '#2ecc71' : '#f1c40f';
+        }
+
+        function mountWheelStage() {
+            const stage = document.getElementById('wheelStage');
+            stage.style.display = 'flex';
+            if (isOverlayMode) {
+                document.getElementById('wheelAppLayout').style.display = 'none';
+                const root = document.getElementById('overlayRoot');
+                root.style.display = 'flex';
+                root.appendChild(stage);
+            } else {
+                document.getElementById('wheelPreviewHost').appendChild(stage);
+            }
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function getItemKey(item) {
+            return `${item.mode || ''}|${item.val || ''}`;
+        }
+
+        function getDrawsPerSpin() {
+            const fromSettings = parseInt(globalSettings?.drawsPerSpin, 10);
+            if (!isNaN(fromSettings) && fromSettings > 0) {
+                return Math.max(1, Math.min(20, fromSettings));
+            }
+            const el = document.getElementById('draws-per-spin');
+            const fromInput = parseInt(el?.value, 10);
+            return Math.max(1, Math.min(20, fromInput || 1));
+        }
+
+        function updateDrawsPerSpin(val) {
+            const n = Math.max(1, Math.min(20, parseInt(val, 10) || 1));
+            globalSettings.drawsPerSpin = n;
+            const el = document.getElementById('draws-per-spin');
+            if (el) el.value = n;
+            saveSettings();
+        }
+
+        function aggregatePicks(picks) {
+            const counts = new Map();
+            const itemByKey = new Map();
+            picks.forEach(item => {
+                const key = getItemKey(item);
+                itemByKey.set(key, item);
+                counts.set(key, (counts.get(key) || 0) + 1);
+            });
+            return { counts, itemByKey };
+        }
+
+        function getDisplayWinner(picks) {
+            if (!picks.length) return { item: null, count: 0 };
+            const { counts, itemByKey } = aggregatePicks(picks);
+            let bestKey = getItemKey(picks[0]);
+            let bestCount = counts.get(bestKey) || 0;
+            counts.forEach((count, key) => {
+                if (count > bestCount) {
+                    bestCount = count;
+                    bestKey = key;
+                }
+            });
+            return { item: itemByKey.get(bestKey), count: bestCount };
+        }
+
+        function getEffectiveWinMode(item) {
+            if (item?._sessionWinMode === 'minus' || item?._sessionWinMode === 'plus') return item._sessionWinMode;
+            if (activeSessionWinMode === 'minus' || activeSessionWinMode === 'plus') return activeSessionWinMode;
+            return null;
+        }
+
+        function tagPicksWithWinMode(picks, winMode) {
+            if (!Array.isArray(picks) || !picks.length) return picks || [];
+            if (winMode !== 'plus' && winMode !== 'minus') return picks;
+            return picks.map(p => ({ ...p, _sessionWinMode: winMode }));
+        }
+
+        function formatAggregatedSummaryText(picks) {
+            if (!picks.length) return '';
+            const grand = computePicksGrandTotal(picks);
+            const grandLabel = formatGrandTotal(grand);
+            return `สรุปผล ${picks.length} ใบ — รวมทั้งหมด: ${grandLabel}`;
+        }
+
+        function getItemNumericValue(item) {
+            const it = normalizeItemMode({ ...item });
+            const n = parseFloat(String(it.val).replace(/[^0-9.]/g, '')) || 0;
+            const mode = getEffectiveWinMode(item);
+            if (mode === 'minus') return -n;
+            if (mode === 'plus') return n;
+            if (it.mode === '-') return -n;
+            if (it.mode === '+') return n;
+            return n;
+        }
+
+        function computePicksGrandTotal(picks) {
+            return picks.reduce((sum, p) => sum + getItemNumericValue(p), 0);
+        }
+
+        function formatGrandTotal(total) {
+            if (total > 0) return `+${total}`;
+            if (total < 0) return `${total}`;
+            return '0';
+        }
+
+        function getGrandTotalColor(total, picks) {
+            const taggedMode = picks?.find(p => p?._sessionWinMode === 'minus' || p?._sessionWinMode === 'plus')?._sessionWinMode;
+            if (taggedMode === 'minus') return '#ff4d4d';
+            if (taggedMode === 'plus') return '#00ff88';
+            if (activeSessionWinMode === 'minus') return '#ff4d4d';
+            if (activeSessionWinMode === 'plus') return '#00ff88';
+            if (total < 0) return '#ff4d4d';
+            if (total > 0) return '#00ff88';
+            return '#ffffff';
+        }
+
+        function normalizeItemMode(item) {
+            if (!item) return item;
+            const m = String(item.mode ?? '').trim().toLowerCase();
+            if (m === '+' || m === 'plus') item.mode = '+';
+            else if (m === '-' || m === 'minus' || m === '−') item.mode = '-';
+            else if (m === '0' || m === 'none' || m === '') item.mode = '0';
+            return item;
+        }
+
+        function formatWinnerLabel(item) {
+            const it = normalizeItemMode({ ...item });
+            const mode = getEffectiveWinMode(item);
+            if (mode === 'minus') return `-${it.val}`;
+            if (mode === 'plus') return `+${it.val}`;
+            const prefix = it.mode === '+' ? '+' : it.mode === '-' ? '-' : '';
+            return `${prefix}${it.val}`;
+        }
+
+        function getWinnerColor(item) {
+            const mode = getEffectiveWinMode(item);
+            if (mode === 'minus') return '#ff4d4d';
+            if (mode === 'plus') return '#00ff88';
+            const it = normalizeItemMode({ ...item });
+            if (it.mode === '+') return '#00ff88';
+            if (it.mode === '-') return '#ff4d4d';
+            const val = String(it.val || '').trim();
+            if (val.startsWith('-')) return '#ff4d4d';
+            if (val.startsWith('+')) return '#00ff88';
+            return it.color || '#ffffff';
+        }
+
+        function applyWinnerColorToElement(el, item) {
+            if (!el || !item) return;
+            const color = getWinnerColor(item);
+            el.style.setProperty('--item-color', color);
+            el.style.borderColor = color;
+            el.style.boxShadow = `inset 0 0 15px rgba(0,0,0,0.8), 0 0 18px ${color}`;
+        }
+
+        function ensureDisplaySettings() {
+            const defaults = {
+                spinShowValue: false, spinShowImage: true, revealShowValue: true,
+                revealShowImage: true, showCaptureTray: true, showPickProgress: true
+            };
+            Object.entries(defaults).forEach(([key, val]) => {
+                if (globalSettings[key] === undefined) globalSettings[key] = val;
+            });
+        }
+
+        function getDisp() {
+            ensureDisplaySettings();
+            return globalSettings;
+        }
+
+        function getSyncedDisplaySettings() {
+            const d = getDisp();
+            return {
+                spinShowValue: !!d.spinShowValue,
+                spinShowImage: !!d.spinShowImage,
+                revealShowValue: !!d.revealShowValue,
+                revealShowImage: !!d.revealShowImage,
+                showCaptureTray: !!d.showCaptureTray,
+                showPickProgress: !!d.showPickProgress
+            };
+        }
+
+        function applySyncedDisplaySettings(settings) {
+            if (!settings || typeof settings !== 'object') return;
+            ensureDisplaySettings();
+            Object.assign(globalSettings, settings);
+        }
+
+        function toggleDisplaySetting(key, val) {
+            globalSettings[key] = !!val;
+            saveSettings();
+            const btn = document.getElementById('spinBtn');
+            if (btn && !btn.disabled) renderIdleWheel();
+            if (!isOverlayMode) emitWheelIdleSync();
+        }
+
+        function buildSpinImageHtml(imgs, itemColor) {
+            const d = getDisp();
+            if (!d.spinShowImage || !imgs || !imgs.length) return '';
+            const src = imgs[Math.floor(Math.random() * imgs.length)];
+            return `<img src="${src}" style="height:70px; width:70px; object-fit:contain; filter:brightness(0) drop-shadow(0 0 12px ${itemColor}); margin-bottom:5px; opacity:0.9;">`;
+        }
+
+        function buildRevealImageHtml(imgs) {
+            const d = getDisp();
+            if (!d.revealShowImage || !imgs || !imgs.length) return '';
+            const src = imgs[Math.floor(Math.random() * imgs.length)];
+            return `<img src="${src}" style="height:70px; width:70px; object-fit:contain; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.5)); margin-bottom:5px;">`;
+        }
+
+        function buildSpinValueHtml(item, itemColor) {
+            const it = normalizeItemMode({ ...item });
+            const d = getDisp();
+            if (d.spinShowValue) {
+                const label = formatWinnerLabel(it);
+                return `<span style="font-size:2rem; text-align:center; width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1; color:${itemColor}; text-shadow:0 0 15px ${itemColor}; font-weight:800;">${label}</span>`;
+            }
+            return `<span style="font-size:2rem; text-align:center; width:100%; line-height:1; color:${itemColor}; text-shadow:0 0 15px ${itemColor}; letter-spacing:2px;">???</span>`;
+        }
+
+        function buildRevealValueHtml(item, itemColor) {
+            const d = getDisp();
+            if (!d.revealShowValue) return '';
+            const label = formatWinnerLabel(item);
+            return `<span style="font-size:1.6rem; text-align:center; width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1; color:${itemColor}; text-shadow:0 0 12px ${itemColor}; font-weight:800;">${label}</span>`;
+        }
+
+        function buildPickProgressHtml(pickIndex, totalPicks) {
+            const d = getDisp();
+            if (!d.showPickProgress || totalPicks <= 1) return '';
+            return `<div style="font-size:0.75rem; color:#aaa; margin-top:5px; font-family:'Kanit',sans-serif;">จับ ${pickIndex}/${totalPicks}</div>`;
+        }
+
+        function buildRevealContent(item, pickIndex, totalPicks) {
+            const it = normalizeItemMode({ ...item });
+            const itemColor = getWinnerColor(it);
+            const imgs = it.images || [];
+            const imgHtml = buildRevealImageHtml(imgs);
+            const valHtml = buildRevealValueHtml(it, itemColor);
+            const progress = buildPickProgressHtml(pickIndex, totalPicks);
+            const fallback = (!imgHtml && !valHtml)
+                ? `<span style="font-size:2rem; color:${itemColor}; text-shadow:0 0 18px ${itemColor};">★</span>`
+                : '';
+            return `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; padding:8px; box-sizing:border-box;">
+                    ${imgHtml}${valHtml || fallback}
+                    ${progress}
+                </div>`;
+        }
+
+        function resetCaptureTray() {
+            const tray = document.getElementById('wheelCaptureTray');
+            if (!tray) return;
+            tray.innerHTML = '';
+            tray.classList.remove('active');
+        }
+
+        function addCaptureChip(item, index) {
+            const d = getDisp();
+            if (!d.showCaptureTray) return;
+            const tray = document.getElementById('wheelCaptureTray');
+            if (!tray) return;
+            tray.classList.add('active');
+            const color = getWinnerColor(item);
+            const chip = document.createElement('div');
+            chip.className = 'wheel-capture-chip';
+            chip.style.borderColor = color;
+            chip.style.color = color;
+            chip.style.boxShadow = `0 0 12px ${color}55`;
+            const label = d.revealShowValue ? formatWinnerLabel(item) : '?';
+            chip.textContent = `${index}. ${label}`;
+            tray.appendChild(chip);
+        }
+
+        function buildWinnerSummaryHtml(winner, count = 1) {
+            const itemColor = getWinnerColor(winner);
+            const imgs = winner.images || [];
+            let imgHtml = '';
+            if (imgs.length > 0) {
+                imgHtml = `<img src="${imgs[0]}" style="height:88px; width:88px; object-fit:contain; margin-bottom:12px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.45));">`;
+            }
+            const label = formatWinnerLabel(winner);
+            const countHtml = count > 1
+                ? `<div style="font-size:1.15rem; color:#f1c40f; font-weight:800; margin-top:10px; font-family:'Kanit',sans-serif;">ได้ ${count} ใบ (มากที่สุด)</div>`
+                : '';
+            return `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    ${imgHtml}
+                    <div style="font-size:2.5rem; font-weight:900; color:${itemColor}; text-shadow:0 0 24px ${itemColor}; line-height:1.1;">${label}</div>
+                    ${countHtml}
+                </div>
+            `;
+        }
+
+        function buildAggregatedSummaryHtml(picks) {
+            if (!picks || picks.length === 0) return '';
+            const grandTotal = computePicksGrandTotal(picks);
+            const totalColor = getGrandTotalColor(grandTotal, picks);
+            const grandLabel = formatGrandTotal(grandTotal);
+
+            const { counts, itemByKey } = aggregatePicks(picks);
+            const entries = [...counts.entries()]
+                .map(([key, count]) => ({ item: itemByKey.get(key), count, key }))
+                .sort((a, b) => Math.abs(getItemNumericValue(b.item) * b.count) - Math.abs(getItemNumericValue(a.item) * a.count));
+
+            let html = `
+                <div style="text-align:center; margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08);">
+                    <div style="font-size:0.9rem; color:#aaa; margin-bottom:8px; font-family:'Kanit',sans-serif;">รวมทุกการ์ด</div>
+                    <div style="font-size:2.8rem; font-weight:900; color:${totalColor}; text-shadow:0 0 22px ${totalColor}; line-height:1.1;">${grandLabel}</div>
+                    <div style="font-size:0.8rem; color:#888; margin-top:8px; font-family:'Kanit',sans-serif;">จาก ${picks.length} ใบ</div>
+                </div>
+            `;
+
+            if (entries.length > 1) {
+                const rowsHtml = entries.map(({ item, count }) => {
+                    const itemColor = getWinnerColor(item);
+                    const label = formatWinnerLabel(item);
+                    const subtotal = getItemNumericValue(item) * count;
+                    const subLabel = formatGrandTotal(subtotal);
+                    return `
+                        <div class="wheel-result-summary-item">
+                            <span style="color:#ddd; font-size:0.9rem;">${label} ×${count}</span>
+                            <span style="font-size:1.1rem; font-weight:900; color:${itemColor};">${subLabel}</span>
+                        </div>
+                    `;
+                }).join('');
+                html += `<div style="max-height:200px; overflow-y:auto; padding-right:4px;">${rowsHtml}</div>`;
+            }
+
+            return html;
+        }
+
+        function buildBatchSummaryHtml(picks) {
+            return buildAggregatedSummaryHtml(picks);
+        }
+
+        function clearWheelHideTimer() {
+            if (wheelHideTimer) {
+                clearTimeout(wheelHideTimer);
+                wheelHideTimer = null;
+            }
+        }
+
+        function resetOverlayWheelDom() {
+            const container = document.getElementById('slot-container');
+            if (container) {
+                container.innerHTML = '';
+                container.style.transition = 'none';
+                container.style.transform = 'translateX(0)';
+            }
+            resetCaptureTray();
+            document.querySelectorAll('.winner-highlight').forEach(el => el.classList.remove('winner-highlight'));
+        }
+
+        function applyOverlayClosedState() {
+            if (!isOverlayMode) return;
+            const root = document.getElementById('overlayRoot');
+            if (!root) return;
+            root.classList.remove('wheel-visible', 'summary-mode');
+            const summaryEl = document.getElementById('wheelResultSummary');
+            if (summaryEl) summaryEl.classList.remove('visible');
+            resetOverlayWheelDom();
+        }
+
+        async function closeOverlayCompletely(options = {}) {
+            if (!isOverlayMode) return;
+            overlaySequenceGen++;
+            clearWheelHideTimer();
+            hideWheelResultSummary();
+            applyOverlayClosedState();
+            const fadeMs = options.immediate ? 0 : (options.fadeMs ?? 560);
+            if (fadeMs > 0) await delay(fadeMs);
+        }
+
+        async function openOverlayForSpin() {
+            if (!isOverlayMode) return;
+            await closeOverlayCompletely({ immediate: true });
+            await delay(WHEEL_SPIN_GAP_MS);
+            resetOverlayWheelDom();
+            showWheelVisible();
+            await delay(120);
+        }
+
+        async function prepareWheelForNextSession() {
+            if (isOverlayMode) {
+                await openOverlayForSpin();
+                return;
+            }
+            resetCaptureTray();
+            renderIdleWheel();
+            await delay(WHEEL_SPIN_GAP_MS);
+        }
+
+        async function hideWheelStageForSummary() {
+            if (!isOverlayMode) return;
+            const root = document.getElementById('overlayRoot');
+            root.classList.remove('wheel-visible');
+            root.classList.add('summary-mode');
+            await delay(420);
+        }
+
+        function restoreWheelStageAfterSummary() {
+            if (!isOverlayMode) return;
+            document.getElementById('overlayRoot').classList.remove('summary-mode');
+        }
+
+        async function showWheelResultSummary(picks) {
+            const summaryEl = document.getElementById('wheelResultSummary');
+            const bodyEl = document.getElementById('wheelResultSummaryBody');
+            if (!summaryEl || !bodyEl) return;
+
+            const list = Array.isArray(picks) ? picks : [picks];
+            if (!list.length) return;
+
+            const titleEl = summaryEl.querySelector('.wheel-result-summary-title');
+            if (titleEl) {
+                titleEl.textContent = list.length > 1 ? '🎉 สรุปผลการสุ่ม' : '🎉 ผลการสุ่ม';
+            }
+
+            bodyEl.innerHTML = buildAggregatedSummaryHtml(list);
+            summaryEl.classList.add('visible');
+            await delay(60);
+        }
+
+        function hideWheelResultSummary() {
+            const summaryEl = document.getElementById('wheelResultSummary');
+            if (summaryEl) summaryEl.classList.remove('visible');
+            restoreWheelStageAfterSummary();
+        }
+
+        async function finishWheelOverlaySequence(picks) {
+            const list = Array.isArray(picks) ? picks : [picks];
+            if (!list.length) return;
+
+            await delay(WHEEL_RESULT_HOLD_MS);
+            await hideWheelStageForSummary();
+            await showWheelResultSummary(list);
+            await delay(WHEEL_SUMMARY_HOLD_MS);
+            await closeOverlayCompletely({ fadeMs: 400 });
+        }
+
+        function showWheelVisible() {
+            if (!isOverlayMode) return;
+            clearWheelHideTimer();
+            const root = document.getElementById('overlayRoot');
+            const summaryEl = document.getElementById('wheelResultSummary');
+            if (summaryEl) summaryEl.classList.remove('visible');
+            root.classList.remove('summary-mode');
+            root.classList.add('wheel-visible');
+        }
+
+        function hideWheelVisible(delay) {
+            if (!isOverlayMode) return Promise.resolve();
+            const ms = delay == null ? WHEEL_RESULT_HOLD_MS : delay;
+            return closeOverlayCompletely({ fadeMs: ms });
+        }
+
+        function broadcastWheelShow() {
+            const token = getStreamToken();
+            if (!token || !wheelSocket || isOverlayMode) return;
+            wheelSocket.emit('send_wheel_show', { token });
+        }
+
+        function broadcastWheelHide() {
+            const token = getStreamToken();
+            if (!token || !wheelSocket || isOverlayMode) return;
+            wheelSocket.emit('send_wheel_hide', { token });
+        }
+
+        function getStreamToken() {
+            const fromStorage = localStorage.getItem('pandy_stream_token');
+            if (fromStorage) return fromStorage;
+            try {
+                if (window.parent && window.parent !== window && window.parent.currentUser && window.parent.currentUser.streamToken) {
+                    return window.parent.currentUser.streamToken;
+                }
+            } catch (e) {}
+            return overlayToken || '';
+        }
+
+        function getOverlayURL() {
+            const url = new URL(window.location.origin + window.location.pathname);
+            url.searchParams.set('overlay', '1');
+            const token = getStreamToken();
+            if (token) url.searchParams.set('token', token);
+            return url.toString();
+        }
+
+        function copyOverlayURL() {
+            const token = getStreamToken();
+            if (!token) {
+                showToast("กรุณาล็อกอินก่อนคัดลอก Overlay URL", "error");
+                return;
+            }
+            const url = getOverlayURL();
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(url).then(() => showToast("คัดลอก Overlay URL แล้ว!"));
+            } else {
+                const textArea = document.createElement("textarea");
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try { document.execCommand('copy'); showToast("คัดลอก Overlay URL แล้ว!"); }
+                catch (err) { showToast("คัดลอก URL ไม่สำเร็จ", "error"); }
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function emitWheelIdleSync() {
+            if (!wheelSocket || isOverlayMode) return;
+            const token = getStreamToken();
+            if (!token) return;
+            wheelSocket.emit('send_wheel_idle', {
+                token,
+                wheels,
+                activeWheelId,
+                activeProfileId,
+                displaySettings: getSyncedDisplaySettings()
+            });
+        }
+
+        function buildSpinSessionPayload(picks, pool, sessionWinMode) {
+            const { item: displayWinner, count: displayCount } = getDisplayWinner(picks);
+            return {
+                sessionId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                picks,
+                displayWinner,
+                displayCount,
+                pool,
+                sessionWinMode: sessionWinMode || null,
+                displaySettings: getSyncedDisplaySettings(),
+                duration: parseInt(document.getElementById('spin-duration')?.value || 6, 10)
+            };
+        }
+
+        function broadcastWheelBatch(sessions) {
+            if (isOverlayMode || !sessions || !sessions.length) return;
+            const token = getStreamToken();
+            if (!token) {
+                showToast("ไม่พบ Stream Token — กรุณาล็อกอินก่อนใช้ Overlay", "error");
+                return;
+            }
+            if (!wheelSocket || !wheelSocket.connected) {
+                showToast("ยังไม่เชื่อมต่อเซิร์ฟเวอร์ — รอสักครู่แล้วลองใหม่", "error");
+                return;
+            }
+            wheelSocket.emit('send_wheel_batch', {
+                token,
+                batchId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                sessions
+            });
+        }
+
+        function broadcastWheelSpin(sessionData) {
+            if (isOverlayMode) return;
+            const token = getStreamToken();
+            if (!token) {
+                showToast("ไม่พบ Stream Token — กรุณาล็อกอินก่อนใช้ Overlay", "error");
+                return;
+            }
+            if (!wheelSocket || !wheelSocket.connected) {
+                showToast("ยังไม่เชื่อมต่อเซิร์ฟเวอร์ — รอสักครู่แล้วลองใหม่", "error");
+                return;
+            }
+            wheelSocket.emit('send_wheel_spin', {
+                token,
+                sessionId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                picks: sessionData.picks,
+                displayWinner: sessionData.displayWinner,
+                displayCount: sessionData.displayCount,
+                pool: sessionData.pool,
+                sessionWinMode: sessionData.sessionWinMode || null,
+                displaySettings: sessionData.displaySettings || getSyncedDisplaySettings(),
+                duration: parseInt(document.getElementById('spin-duration')?.value || 6, 10)
+            });
+        }
+
+        function normalizeSpinSession(data) {
+            if (!data) return null;
+            const picks = Array.isArray(data.picks)
+                ? data.picks
+                : (data.winner ? [data.winner] : []);
+            if (!picks.length) return null;
+            const display = getDisplayWinner(picks);
+            return {
+                sessionId: data.sessionId || null,
+                picks,
+                displayWinner: data.displayWinner || display.item,
+                displayCount: data.displayCount || display.count,
+                pool: data.pool || [],
+                sessionWinMode: data.sessionWinMode || null,
+                displaySettings: data.displaySettings || null,
+                duration: data.duration
+            };
+        }
+
+        function initWheelSocket() {
+            if (typeof io === 'undefined') return;
+            wheelSocket = io();
+
+            wheelSocket.on('connect', () => {
+                if (isOverlayMode && overlayToken) {
+                    wheelSocket.emit('join_overlay', overlayToken);
+                } else if (!isOverlayMode) {
+                    emitWheelIdleSync();
+                }
+            });
+
+            if (isOverlayMode) {
+                wheelSocket.on('overlay_wheel_batch', (data) => {
+                    const sessions = (data.sessions || []).map(normalizeSpinSession).filter(Boolean);
+                    if (!sessions.length) return;
+                    overlayBatchQueue.push(sessions);
+                    processOverlayBatchQueue();
+                });
+                wheelSocket.on('overlay_wheel_spin', (data) => {
+                    const session = normalizeSpinSession(data);
+                    if (!session) return;
+                    if (session.sessionId && session.sessionId === lastOverlaySessionId) return;
+                    overlayBatchQueue.push([session]);
+                    processOverlayBatchQueue();
+                });
+                wheelSocket.on('overlay_wheel_show', () => {
+                    if (overlaySpinProcessing || overlayBatchQueue.length > 0) return;
+                    showWheelVisible();
+                });
+                wheelSocket.on('overlay_wheel_hide', () => {
+                    overlayBatchQueue = [];
+                    overlayCompletedBatchCount = 0;
+                    closeOverlayCompletely({ immediate: true });
+                });
+                wheelSocket.on('overlay_wheel_idle', (data) => {
+                    if (data.wheels) wheels = data.wheels;
+                    if (data.activeWheelId) activeWheelId = data.activeWheelId;
+                    if (data.activeProfileId) {
+                        activeProfileId = data.activeProfileId;
+                        activeProfile = profiles.find(p => p.id === activeProfileId) || profiles[0];
+                        if (activeProfile) {
+                            globalSettings = activeProfile.settings;
+                        }
+                    }
+                    if (data.displaySettings) applySyncedDisplaySettings(data.displaySettings);
+                    if (!overlaySpinProcessing) renderIdleWheel();
+                });
+                if (overlayToken) wheelSocket.emit('join_overlay', overlayToken);
+            }
+        }
+
+        async function beginOverlaySpinRound() {
+            await openOverlayForSpin();
+        }
+
+        async function processOverlayBatchQueue() {
+            if (overlaySpinProcessing || overlayBatchQueue.length === 0) return;
+            overlaySpinProcessing = true;
+
+            try {
+                while (overlayBatchQueue.length > 0) {
+                    const batch = overlayBatchQueue.shift();
+                    const allPicks = [];
+
+                    for (let si = 0; si < batch.length; si++) {
+                        const session = batch[si];
+                        const taggedPicks = tagPicksWithWinMode(session.picks, session.sessionWinMode);
+
+                        if (si > 0) await delay(WHEEL_SESSION_RESULT_HOLD_MS);
+                        await beginOverlaySpinRound();
+
+                        if (session.sessionId) lastOverlaySessionId = session.sessionId;
+
+                        if (session.duration) {
+                            const durEl = document.getElementById('spin-duration');
+                            if (durEl) durEl.value = session.duration;
+                        }
+
+                        if (session.displaySettings) applySyncedDisplaySettings(session.displaySettings);
+                        activeSessionWinMode = session.sessionWinMode || null;
+                        await runSequentialPicks(taggedPicks, session.pool);
+                        activeSessionWinMode = null;
+                        allPicks.push(...taggedPicks);
+                    }
+
+                    await finishWheelOverlaySequence(allPicks);
+                    overlayCompletedBatchCount++;
+                }
+            } finally {
+                overlaySpinProcessing = false;
+            }
+        }
+
+        function playTick(count) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const vol = globalSettings.volume / 100;
+            if (globalSettings.tickSound) {
+                let a = new Audio(globalSettings.tickSound); a.volume = vol; a.play().catch(()=>{});
+            } else {
+                const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                o.frequency.setValueAtTime(350 - ((count || 0) * 1.2), audioCtx.currentTime);
+                g.gain.setValueAtTime(vol * 0.1, audioCtx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+                o.connect(g); g.connect(audioCtx.destination); 
+                o.start(); o.stop(audioCtx.currentTime + 0.1);
+            }
+        }
+
+        function playVictory() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const vol = globalSettings.volume / 100;
+            if (globalSettings.victorySound) {
+                let a = new Audio(globalSettings.victorySound); a.volume = vol; a.play().catch(()=>{});
+            } else {
+                const nodes = [ { f: 523.25, t: 0 }, { f: 659.25, t: 0.1 }, { f: 783.99, t: 0.2 }, { f: 1046.50, t: 0.4 } ];
+                nodes.forEach(n => {
+                    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+                    o.type = 'triangle'; o.frequency.setValueAtTime(n.f, audioCtx.currentTime + n.t);
+                    g.gain.setValueAtTime(vol * 0.1, audioCtx.currentTime + n.t);
+                    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + n.t + 0.5);
+                    o.connect(g); g.connect(audioCtx.destination);
+                    o.start(audioCtx.currentTime + n.t); o.stop(audioCtx.currentTime + n.t + 0.5);
+                });
+            }
+        }
+
+        function handleAudioUpload(input, type) {
+            const file = input.files[0]; if (!file) return;
+            if (!file.type.startsWith('audio/')) { showToast("Please upload a valid audio file.", "error"); return; }
+            if (file.size > 800 * 1024) { showToast("File too large! Please use audio under 800KB.", "error"); input.value = ""; return; }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const backup = globalSettings[type];
+                globalSettings[type] = e.target.result;
+                try { saveSettings(); showToast("Custom audio saved successfully!"); } 
+                catch (err) { globalSettings[type] = backup; showToast("Storage Full! Could not save audio.", "error"); saveSettings(); }
+            };
+            reader.readAsDataURL(file); input.value = "";
+        }
+
+        function clearAudio(type) { globalSettings[type] = null; saveSettings(); showToast("Reset to default sound."); }
+        function updateVolume(val) { globalSettings.volume = parseInt(val); document.getElementById('vol-display').textContent = val + '%'; saveSettings(); }
+        function renderSettings() {
+            document.getElementById('vol-slider').value = globalSettings.volume;
+            document.getElementById('vol-display').textContent = globalSettings.volume + '%';
+            document.getElementById('tick-status').textContent = globalSettings.tickSound ? "✅ Custom Sound Active" : "Using Default";
+            document.getElementById('tick-status').style.color = globalSettings.tickSound ? "var(--green)" : "#888";
+            document.getElementById('victory-status').textContent = globalSettings.victorySound ? "✅ Custom Sound Active" : "Using Default";
+            document.getElementById('victory-status').style.color = globalSettings.victorySound ? "var(--green)" : "#888";
+            const autoToggle = document.getElementById('wheelAutoDrawToggle');
+            if (autoToggle) {
+                const saved = localStorage.getItem('wheel_auto_draw_on_gift') === '1';
+                globalSettings.autoDrawOnGift = globalSettings.autoDrawOnGift || saved;
+                autoToggle.checked = !!globalSettings.autoDrawOnGift;
+            }
+            const drawsInput = document.getElementById('draws-per-spin');
+            if (drawsInput) {
+                if (!globalSettings.drawsPerSpin) globalSettings.drawsPerSpin = 1;
+                drawsInput.value = getDrawsPerSpin();
+            }
+            ensureDisplaySettings();
+            const dispMap = {
+                spinShowValue: 'disp-spinShowValue',
+                spinShowImage: 'disp-spinShowImage',
+                revealShowValue: 'disp-revealShowValue',
+                revealShowImage: 'disp-revealShowImage',
+                showCaptureTray: 'disp-showCaptureTray',
+                showPickProgress: 'disp-showPickProgress'
+            };
+            Object.entries(dispMap).forEach(([key, id]) => {
+                const el = document.getElementById(id);
+                if (el) el.checked = !!globalSettings[key];
+            });
+        }
+
+        function processSingleImage(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let w = img.width; let h = img.height;
+                        const maxSize = 250; 
+                        if (w > maxSize || h > maxSize) {
+                            if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; } 
+                            else { w = Math.round(w * maxSize / h); h = maxSize; }
+                        }
+                        canvas.width = w; canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/webp', 0.8));
+                    };
+                    img.onerror = () => reject("Failed to load image");
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => reject("Failed to read file");
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleImageUpload(input, idx) {
+            const files = input.files;
+            if (!files || files.length === 0) return;
+            
+            const wheel = wheels.find(w => w.id === activeWheelId);
+            if (!wheel.items[idx].images) wheel.items[idx].images = [];
+            
+            let successCount = 0;
+            // Process files sequentially to avoid memory spikes
+            for(let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.startsWith('image/')) continue;
+                try {
+                    const webpData = await processSingleImage(file);
+                    wheel.items[idx].images.push(webpData);
+                    successCount++;
+                } catch(e) { console.error(e); }
+            }
+
+            input.value = "";
+            if (successCount > 0) {
+                try {
+                    saveData(); renderRows();
+                    showToast(`Added ${successCount} image(s)!`);
+                } catch(err) {
+                    // Revert last additions if full
+                    wheel.items[idx].images.splice(-successCount, successCount);
+                    showToast("Storage limit exceeded! Too many images.", "error");
+                }
+            }
+        }
+
+        function removeImage(rowIdx, imgIdx) {
+            const wheel = wheels.find(w => w.id === activeWheelId);
+            if (wheel.items[rowIdx].images && wheel.items[rowIdx].images.length > imgIdx) {
+                wheel.items[rowIdx].images.splice(imgIdx, 1);
+                saveData(); renderRows();
+            }
+        }
+
+        function renderRows() {
+            const wheel = wheels.find(w => w.id === activeWheelId);
+            if(!wheel) return;
+            document.getElementById('wheel-title').value = wheel.name;
+            const tbody = document.getElementById('tbody');
+            
+            // คำนวณระดับความแรร์ (Rarity) อิงตาม Probability ของวงล้อ
+            let rarityMap = {};
+            let probs = wheel.items.map(it => parseFloat(it.prob||0));
+            let maxProb = Math.max(...probs);
+            let minProb = Math.min(...probs);
+            
+            wheel.items.forEach((it, idx) => {
+                let p = parseFloat(it.prob||0);
+                if(wheel.items.length <= 1) {
+                    rarityMap[idx] = { text: 'Normal', color: '#888' };
+                } else if (p === minProb) {
+                    rarityMap[idx] = { text: 'Super Rare ✨', color: '#ffd700' };
+                } else if (p < maxProb) {
+                    rarityMap[idx] = { text: 'Rare 🌟', color: 'var(--purple-glow)' };
+                } else {
+                    rarityMap[idx] = { text: 'Normal', color: '#888' };
+                }
+            });
+
+            tbody.innerHTML = wheel.items.map((item, idx) => {
+                const imgs = item.images || (item.image ? [item.image] : []);
+                // Ensure color exists
+                const itemColor = getWinnerColor(item);
+
+                let imagesHtml = imgs.map((imgData, imgIdx) => `
+                    <div style="position:relative; flex-shrink:0;">
+                        <img src="${imgData}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid #444;">
+                        <button onclick="removeImage(${idx}, ${imgIdx})" style="position:absolute; top:-6px; right:-6px; background:var(--red); color:white; border:none; border-radius:50%; width:16px; height:16px; font-size:12px; cursor:pointer; line-height:1; padding:0; display:flex; justify-content:center; align-items:center; z-index:2; transition:0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">&times;</button>
+                    </div>
+                `).join('');
+
+                let addBtnHtml = `
+                    <label style="cursor:pointer; flex-shrink:0; display:flex; justify-content:center; align-items:center; width:40px; height:40px; border-radius:6px; background:#1c1c30; border:1px dashed var(--border); transition: 0.2s;" onmouseover="this.style.borderColor='var(--purple)'" onmouseout="this.style.borderColor='var(--border)'">
+                        <span style="font-size:1.2rem; color:#888;">+</span>
+                        <input type="file" accept="image/*" multiple style="display:none;" onchange="handleImageUpload(this, ${idx})">
+                    </label>
+                `;
+
+                return `
+                    <tr>
+                        <td>
+                            <div style="display:flex; background:#000; padding:4px; border-radius:12px; gap:4px;">
+                                <button onclick="updateItem(${idx},'mode','+')" style="flex:1; padding:8px 4px; border:none; border-radius:8px; cursor:pointer; background:${item.mode==='+'?'#333':'transparent'}; color:${item.mode==='+'?'var(--green)':'#666'}; font-weight:700; transition:0.2s;">PLUS</button>
+                                <button onclick="updateItem(${idx},'mode','0')" style="flex:1; padding:8px 4px; border:none; border-radius:8px; cursor:pointer; background:${item.mode==='0'?'#333':'transparent'}; color:${item.mode==='0'?'var(--white)':'#666'}; font-weight:700; transition:0.2s;">NONE</button>
+                                <button onclick="updateItem(${idx},'mode','-')" style="flex:1; padding:8px 4px; border:none; border-radius:8px; cursor:pointer; background:${item.mode==='-'?'#333':'transparent'}; color:${item.mode==='-'?'var(--red)':'#666'}; font-weight:700; transition:0.2s;">MINUS</button>
+                            </div>
+                        </td>
+                        <td style="text-align: center;">
+                            <div class="color-picker-wrapper" title="Choose Tier Color">
+                                <input type="color" value="${itemColor}" onchange="updateItem(${idx}, 'color', this.value)">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="image-gallery">
+                                ${imagesHtml}
+                                ${addBtnHtml}
+                            </div>
+                        </td>
+                        <td>
+                            <input type="text" value="${item.val}" class="input-style" style="width:100%; box-sizing:border-box;" placeholder="e.g. 100 or Sword" onfocus="this.select()" oninput="cleanInput(this, ${idx}, 'val')">
+                        </td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="text" value="${item.prob}" class="input-style" style="width:60px; font-weight:bold;" onfocus="this.select()" oninput="cleanInput(this, ${idx}, 'prob')">
+                                <span style="color:#666; font-size:0.9rem;">%</span>
+                                <div style="display:flex; gap: 4px;">
+                                    ${[1, 10, 50, 100].map(v => `<button style="background:#1c1c30; border:1px solid var(--border); color:#888; padding:6px 8px; border-radius:6px; font-size:0.75rem; cursor:pointer; transition:0.2s;" onmouseover="this.style.background='var(--purple)'; this.style.color='white'" onmouseout="this.style.background='#1c1c30'; this.style.color='#888'" onclick="updateItem(${idx}, 'prob', ${v}); renderRows();">+${v}</button>`).join('')}
+                                </div>
+                            </div>
+                            <div style="font-size: 0.8rem; color:${rarityMap[idx].color}; margin-top:6px; font-weight:700;">${rarityMap[idx].text}</div>
+                        </td>
+                        <td>
+                            <button onclick="removeRow(${idx})" style="background:none; border:none; color:var(--red); font-size:1.8rem; cursor:pointer; opacity:0.7; transition:0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">&times;</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // อัพเดทหน้าจอตอนรอหมุน (แสดงผลตัวแรร์สุดตรงกลาง) ทันทีที่ตารางเปลี่ยน
+            requestAnimationFrame(() => {
+                const btn = document.getElementById('spinBtn');
+                if(btn && !btn.disabled) renderIdleWheel();
+            });
+        }
+
+        function updateItem(idx, key, val) {
+            const wheel = wheels.find(w => w.id === activeWheelId);
+            if (key === 'prob') { wheel.items[idx][key] = parseFloat(val) || 0; } 
+            else if (key === 'mode') { 
+                wheel.items[idx][key] = val; 
+                // Auto-suggest color based on mode if changing
+                wheel.items[idx].color = val === '+' ? '#00ff88' : (val === '-' ? '#ff4d4d' : '#ffffff');
+            }
+            else { wheel.items[idx][key] = val; }
+            saveData();
+            if(key === 'mode' || key === 'color') renderRows();
+        }
+
+        function cleanInput(el, idx, key) {
+            if (key === 'prob') el.value = el.value.replace(/[^0-9.]/g, '');
+            updateItem(idx, key, el.value);
+        }
+
+        function renderTabs() {
+            const container = document.getElementById('tabs-container');
+            container.innerHTML = wheels.map(w => `<div class="tab ${w.id === activeWheelId ? 'active' : ''}" onclick="switchWheel(${w.id})">${w.name}</div>`).join('') + `<div class="tab" onclick="addNewWheel()" style="border:1px dashed #666; background:none; color:#aaa;">+ New Wheel</div>`;
+        }
+
+        function switchWheel(id) { activeWheelId = id; renderRows(); renderTabs(); }
+        function addNewWheel() { 
+            const newW = { id: Date.now(), name: "Wheel " + (wheels.length + 1), items: [{ mode: '+', val: "100", prob: 100, images: [], color: "#00ff88" }] }; 
+            wheels.push(newW); activeWheelId = newW.id; saveData(); renderRows(); 
+        }
+        function addRow() { 
+            wheels.find(w => w.id === activeWheelId).items.push({ mode: '+', val: "0", prob: 0, images: [], color: "#00ff88" }); 
+            renderRows(); 
+        }
+        function removeRow(idx) { 
+            wheels.find(w => w.id === activeWheelId).items.splice(idx, 1); 
+            renderRows(); saveData();
+        }
+        function updateWheelName(val) { wheels.find(w => w.id === activeWheelId).name = val; saveData(); }
+        function deleteCurrentWheel() { 
+            if(wheels.length > 1) { 
+                wheels = wheels.filter(w => w.id !== activeWheelId); 
+                activeWheelId = wheels[0].id; 
+                saveData(); renderRows(); 
+            } else { showToast("Cannot delete the last wheel.", "error"); }
+        }
+
+        function renderIdleWheel() {
+            const container = document.getElementById('slot-container');
+            const viewport = document.getElementById('viewport');
+            const wheel = wheels.find(w => w.id === activeWheelId);
+            
+            if (!wheel || wheel.items.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            // หาไอเทมที่แรร์สุด (เปอร์เซ็นต์น้อยสุด)
+            let minProb = Math.min(...wheel.items.map(i => parseFloat(i.prob||0)));
+            let rarestItems = wheel.items.filter(i => parseFloat(i.prob||0) === minProb);
+            let rarest = rarestItems[0]; // ดึงตัวที่แรร์สุดมา 1 ตัว
+            
+            // สร้างกลุ่มไอเทม 5 ตัวสำหรับพรีวิว โดยเอาของแรร์สุดไว้ตำแหน่งตรงกลาง (Index 2)
+            let displayItems = [];
+            for (let i = 0; i < 5; i++) {
+                if (i === 2) {
+                    displayItems.push(rarest);
+                } else {
+                    displayItems.push(wheel.items[Math.floor(Math.random() * wheel.items.length)]);
+                }
+            }
+
+            let html = "";
+            displayItems.forEach((item, i) => {
+                const it = normalizeItemMode({ ...item });
+                if (activeSessionWinMode === 'plus' || activeSessionWinMode === 'minus') {
+                    it._sessionWinMode = activeSessionWinMode;
+                }
+                const imgs = it.images || [];
+                const itemColor = getWinnerColor(it);
+                const content = buildSpinImageHtml(imgs, itemColor);
+                const valStr = buildSpinValueHtml(it, itemColor);
+
+                // ตำแหน่งที่ 2 (ตรงกลาง) สว่างและเด่นสุด, ตำแหน่งอื่นดรอปแสงลงเพื่อสร้างความลึก
+                let extraStyle = i === 2 ? 'opacity: 1; transform: scale(1.05); z-index: 5;' : 'opacity: 0.4; transform: scale(0.95);';
+
+                html += `<div class="slot-item" style="--item-color: ${itemColor}; border-color: ${itemColor}; ${extraStyle}">
+                            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; padding:8px; box-sizing:border-box;">
+                                ${content}
+                                ${valStr}
+                            </div>
+                        </div>`;
+            });
+            
+            container.innerHTML = html;
+            container.style.transition = 'none';
+            
+            // จัดตำแหน่งให้ชิ้นที่ 3 (Index 2) อยู่ตรงกลางจอพอดีเสมอ
+            const fullItemWidth = 180;
+            const targetX = -((2 * fullItemWidth) + (fullItemWidth / 2) - (viewport.offsetWidth / 2));
+            container.style.transform = `translateX(${targetX}px)`;
+        }
+
+        // จัดหน้าต่างใหม่เมื่อย่อ-ขยายเบราว์เซอร์
+        window.addEventListener('resize', () => {
+            const btn = document.getElementById('spinBtn');
+            if(btn && !btn.disabled) renderIdleWheel();
+        });
+
+        async function runSequentialPicks(picks, pool) {
+            if (!picks || !picks.length) return;
+            resetCaptureTray();
+            if (picks.length === 1) {
+                await startAnimation(picks[0], pool, { pickIndex: 1, totalPicks: 1 });
+                addCaptureChip(picks[0], 1);
+                return;
+            }
+            await startMultiPickAnimation(picks, pool);
+        }
+
+        async function startMultiPickAnimation(picks, pool) {
+            const spinGen = ++wheelSpinGeneration;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const container = document.getElementById('slot-container');
+            const viewport = document.getElementById('viewport');
+            const btn = document.getElementById('spinBtn');
+            const baseDuration = parseInt(document.getElementById('spin-duration')?.value || 6, 10);
+            if (btn) btn.disabled = true;
+
+            const fullItemWidth = 180;
+            const gapBetweenStops = 10;
+            const firstStopIdx = 48;
+            const stopIndices = picks.map((_, i) => firstStopIdx + i * gapBetweenStops);
+            const total = stopIndices[stopIndices.length - 1] + 18;
+            const revealMap = {};
+
+            let html = '';
+            for (let i = 0; i < total; i++) {
+                const pickAt = stopIndices.indexOf(i);
+                const item = pickAt >= 0 ? normalizeItemMode({ ...picks[pickAt] }) : normalizeItemMode({ ...pool[Math.floor(Math.random() * pool.length)] });
+                const itemColor = getWinnerColor(item);
+                const imgs = item.images || [];
+                const shadowContent = buildSpinImageHtml(imgs, itemColor);
+                const shadowVal = buildSpinValueHtml(item, itemColor);
+                if (pickAt >= 0) revealMap[i] = buildRevealContent(item, pickAt + 1, picks.length);
+                html += `<div class="slot-item" id="it-${i}" style="--item-color:${itemColor}; opacity:0.85; border-color:${itemColor};">
+                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;height:100%;padding:8px;box-sizing:border-box;">
+                        ${shadowContent}${shadowVal}
+                    </div></div>`;
+            }
+            container.innerHTML = html;
+            container.style.transition = 'none';
+            container.style.transform = 'translateX(0)';
+            await delay(40);
+
+            for (let p = 0; p < picks.length; p++) {
+                const stopIdx = stopIndices[p];
+                const segDuration = p === 0
+                    ? Math.max(3.5, baseDuration * 0.75)
+                    : Math.max(1.4, baseDuration * 0.22);
+                const targetX = -((stopIdx * fullItemWidth) + (fullItemWidth / 2) - (viewport.offsetWidth / 2));
+
+                container.style.transition = `transform ${segDuration}s cubic-bezier(0.08, 0, 0.12, 1.01)`;
+                container.style.transform = `translateX(${targetX}px)`;
+
+                let tCount = 0;
+                const sTime = performance.now();
+                const tickLoop = () => {
+                    if (performance.now() - sTime < segDuration * 1000 + 300) {
+                        const style = window.getComputedStyle(container);
+                        const matrix = new DOMMatrixReadOnly(style.transform);
+                        const currentX = Math.abs(matrix.m41);
+                        if (tCount < 8 && currentX > (tCount * fullItemWidth * 0.8)) {
+                            playTick(tCount); tCount++;
+                        }
+                        requestAnimationFrame(tickLoop);
+                    }
+                };
+                tickLoop();
+
+                await delay(segDuration * 1000 + 120);
+
+                const winnerEl = document.getElementById(`it-${stopIdx}`);
+                if (winnerEl && revealMap[stopIdx]) {
+                    document.querySelectorAll('.winner-highlight').forEach(el => el.classList.remove('winner-highlight'));
+                    winnerEl.innerHTML = revealMap[stopIdx];
+                    winnerEl.classList.add('winner-highlight');
+                    applyWinnerColorToElement(winnerEl, picks[p]);
+                    addCaptureChip(picks[p], p + 1);
+                    playVictory();
+                }
+
+                if (p < picks.length - 1) await delay(280);
+            }
+
+            if (spinGen === wheelSpinGeneration && btn && !wheelQueueProcessing && wheelDrawQueue.length === 0) {
+                btn.disabled = false;
+            }
+        }
+
+        async function startAnimation(winner, pool, opts = {}) {
+            const spinGen = ++wheelSpinGeneration;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const container = document.getElementById('slot-container');
+            const viewport = document.getElementById('viewport');
+            const btn = document.getElementById('spinBtn');
+            const baseDuration = parseInt(document.getElementById('spin-duration')?.value || 6, 10);
+            const totalPicks = opts.totalPicks || 1;
+            const pickIndex = opts.pickIndex || 1;
+            const duration = opts.fastMode
+                ? Math.max(2.5, baseDuration * 0.45)
+                : (totalPicks > 1 ? Math.max(3.5, baseDuration * 0.65) : baseDuration);
+            if (btn) btn.disabled = true;
+
+            const total = 80; const stopIdx = total - 10;
+            const fullItemWidth = 180; // 160 width + 20 margin
+            
+            let html = "";
+            const realWinnerHTML = {}; // เก็บเนื้อหาจริงของชิ้นที่ชนะไว้เปิดเผยตอนหยุด
+
+            for (let i = 0; i < total; i++) {
+                const item = normalizeItemMode({ ...((i === stopIdx) ? winner : pool[Math.floor(Math.random() * pool.length)]) });
+                const imgs = item.images || [];
+                const itemColor = getWinnerColor(item);
+                const shadowContent = buildSpinImageHtml(imgs, itemColor);
+                const shadowVal = buildSpinValueHtml(item, itemColor);
+                const realContent = buildRevealImageHtml(imgs);
+                const realVal = buildRevealValueHtml(item, itemColor);
+                const pickProgress = buildPickProgressHtml(pickIndex, totalPicks);
+                const revealFallback = (!realContent && !realVal)
+                    ? `<span style="font-size:2rem; color:${itemColor}; text-shadow:0 0 18px ${itemColor};">★</span>`
+                    : '';
+
+                if (i === stopIdx) {
+                    realWinnerHTML.content = `
+                        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; padding:8px; box-sizing:border-box;">
+                            ${realContent}
+                            ${realVal || revealFallback}
+                            ${pickProgress}
+                        </div>`;
+                }
+
+                html += `<div class="slot-item" id="it-${i}" style="--item-color: ${itemColor}; border-color: ${itemColor}; opacity: 0.8;">
+                            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; padding:8px; box-sizing:border-box;">
+                                ${shadowContent}
+                                ${shadowVal}
+                            </div>
+                        </div>`;
+            }
+            container.innerHTML = html;
+            
+            await new Promise(r => setTimeout(r, 30));
+            document.querySelectorAll('.slot-item').forEach(el => el.classList.remove('winner-highlight'));
+            container.style.transition = 'none';
+            container.style.transform = 'translateX(0)';
+
+            await new Promise(r => setTimeout(r, 50));
+            const targetX = -((stopIdx * fullItemWidth) + (fullItemWidth / 2) - (viewport.offsetWidth / 2));
+            
+            // อนิเมชั่น "Troll Effect" (กวนประสาท)
+            // cubic-bezier(..., 1.012) จะทำให้วงล้อไหลทะลุเป้าหมายไป ~150px (เกือบเข้ากรอบถัดไป) แล้วค่อยๆ สไลด์ถอยหลังกลับมา
+            container.style.transition = `transform ${duration}s cubic-bezier(0.1, 0, 0.1, 1.012)`;
+            container.style.transform = `translateX(${targetX}px)`;
+
+            let tCount = 0; const sTime = performance.now();
+            function check() {
+                if (performance.now() - sTime < (duration * 1000) + 500) { // +500 เผื่อเวลาเด้งกลับนิดนึง
+                    const style = window.getComputedStyle(container);
+                    const matrix = new DOMMatrixReadOnly(style.transform);
+                    const currentX = Math.abs(matrix.m41);
+
+                    // เล่นเสียงติ๊กเฉพาะตอนพุ่งไปข้างหน้า (ป้องกันไม่ให้เสียงเบิ้ลตอนสไลด์ถอยกลับ)
+                    if (tCount <= stopIdx && currentX > (tCount * fullItemWidth)) {
+                        playTick(tCount); tCount++;
+                    }
+                    requestAnimationFrame(check);
+                }
+            }
+            check();
+
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    if (spinGen !== wheelSpinGeneration) {
+                        resolve();
+                        return;
+                    }
+                    const winnerEl = document.getElementById(`it-${stopIdx}`);
+                    if (winnerEl) {
+                        winnerEl.innerHTML = realWinnerHTML.content;
+                        winnerEl.classList.add('winner-highlight');
+                        applyWinnerColorToElement(winnerEl, winner);
+                        playVictory();
+                    }
+                    if (btn && !wheelQueueProcessing && wheelDrawQueue.length === 0) {
+                        btn.disabled = false;
+                    }
+                    resolve();
+                }, duration * 1000);
+            });
+        }
+
+        function pickWinner() {
+            const wheel = wheels.find(w => w.id === activeWheelId);
+            if (!wheel || !wheel.items.length) return null;
+            const sum = wheel.items.reduce((a, b) => a + parseFloat(b.prob || 0), 0);
+            if (sum <= 0) return null;
+            let r = Math.random() * sum;
+            let winner = wheel.items[0];
+            for (let item of wheel.items) {
+                if (r < parseFloat(item.prob)) { winner = item; break; }
+                r -= parseFloat(item.prob);
+            }
+            return normalizeItemMode({ ...winner });
+        }
+
+        function pickWinners(count) {
+            const picks = [];
+            for (let i = 0; i < count; i++) {
+                const winner = pickWinner();
+                if (!winner) break;
+                picks.push(winner);
+            }
+            return picks;
+        }
+
+        function updateWheelQueueUI() {
+            if (isOverlayMode) return;
+            const status = document.getElementById('wheel-queue-status');
+            const countEl = document.getElementById('wheel-queue-count');
+            const activeEl = document.getElementById('wheel-queue-active');
+            if (!status) return;
+            const queued = wheelDrawQueue.length;
+            if (queued > 0 || isWheelSpinning) {
+                status.style.display = 'block';
+                if (countEl) countEl.textContent = queued;
+                if (activeEl) activeEl.style.display = isWheelSpinning ? 'block' : 'none';
+            } else {
+                status.style.display = 'none';
+            }
+        }
+
+        function enqueueWheelJob() {
+            wheelDrawQueue.push({
+                sessions: 1,
+                drawsPerSpin: null,
+                winMode: null,
+                coins: 0
+            });
+            updateWheelQueueUI();
+            processWheelQueue();
+        }
+
+        function enqueueWheelTriggerJob(opts) {
+            wheelDrawQueue.push({
+                sessions: 1,
+                drawsPerSpin: 1,
+                winMode: (opts?.winMode === 'plus' || opts?.winMode === 'minus') ? opts.winMode : null,
+                coins: parseInt(opts?.coins, 10) || 0
+            });
+            updateWheelQueueUI();
+            processWheelQueue();
+        }
+
+        function notifyWheelJobComplete(picks, job) {
+            if (isOverlayMode) return;
+            try {
+                window.parent.postMessage({
+                    type: 'pandy_wheel_job_done',
+                    picks: picks || [],
+                    winMode: job?.winMode || null,
+                    coins: job?.coins || 0
+                }, '*');
+            } catch (e) {}
+        }
+
+        async function runWheelJob(job, options = {}) {
+            const isFollowUpJob = !!options.isFollowUp;
+            const sessionDraws = job.drawsPerSpin ?? getDrawsPerSpin();
+            const sessionWinMode = job.winMode;
+            const pendingCount = Math.max(1, job.sessions || 1);
+
+            const wheel = wheels.find(w => w.id === activeWheelId);
+            if (!wheel || !wheel.items.length) {
+                showToast("Total probability must be greater than 0!", "error");
+                return null;
+            }
+
+            const sessions = [];
+            const allPicks = [];
+            for (let i = 0; i < pendingCount; i++) {
+                const picks = pickWinners(sessionDraws);
+                if (!picks.length) {
+                    showToast("Total probability must be greater than 0!", "error");
+                    break;
+                }
+                sessions.push(buildSpinSessionPayload(picks, wheel.items, sessionWinMode));
+                allPicks.push(...tagPicksWithWinMode(picks, sessionWinMode));
+            }
+
+            if (!sessions.length) return null;
+
+            activeSessionWinMode = sessionWinMode || null;
+            if (!isOverlayMode && isFollowUpJob) {
+                await prepareWheelForNextSession();
+            } else if (!isOverlayMode) {
+                resetCaptureTray();
+            }
+
+            broadcastWheelShow();
+            broadcastWheelBatch(sessions);
+
+            for (let i = 0; i < sessions.length; i++) {
+                if (i > 0) {
+                    await delay(WHEEL_SESSION_RESULT_HOLD_MS);
+                    await prepareWheelForNextSession();
+                }
+
+                const s = sessions[i];
+                const taggedPicks = tagPicksWithWinMode(s.picks, sessionWinMode);
+                activeSessionWinMode = sessionWinMode || null;
+                await runSequentialPicks(taggedPicks, s.pool);
+            }
+            activeSessionWinMode = null;
+
+            if (allPicks.length > 0 && !isOverlayMode) {
+                showToast(formatAggregatedSummaryText(allPicks), 'success');
+            }
+
+            if (!isOverlayMode) {
+                await delay(WHEEL_CONTROL_JOB_GAP_MS);
+            }
+
+            notifyWheelJobComplete(allPicks, job);
+            return allPicks;
+        }
+
+        async function processWheelQueue() {
+            if (wheelQueueProcessing) return;
+            wheelQueueProcessing = true;
+            const btn = document.getElementById('spinBtn');
+            if (btn) btn.disabled = true;
+            let jobIndex = 0;
+
+            try {
+                while (wheelDrawQueue.length > 0) {
+                    isWheelSpinning = true;
+                    updateWheelQueueUI();
+
+                    const job = wheelDrawQueue.shift();
+                    updateWheelQueueUI();
+
+                    try {
+                        await runWheelJob(job, { isFollowUp: jobIndex > 0 });
+                    } catch (err) {
+                        console.error('Wheel queue error:', err);
+                    }
+
+                    jobIndex++;
+                    isWheelSpinning = false;
+                    updateWheelQueueUI();
+                }
+            } finally {
+                wheelQueueProcessing = false;
+                isWheelSpinning = false;
+                updateWheelQueueUI();
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        function queueWheelSpin(count, drawsPerSpin, winMode) {
+            const rounds = Math.max(1, parseInt(count, 10) || 1) * Math.max(1, parseInt(drawsPerSpin, 10) || 1);
+            for (let i = 0; i < Math.min(rounds, 20); i++) {
+                enqueueWheelTriggerJob({ winMode, coins: 0 });
+            }
+        }
+
+        function spin() {
+            const btn = document.getElementById('spinBtn');
+            if (isWheelSpinning || wheelQueueProcessing || wheelDrawQueue.length > 0) return;
+            if (btn) btn.disabled = true;
+            enqueueWheelJob();
+        }
+
+        // Initialize UI
+        mountWheelStage();
+        if (isOverlayMode) {
+            document.body.classList.add('overlay-mode');
+            initWheelSocket();
+            renderIdleWheel();
+        } else {
+            renderProfiles(); renderTabs(); renderRows(); renderSettings();
+            initAllSelectAsButtons();
+            initWheelSocket();
+            renderIdleWheel();
+            const _origSaveData = saveData;
+            saveData = function() { _origSaveData(); emitWheelIdleSync(); };
+            const _origSaveSettings = saveSettings;
+            saveSettings = function() { _origSaveSettings(); emitWheelIdleSync(); };
+            const _origSwitchWheel = switchWheel;
+            switchWheel = function(id) { _origSwitchWheel(id); emitWheelIdleSync(); };
+            setTimeout(emitWheelIdleSync, 800);
+            setTimeout(emitWheelIdleSync, 2500);
+            try { window.parent.postMessage({ type: 'pandy_request_wheel_win_link_state' }, '*'); } catch (e) {}
+            window.addEventListener('message', (e) => {
+                if (!e.data) return;
+                if (e.data.type === 'pandy_wheel_sync_request') emitWheelIdleSync();
+                if (e.data.type === 'pandy_wheel_win_link_state') {
+                    updateWheelWinLinkBtnPage(!!e.data.linked);
+                }
+                if (e.data.type === 'pandy_wheel_auto_spin') {
+                    const rounds = Math.max(1, Math.min(20,
+                        parseInt(e.data.rounds, 10)
+                        || (parseInt(e.data.sessions || e.data.count, 10) || 1) * (parseInt(e.data.drawsPerSpin, 10) || 1)
+                        || 1
+                    ));
+                    for (let i = 0; i < rounds; i++) {
+                        enqueueWheelTriggerJob({
+                            winMode: e.data.winMode,
+                            coins: parseInt(e.data.coins, 10) || 0
+                        });
+                    }
+                }
+            });
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'pandy_stream_token' && e.newValue) emitWheelIdleSync();
+            });
+        }
+
+        function patchSelectValueSync(selectEl, updateActive) {
+            if (selectEl._btnSelectValuePatched) return;
+            selectEl._btnSelectValuePatched = true;
+            const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+            if (!desc) return;
+            Object.defineProperty(selectEl, 'value', {
+                get() { return desc.get.call(this); },
+                set(v) { desc.set.call(this, v); updateActive(); },
+                configurable: true
+            });
+        }
+
+        function convertSelectToButtons(selectEl) {
+            if (!selectEl || selectEl.tagName !== 'SELECT') return;
+            if (selectEl.dataset.btnSelectInit === '1') return;
+            selectEl.dataset.btnSelectInit = '1';
+            const wrap = document.createElement('div');
+            wrap.className = 'ui-btn-select-wrap';
+            const group = document.createElement('div');
+            group.className = 'ui-btn-select-group';
+            wrap.appendChild(group);
+            selectEl.classList.add('ui-select-hidden');
+            selectEl.parentNode.insertBefore(wrap, selectEl);
+            wrap.appendChild(selectEl);
+            const nativeValueDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+
+            function updateActiveButtons() {
+                const current = String(selectEl.value ?? '');
+                group.querySelectorAll('.ui-btn-select-option').forEach(b => {
+                    const isActive = String(b.dataset.value ?? '') === current;
+                    b.classList.toggle('active', isActive);
+                    b.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+                });
+            }
+
+            function rebuild() {
+                const opts = Array.from(selectEl.options);
+                const compact = opts.length > 6;
+                group.className = 'ui-btn-select-group' + (compact ? ' compact' : '');
+                group.innerHTML = '';
+                opts.forEach(opt => {
+                    if (!opt.value) return;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.dataset.value = opt.value;
+                    btn.className = 'ui-btn-select-option' + (compact ? ' compact' : '');
+                    btn.textContent = opt.textContent;
+                    btn.onclick = () => {
+                        nativeValueDesc.set.call(selectEl, opt.value);
+                        updateActiveButtons();
+                        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+                    };
+                    group.appendChild(btn);
+                });
+                updateActiveButtons();
+            }
+            selectEl._refreshBtnSelect = rebuild;
+            selectEl._updateActiveButtons = updateActiveButtons;
+            patchSelectValueSync(selectEl, updateActiveButtons);
+            rebuild();
+            new MutationObserver((mutations) => {
+                const optionsChanged = mutations.some(m => m.type === 'childList');
+                if (optionsChanged) rebuild();
+                else updateActiveButtons();
+            }).observe(selectEl, { childList: true, subtree: true, attributes: true, attributeFilter: ['selected'] });
+        }
+
+        function initAllSelectAsButtons() {
+            document.querySelectorAll('select').forEach(convertSelectToButtons);
+            if (window._btnSelectBodyObserver) return;
+            window._btnSelectBodyObserver = new MutationObserver(mutations => {
+                mutations.forEach(m => {
+                    m.addedNodes.forEach(node => {
+                        if (node.nodeType !== 1) return;
+                        if (node.tagName === 'SELECT') convertSelectToButtons(node);
+                        if (node.querySelectorAll) node.querySelectorAll('select').forEach(convertSelectToButtons);
+                    });
+                });
+            });
+            window._btnSelectBodyObserver.observe(document.body, { childList: true, subtree: true });
+        }
+    </script>
+</body>
+</html>

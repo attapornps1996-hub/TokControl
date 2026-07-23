@@ -1,0 +1,21 @@
+[REJECTION] TypeError: Cannot set properties of null (setting 'innerHTML')
+Stack: TypeError: Cannot set properties of null (setting 'innerHTML')
+    at renderMailbox (http://127.0.0.1:3000/:4661:113)
+    at updateMailboxUI (http://127.0.0.1:3000/:4660:360)
+    at initApp (http://127.0.0.1:3000/:2713:13)
+
+[REJECTION] TypeError: Cannot set properties of null (setting 'innerHTML')
+Stack: TypeError: Cannot set properties of null (setting 'innerHTML')
+    at renderBannerUI (http://127.0.0.1:3000/:4306:103)
+    at initApp (http://127.0.0.1:3000/:2712:13)
+
+[REJECTION] TypeError: Cannot set properties of null (setting 'innerHTML')
+Stack: TypeError: Cannot set properties of null (setting 'innerHTML')
+    at renderBannerUI (http://127.0.0.1:3000/:4306:103)
+    at initApp (http://127.0.0.1:3000/:2712:13)
+
+[REJECTION] TypeError: Cannot set properties of null (setting 'innerText')
+Stack: TypeError: Cannot set properties of null (setting 'innerText')
+    at updateAccountUI (http://127.0.0.1:3000/:3753:36)
+    at initApp (http://127.0.0.1:3000/:2719:13)
+
