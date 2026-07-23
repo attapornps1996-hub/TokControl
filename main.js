@@ -41,6 +41,8 @@ function checkForAppUpdates() {
   });
 }
 
+app.setName('TokControl');
+
 function createWindow () {
   Menu.setApplicationMenu(null);
 
@@ -98,7 +100,7 @@ ipcMain.on('open-tiktok-browser', (event, username) => {
     const tkWin = new BrowserWindow({
         width: 1100,
         height: 750,
-        title: 'TikTok Browser - Pandy App',
+        title: 'TikTok Browser - TokControl',
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,

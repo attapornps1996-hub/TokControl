@@ -38,6 +38,8 @@ async function initTikTokConnector() {
 initTikTokConnector().catch(console.error);
 const db = require('./database');
 const spotify = require('./spotify');
+const { syncSharedGiftsToLocal, upsertTikTokGift } = require('./gifts_sync');
+const { registerOverlayRoutes, setActiveOverlaySession } = require('./overlay_routes');
 
 const app = express();
 const server = http.createServer(app);
@@ -478,6 +480,7 @@ app.post('/api/login', async (appReq, appRes) => {
         }
 
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+        setActiveOverlaySession(user.streamToken, user.id);
         appRes.json({
             success: true,
             token,
@@ -603,7 +606,7 @@ app.get('/api/spotify/auth', (appReq, appRes) => {
 app.get('/api/spotify/callback', async (appReq, appRes) => {
     const { code, state, error } = appReq.query;
     if (error) {
-        return appRes.send(`<html><body style="background:#111;color:#fff;font-family:sans-serif;text-align:center;padding:40px;"><h2>Spotify เชื่อมต่อไม่สำเร็จ</h2><p>${error}</p><p>ปิดหน้านี้แล้วกลับไปที่ Pandy App</p></body></html>`);
+        return appRes.send(`<html><body style="background:#111;color:#fff;font-family:sans-serif;text-align:center;padding:40px;"><h2>Spotify เชื่อมต่อไม่สำเร็จ</h2><p>${error}</p><p>ปิดหน้านี้แล้วกลับไปที่ TokControl</p></body></html>`);
     }
     const session = spotifyOAuthStates[state];
     if (!session) {
@@ -613,7 +616,7 @@ app.get('/api/spotify/callback', async (appReq, appRes) => {
     try {
         const tokenData = await spotify.exchangeCode(code);
         await spotify.saveTokens(db, session.userId, tokenData);
-        appRes.send(`<html><body style="background:#0d1a0d;color:#fff;font-family:sans-serif;text-align:center;padding:40px;"><h2 style="color:#1DB954;">✅ เชื่อมต่อ Spotify สำเร็จ!</h2><p>ปิดหน้านี้แล้วกลับไปที่ Pandy App</p><script>setTimeout(()=>window.close(),2000)</script></body></html>`);
+        appRes.send(`<html><body style="background:#0d1a0d;color:#fff;font-family:sans-serif;text-align:center;padding:40px;"><h2 style="color:#1DB954;">✅ เชื่อมต่อ Spotify สำเร็จ!</h2><p>ปิดหน้านี้แล้วกลับไปที่ TokControl</p><script>setTimeout(()=>window.close(),2000)</script></body></html>`);
     } catch (e) {
         console.error('Spotify OAuth error:', e);
         appRes.status(500).send('Spotify OAuth failed: ' + e.message);
@@ -771,42 +774,13 @@ async function processBrowserEvent(type, data) {
 
             // บันทึกของขวัญลงฐานข้อมูลแบบไดนามิก (บันทึกเสมอแม้จะไม่มีรูปภาพในช่วงแรก เพื่อไม่ให้การคำนวณเงื่อนไขและสถิติผิดพลาด)
             try {
-                const existingGift = await db.get('SELECT * FROM tiktok_gifts WHERE giftId = ? OR giftName = ?', [pseudoGiftId, data.giftName]);
-                const nowStr = new Date().toISOString();
                 const iconToSave = data.giftIcon && data.giftIcon.trim() !== '' ? data.giftIcon : '';
-                
-                if (!existingGift) {
-                    await db.run(
-                        'INSERT INTO tiktok_gifts (giftId, giftName, diamondCount, giftIcon, createdAt) VALUES (?, ?, ?, ?, ?)',
-                        [pseudoGiftId, data.giftName, diamondCount, iconToSave, nowStr]
-                    );
-                    console.log(`Saved new Browser-Scraped Gift to DB: ${data.giftName} (ID: ${pseudoGiftId})`);
-                    io.to(session.token).emit('new_gift_discovered', { giftId: pseudoGiftId, giftName: data.giftName, diamondCount: diamondCount, giftIcon: iconToSave });
-                } else {
-                    let needsUpdate = false;
-                    let newIcon = existingGift.giftIcon;
-                    let newCount = existingGift.diamondCount;
-
-                    // อัปเดตราคาเหรียญหากราคาในตารางเป็นราคาเริ่มต้น (1) แต่เรามีราคาที่ถูกต้อง
-                    if (diamondCount > 1 && existingGift.diamondCount === 1) {
-                        newCount = diamondCount;
-                        needsUpdate = true;
-                    }
-                    // อัปเดตรูปภาพของขวัญหากของเดิมไม่มี หรือของเดิมเป็นรูปจำลอง
-                    if (iconToSave && (!existingGift.giftIcon || existingGift.giftIcon.startsWith('data:'))) {
-                        newIcon = iconToSave;
-                        needsUpdate = true;
-                    }
-
-                    if (needsUpdate) {
-                        await db.run(
-                            'UPDATE tiktok_gifts SET diamondCount = ?, giftIcon = ? WHERE giftId = ?',
-                            [newCount, newIcon, existingGift.giftId]
-                        );
-                        console.log(`Updated Gift in DB: ${data.giftName} (Coins: ${newCount})`);
-                        io.to(session.token).emit('new_gift_discovered', { giftId: existingGift.giftId, giftName: data.giftName, diamondCount: newCount, giftIcon: newIcon });
-                    }
-                }
+                await upsertTikTokGift(db, {
+                    giftId: pseudoGiftId,
+                    giftName: data.giftName,
+                    diamondCount,
+                    giftIcon: iconToSave
+                }, { io, token: session.token });
             } catch (e) {
                 console.error("Failed to dynamically save Browser Scraped Gift:", e);
             }
@@ -899,40 +873,13 @@ async function processBrowserEvent(type, data) {
         } else if (type === 'gift_discovered_from_panel') {
             // บันทึกหรืออัปเดตของขวัญที่ขูดจากแถบด้านล่างลงฐานข้อมูลโดยตรง
             try {
-                const existingGift = await db.get('SELECT * FROM tiktok_gifts WHERE giftId = ? OR giftName = ?', [data.giftId, data.giftName]);
-                const nowStr = new Date().toISOString();
                 const iconToSave = data.giftIcon && data.giftIcon.trim() !== '' ? data.giftIcon : '';
-                
-                if (!existingGift) {
-                    await db.run(
-                        'INSERT INTO tiktok_gifts (giftId, giftName, diamondCount, giftIcon, createdAt) VALUES (?, ?, ?, ?, ?)',
-                        [data.giftId, data.giftName, data.diamondCount, iconToSave, nowStr]
-                    );
-                    console.log(`Saved new Panel-Scraped Gift to DB: ${data.giftName} (ID: ${data.giftId}, Coins: ${data.diamondCount})`);
-                    io.to(session.token).emit('new_gift_discovered', { giftId: data.giftId, giftName: data.giftName, diamondCount: data.diamondCount, giftIcon: iconToSave });
-                } else {
-                    let needsUpdate = false;
-                    let newIcon = existingGift.giftIcon;
-                    let newCount = existingGift.diamondCount;
-
-                    if (data.diamondCount > 1 && existingGift.diamondCount === 1) {
-                        newCount = data.diamondCount;
-                        needsUpdate = true;
-                    }
-                    if (iconToSave && (!existingGift.giftIcon || existingGift.giftIcon.startsWith('data:'))) {
-                        newIcon = iconToSave;
-                        needsUpdate = true;
-                    }
-
-                    if (needsUpdate) {
-                        await db.run(
-                            'UPDATE tiktok_gifts SET diamondCount = ?, giftIcon = ? WHERE giftId = ?',
-                            [newCount, newIcon, existingGift.giftId]
-                        );
-                        console.log(`Updated Panel-Scraped Gift in DB: ${data.giftName} (Coins: ${newCount})`);
-                        io.to(session.token).emit('new_gift_discovered', { giftId: existingGift.giftId, giftName: data.giftName, diamondCount: newCount, giftIcon: newIcon });
-                    }
-                }
+                await upsertTikTokGift(db, {
+                    giftId: data.giftId,
+                    giftName: data.giftName,
+                    diamondCount: data.diamondCount,
+                    giftIcon: iconToSave
+                }, { io, token: session.token });
             } catch (e) {
                 console.error("Failed to dynamically save Panel Scraped Gift:", e);
             }
@@ -990,7 +937,7 @@ app.get('/api/open-tiktok-browser', (req, res) => {
         const tkWin = new BrowserWindow({
             width: 1100,
             height: 750,
-            title: 'TikTok Browser - Pandy App',
+            title: 'TikTok Browser - TokControl',
             webPreferences: {
                 nodeIntegration: false,
                 contextIsolation: true,
@@ -1408,7 +1355,7 @@ const MYINSTANTS_CATEGORIES = [
 function fetchMyInstantsHtml(pathOrUrl) {
     const url = pathOrUrl.startsWith('http') ? pathOrUrl : `${MYINSTANTS_BASE}${pathOrUrl}`;
     return new Promise((resolve, reject) => {
-        const req = https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Pandy App)' } }, (res) => {
+        const req = https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0 (TokControl)' } }, (res) => {
             if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
                 fetchMyInstantsHtml(res.headers.location).then(resolve).catch(reject);
                 return;
@@ -1478,6 +1425,28 @@ app.get('/api/gifts', async (appReq, appRes) => {
     } catch (err) {
         console.error(err);
         appRes.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงรายการของขวัญ' });
+    }
+});
+
+// รับของขวัญใหม่จาก client อื่นเพื่อรวมเข้าคลังกลาง (ใช้กับ cloud server หรือ sync ภายใน)
+app.post('/api/gifts/sync', async (appReq, appRes) => {
+    try {
+        const expectedKey = (process.env.GIFTS_SYNC_KEY || '').trim();
+        if (expectedKey && appReq.body?.syncKey !== expectedKey) {
+            return appRes.status(403).json({ error: 'Invalid sync key' });
+        }
+        const { giftId, giftName, diamondCount, giftIcon } = appReq.body || {};
+        if (!giftId || !giftName) {
+            return appRes.status(400).json({ error: 'ข้อมูลไม่ครบถ้วน' });
+        }
+        const result = await upsertTikTokGift(db, { giftId, giftName, diamondCount, giftIcon });
+        if (result.action === 'insert' || result.action === 'update') {
+            io.emit('new_gift_discovered', result.gift);
+        }
+        appRes.json({ success: true, action: result.action });
+    } catch (err) {
+        console.error('[GiftsSync] /api/gifts/sync error:', err);
+        appRes.status(500).json({ error: err.message });
     }
 });
 
@@ -1641,11 +1610,7 @@ app.get('/', (appReq, appRes) => {
     appRes.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/overlay', (appReq, appRes) => {
-    appRes.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-    appRes.set('Pragma', 'no-cache');
-    appRes.sendFile(path.join(__dirname, 'overlay.html'));
-});
+registerOverlayRoutes(app, db, __dirname);
 
 // ==========================================
 // ASSET OPTIMIZATION ENDPOINT
@@ -1768,6 +1733,7 @@ io.on('connection', (socket) => {
         
         activePanels[token] = socket.id;
         socket.streamToken = token; // บันทึก token ไว้ใน socket instance
+        setActiveOverlaySession(token);
         socket.join(token);
         console.log(`Panel joined room: ${token}`);
     });
@@ -2067,26 +2033,12 @@ io.on('connection', (socket) => {
                                 
                                 // Auto insert/update the DB if we don't have this gift or if it has 0 coins or empty icon
                                 try {
-                                    const existingGift = await db.get('SELECT * FROM tiktok_gifts WHERE giftId = ?', [giftId]);
-                                    if (!existingGift) {
-                                        await db.run(
-                                            'INSERT INTO tiktok_gifts (giftId, giftName, diamondCount, giftIcon, createdAt) VALUES (?, ?, ?, ?, ?)',
-                                            [giftId, giftName, diamondCount, giftIconUrl, nowStr]
-                                        );
-                                        const discPayload = { giftId, giftName, diamondCount, giftIcon: giftIconUrl };
-                                        io.to(token).emit('new_gift_discovered', discPayload);
-                                    } else {
-                                        if ((!existingGift.diamondCount && diamondCount > 0) || (!existingGift.giftIcon && giftIconUrl)) {
-                                            const finalCoins = existingGift.diamondCount || diamondCount;
-                                            const finalIcon = existingGift.giftIcon || giftIconUrl;
-                                            await db.run(
-                                                'UPDATE tiktok_gifts SET diamondCount = ?, giftIcon = ? WHERE giftId = ?',
-                                                [finalCoins, finalIcon, giftId]
-                                            );
-                                            const discPayload = { giftId, giftName: existingGift.giftName, diamondCount: finalCoins, giftIcon: finalIcon };
-                                            io.to(token).emit('new_gift_discovered', discPayload);
-                                        }
-                                    }
+                                    await upsertTikTokGift(db, {
+                                        giftId,
+                                        giftName,
+                                        diamondCount,
+                                        giftIcon: giftIconUrl
+                                    }, { io, token });
                                 } catch (dbErr) {
                                     console.error(`Error saving gift ${giftName} to DB:`, dbErr);
                                 }
@@ -2297,30 +2249,12 @@ io.on('connection', (socket) => {
                 // Save to DB only if we have a valid numeric gift ID
                 if (giftId && !isNaN(parseInt(giftId))) {
                     try {
-                        const existingGift = await db.get('SELECT * FROM tiktok_gifts WHERE giftId = ?', [giftId]);
-                        if (!existingGift) {
-                            const nowStr = new Date().toISOString();
-                            await db.run(
-                                'INSERT INTO tiktok_gifts (giftId, giftName, diamondCount, giftIcon, createdAt) VALUES (?, ?, ?, ?, ?)',
-                                [giftId, giftName, finalDiamondCount, finalIconUrl, nowStr]
-                            );
-                            console.log(`Saved new TikTok Gift to DB: ${giftName} (ID: ${giftId})`);
-                            const discPayload = { giftId: giftId, giftName: giftName, diamondCount: finalDiamondCount, giftIcon: finalIconUrl };
-                            io.to(token).emit('new_gift_discovered', discPayload);
-                        } else {
-                            // If the gift exists, but its coins/image are missing (0 or empty), let's auto-repair it!
-                            if ((!existingGift.diamondCount && finalDiamondCount > 0) || (!existingGift.giftIcon && finalIconUrl)) {
-                                const finalCoins = existingGift.diamondCount || finalDiamondCount;
-                                const finalIcon = existingGift.giftIcon || finalIconUrl;
-                                await db.run(
-                                    'UPDATE tiktok_gifts SET diamondCount = ?, giftIcon = ? WHERE giftId = ?',
-                                    [finalCoins, finalIcon, giftId]
-                                );
-                                console.log(`Auto-repaired TikTok Gift ID ${giftId}: Coins = ${finalCoins}, Icon = ${finalIcon}`);
-                                const discPayload = { giftId: giftId, giftName: existingGift.giftName, diamondCount: finalCoins, giftIcon: finalIcon };
-                                io.to(token).emit('new_gift_discovered', discPayload);
-                            }
-                        }
+                        await upsertTikTokGift(db, {
+                            giftId,
+                            giftName,
+                            diamondCount: finalDiamondCount,
+                            giftIcon: finalIconUrl
+                        }, { io, token });
                     } catch (e) {
                         console.error("Failed to dynamically save TikTok Gift:", e);
                     }
@@ -3028,7 +2962,8 @@ app.delete('/api/ai/memories/:id', authenticateToken, async (req, res) => {
 // รันเซิร์ฟเวอร์
 server.listen(PORT, () => {
     seedStarterMemoriesIfEmpty().catch(err => console.error('Failed to seed AI memories:', err.message));
-    console.log(`Pandy App Web Server running on port ${PORT}`);
+    syncSharedGiftsToLocal(db).catch(err => console.error('[GiftsSync] Startup sync failed:', err.message));
+    console.log(`TokControl Web Server running on port ${PORT}`);
 });
 
 // ฟังก์ชั่นช่วยอัปเดตราคาเหรียญของขวัญในฐานข้อมูลให้ตรงตามความเป็นจริงเมื่อเปิดโปรแกรม

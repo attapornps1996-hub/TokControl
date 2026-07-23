@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pandy App V1</title>
+    <title>TokControl</title>
     
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -1567,6 +1567,12 @@
         .ov-gallery-badge.ready { background:rgba(46,204,113,0.15); color:#2ecc71; border:1px solid rgba(46,204,113,0.35); }
         .ov-gallery-badge.soon { background:rgba(255,255,255,0.06); color:#888; border:1px solid rgba(255,255,255,0.1); }
         .ov-gallery-badge.pro { background:rgba(241,196,15,0.12); color:#f1c40f; border:1px solid rgba(241,196,15,0.35); }
+        .nav-item.nav-locked-pro { opacity:0.62; }
+        .nav-item.nav-locked-soon { opacity:0.5; }
+        .nav-access-badge { margin-left:auto; font-size:0.55rem; font-weight:900; padding:2px 7px; border-radius:6px; letter-spacing:0.4px; flex-shrink:0; }
+        .nav-access-badge.pro { background:rgba(241,196,15,0.15); color:#f1c40f; border:1px solid rgba(241,196,15,0.35); }
+        .nav-access-badge.soon { background:rgba(255,255,255,0.06); color:#888; border:1px solid rgba(255,255,255,0.12); }
+        .sa-limit-hint { font-size:0.72rem; color:#f1c40f; margin-top:4px; font-weight:700; }
         .ov-gallery-desc { margin:0; font-size:0.72rem; color:#777; line-height:1.45; min-height:2.2em; }
         .ov-gallery-url-row { display:flex; gap:6px; align-items:stretch; }
         .ov-gallery-url-row input { flex:1; min-width:0; padding:8px 10px; border-radius:8px; border:1px solid rgba(255,255,255,0.08); background:rgba(0,0,0,0.35); color:#aaa; font-size:0.68rem; font-family:monospace; outline:none; }
@@ -1935,8 +1941,8 @@
         <div class="brand" style="display:flex; align-items:center; gap:10px; margin-bottom: 25px;">
             <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Pandy&backgroundColor=bc13fe" style="width:36px; height:36px; border-radius:8px;">
             <div style="display:flex; flex-direction:column; text-align:left;">
-                <span style="font-size:1.15rem; font-weight:900; color:#fff; font-family:'Kanit'; letter-spacing:1px; line-height:1.2;">Pandy App</span>
-                <span style="font-size:0.65rem; color:#888; letter-spacing:2px; font-weight:800; line-height:1;">PLATFORM V1.0</span>
+                <span style="font-size:1.15rem; font-weight:900; color:#fff; font-family:'Kanit'; letter-spacing:1px; line-height:1.2;">TokControl</span>
+                <span style="font-size:0.65rem; color:#888; letter-spacing:2px; font-weight:800; line-height:1;">v1.0.2</span>
             </div>
         </div>
         
@@ -2060,7 +2066,7 @@
             <button onclick="window.open('https://discord.gg/yourinvite', '_blank')" style="width:100%; padding:10px; border-radius:8px; background:#5865F2; border:none; color:#fff; font-weight:bold; font-size:0.8rem; font-family:'Kanit'; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
                 <span style="font-size:0.95rem;">💬</span> เข้าร่วม Discord
             </button>
-            <div style="text-align:center; font-size:0.65rem; color:#444; font-family:'Kanit';">Pandy App v1.0.0</div>
+            <div style="text-align:center; font-size:0.65rem; color:#444; font-family:'Kanit';">TokControl v1.0.2</div>
         </div>
     </div>
 
@@ -2155,7 +2161,7 @@
                         <span id="dashLiveIndicator" style="font-size: 0.7rem; font-weight: 900; background: #555; color: #fff; padding: 2px 10px; border-radius: 10px; font-family: 'Kanit';">STANDBY</span>
                     </span>
                     <div id="dashLiveLogs" style="flex: 1; overflow-y: auto; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.03); font-family: monospace; font-size: 0.8rem; line-height: 1.6; color: #ccc;">
-                        <div style="color: #666; font-family: 'Kanit';">- ยินดีต้อนรับสู่ Pandy App. รอดึงอีเวนต์แชทและของขวัญแบบ Real-time -</div>
+                        <div style="color: #666; font-family: 'Kanit';">- ยินดีต้อนรับสู่ TokControl. รอดึงอีเวนต์แชทและของขวัญแบบ Real-time -</div>
                     </div>
                 </div>
             </div>
@@ -3212,7 +3218,7 @@
                                 <div style="background: rgba(0,0,0,0.2); padding: 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.04); margin-bottom: 16px;">
                                     <span class="field-label" style="font-family: 'Kanit'; color: #bc13fe;">🎙️ Voice Tester (ทดสอบเสียงสังเคราะห์)</span>
                                     <div style="display:flex; gap:10px; margin-top:8px;">
-                                        <input type="text" id="tts-test-input" value="สวัสดีครับ ยินดีต้อนรับสู่สตรีม Pandy App" style="flex:1; background:#07070a; border: 1.5px solid #202025; color:#fff; padding:8px 10px; border-radius:8px; font-size:0.82rem; outline:none; font-family: 'Kanit';">
+                                        <input type="text" id="tts-test-input" value="สวัสดีครับ ยินดีต้อนรับสู่สตรีม TokControl" style="flex:1; background:#07070a; border: 1.5px solid #202025; color:#fff; padding:8px 10px; border-radius:8px; font-size:0.82rem; outline:none; font-family: 'Kanit';">
                                         <button onclick="testTTS()" style="padding:8px 16px; background:rgba(188,19,254,0.15); border:1.5px solid #bc13fe; color:#bc13fe; border-radius:8px; cursor:pointer; font-weight:700; font-size:0.82rem; white-space:nowrap; font-family: 'Kanit';">▶ Play</button>
                                     </div>
                                 </div>
@@ -4308,7 +4314,8 @@
                 <div class="sa-v2-main-head">
                     <div>
                         <h3>เสียงตามเหตุการณ์</h3>
-                        <p>จัดการเสียงสำหรับแต่ละเหตุการณ์</p>
+                        <p id="soundAlertsSubhead">จัดการเสียงสำหรับแต่ละเหตุการณ์</p>
+                        <div id="soundAlertsLimitHint" class="sa-limit-hint" style="display:none;"></div>
                     </div>
                     <button type="button" class="sa-btn-add" onclick="openSoundAlertEditorModal()">+ เพิ่มเหตุการณ์เสียง</button>
                 </div>
@@ -5471,6 +5478,104 @@
         async function purchasePro() {
             openDiscordPurchase();
         }
+
+        const FREE_SOUND_ALERT_MAX = 5;
+        const PRO_ONLY_TABS = { gacha: 'กาชา', airdrop: 'Airdrop', credits: 'Stream Credits' };
+        const SOON_TABS = { songrequest: 'Song Request', chatbot: 'AI Chatbot' };
+
+        function isAppAdmin() {
+            return (currentUser.isLoggedIn && (currentUser.name.toLowerCase() === 'admin' || currentUser.name === 'Pandy_Puncheroo')) || isAdminUnlocked;
+        }
+
+        function isAppPro() {
+            if (!currentUser.isLoggedIn) return false;
+            if (isAppAdmin()) return true;
+            if (!currentUser.isPro) return false;
+            if (currentUser.proExpireAt && new Date(currentUser.proExpireAt) <= new Date()) return false;
+            return true;
+        }
+
+        function countSoundAlertRules() {
+            ensureSoundAlertsStore();
+            return Object.keys(advConf.soundAlerts.rules || {}).length;
+        }
+
+        function showProUpgradePrompt(featureLabel) {
+            const label = featureLabel || 'ฟีเจอร์นี้';
+            showCustomMsg(
+                'warning',
+                '🔒 ฟีเจอร์ PRO',
+                `${label} สงวนไว้สำหรับสมาชิก PRO เท่านั้น<br><br><button type="button" onclick="purchasePro()" style="margin-top:6px;padding:8px 14px;border-radius:8px;border:1px solid #f1c40f;background:linear-gradient(45deg,#f1c40f,#ff4757);color:#fff;font-weight:800;cursor:pointer;font-family:Kanit,sans-serif;">👑 อัปเกรดเป็น PRO</button>`
+            );
+        }
+
+        function showSoonFeaturePrompt(featureLabel) {
+            showCustomMsg('info', '🚀 เร็วๆ นี้', `${featureLabel || 'ฟีเจอร์นี้'} กำลังอยู่ระหว่างพัฒนา โปรดติดตามอัปเดตเร็วๆ นี้`);
+        }
+
+        function canAddSoundAlertRule() {
+            if (isAppPro()) return true;
+            return countSoundAlertRules() < FREE_SOUND_ALERT_MAX;
+        }
+
+        function updateSoundAlertsLimitUI() {
+            const hint = document.getElementById('soundAlertsLimitHint');
+            const sub = document.getElementById('soundAlertsSubhead');
+            const addBtn = document.querySelector('.sa-btn-add');
+            const count = countSoundAlertRules();
+            if (isAppPro()) {
+                if (hint) hint.style.display = 'none';
+                if (sub) sub.textContent = 'จัดการเสียงสำหรับแต่ละเหตุการณ์';
+                if (addBtn) {
+                    addBtn.disabled = false;
+                    addBtn.style.opacity = '';
+                    addBtn.title = '';
+                }
+                return;
+            }
+            if (hint) {
+                hint.style.display = 'block';
+                hint.textContent = `แพ็กฟรี: ใช้งานได้ ${count}/${FREE_SOUND_ALERT_MAX} เสียง — อัปเกรด PRO เพื่อเพิ่มได้ไม่จำกัด`;
+            }
+            if (sub) sub.textContent = 'จัดการเสียงสำหรับแต่ละเหตุการณ์ (ฟรีสูงสุด 5 เสียง)';
+            if (addBtn) {
+                const atLimit = count >= FREE_SOUND_ALERT_MAX;
+                addBtn.disabled = atLimit;
+                addBtn.style.opacity = atLimit ? '0.45' : '';
+                addBtn.title = atLimit ? 'แพ็กฟรีเพิ่มได้สูงสุด 5 เสียง' : '';
+            }
+        }
+
+        function applyNavAccessLocks() {
+            const isPro = isAppPro();
+            const isAdmin = isAppAdmin();
+            document.querySelectorAll('.nav-access-badge').forEach(el => el.remove());
+
+            Object.keys(PRO_ONLY_TABS).forEach((tab) => {
+                const nav = document.getElementById('nav-' + tab);
+                if (!nav) return;
+                nav.classList.toggle('nav-locked-pro', !isPro);
+                if (!isPro) {
+                    const badge = document.createElement('span');
+                    badge.className = 'nav-access-badge pro';
+                    badge.textContent = 'PRO';
+                    nav.appendChild(badge);
+                }
+            });
+
+            Object.keys(SOON_TABS).forEach((tab) => {
+                const nav = document.getElementById('nav-' + tab);
+                if (!nav) return;
+                const lockedSoon = !isAdmin;
+                nav.classList.toggle('nav-locked-soon', lockedSoon);
+                if (lockedSoon) {
+                    const badge = document.createElement('span');
+                    badge.className = 'nav-access-badge soon';
+                    badge.textContent = 'SOON';
+                    nav.appendChild(badge);
+                }
+            });
+        }
         
         function purchaseProFromModal() {
             document.getElementById('obsModalOverlay').style.display = 'none';
@@ -5545,6 +5650,12 @@
 
         let autoDrawOnGift = false;
         function toggleAutoDraw(chk) {
+            if (!isAppPro()) {
+                chk.checked = false;
+                autoDrawOnGift = false;
+                showProUpgradePrompt('กาชา — สุ่มอัตโนมัติเมื่อได้ของขวัญ');
+                return;
+            }
             autoDrawOnGift = chk.checked;
             showCustomMsg('success', autoDrawOnGift ? 'เปิดระบบอัตโนมัติ' : 'ปิดระบบอัตโนมัติ', autoDrawOnGift ? 'ระบบจะทำการหมุนตู้สุ่มอัตโนมัติตามมูลค่าของขวัญที่ได้รับ' : 'ปิดระบบสุ่มการ์ดคัดเลือกอัตโนมัติ');
         }
@@ -6154,6 +6265,7 @@
             if (volLabel) volLabel.textContent = (sa.globalVolume ?? 70) + '%';
             syncSoundAlertPlayModeUI();
             renderSoundAlertRulesList();
+            updateSoundAlertsLimitUI();
         }
 
         async function refreshSoundAlertsAfterCatalog() {
@@ -6167,6 +6279,10 @@
         }
 
         function openSoundAlertEditorModal(key) {
+            if (!key && !canAddSoundAlertRule()) {
+                showProUpgradePrompt(`Sound Alerts — แพ็กฟรีเพิ่มได้สูงสุด ${FREE_SOUND_ALERT_MAX} เสียง`);
+                return;
+            }
             soundAlertEditingKey = key || null;
             soundAlertDraft = { soundData: null, soundName: '', builtin: '', soundUrl: null, myinstantsSlug: null };
             soundAlertSelectedGiftId = null;
@@ -6705,6 +6821,11 @@
                 showCustomMsg('error', 'ผิดพลาด', 'กรุณาเลือกเสียงจาก MyInstants หรืออัปโหลดไฟล์');
                 return;
             }
+            const isNewRule = !advConf.soundAlerts.rules[ruleKey];
+            if (isNewRule && !canAddSoundAlertRule()) {
+                showProUpgradePrompt(`Sound Alerts — แพ็กฟรีเพิ่มได้สูงสุด ${FREE_SOUND_ALERT_MAX} เสียง`);
+                return;
+            }
             const prev = soundAlertEditingKey && advConf.soundAlerts.rules[soundAlertEditingKey];
             if (soundAlertEditingKey && soundAlertEditingKey !== ruleKey) {
                 delete advConf.soundAlerts.rules[soundAlertEditingKey];
@@ -6716,6 +6837,7 @@
             showCustomMsg('success', 'บันทึกแล้ว', 'ตั้งค่าเสียงสำหรับ ' + ruleName);
             closeSoundAlertEditorModal();
             renderSoundAlertRulesList();
+            updateSoundAlertsLimitUI();
             saveSoundAlertsToServer();
         }
 
@@ -6723,6 +6845,7 @@
             ensureSoundAlertsStore();
             delete advConf.soundAlerts.rules[key];
             renderSoundAlertRulesList();
+            updateSoundAlertsLimitUI();
             saveSoundAlertsToServer();
         }
 
@@ -7469,7 +7592,7 @@
                 const { gachaRule, wheelRule } = resolveGiftRulesForGift(gift);
                 const ruleKey = gift.giftId || '';
                 
-                if (gachaRule) {
+                if (gachaRule && isAppPro()) {
                     processRuleWithThreshold(gachaTriggerCounters, ruleKey, gift.repeatCount, gachaRule, (timesTriggered) => {
                         const result = applyGachaRuleAction(gachaRule, timesTriggered, gift.uniqueId);
                         if (gachaRule.alert !== false) {
@@ -7499,7 +7622,7 @@
                 if (!gachaRule && !wheelRule) {
                     const totalCoins = gift.diamondCount * gift.repeatCount;
                     updateCoins(totalCoins);
-                    if (autoDrawOnGift && totalCoins > 0) {
+                    if (autoDrawOnGift && totalCoins > 0 && isAppPro()) {
                         let remainingDraws = totalCoins;
                         while (remainingDraws > 0) {
                             const batch = Math.min(10, remainingDraws);
@@ -7529,7 +7652,7 @@
                 const { gachaRule, wheelRule } = resolveEventRules('__event_like');
                 const likeInc = data.likeCount || 1;
 
-                if (gachaRule) {
+                if (gachaRule && isAppPro()) {
                     processRuleWithThreshold(gachaTriggerCounters, '__event_like', likeInc, gachaRule, (timesTriggered) => {
                         const result = applyGachaRuleAction(gachaRule, timesTriggered, data.uniqueId);
                         if (gachaRule.alert !== false) {
@@ -7563,7 +7686,7 @@
 
                 const { gachaRule, wheelRule } = resolveEventRules('__event_follow');
 
-                if (gachaRule) {
+                if (gachaRule && isAppPro()) {
                     processRuleWithThreshold(gachaTriggerCounters, '__event_follow', 1, gachaRule, (timesTriggered) => {
                         const result = applyGachaRuleAction(gachaRule, timesTriggered, data.uniqueId);
                         if (gachaRule.alert !== false) {
@@ -7593,7 +7716,7 @@
 
                 const { gachaRule, wheelRule } = resolveEventRules('__event_share');
 
-                if (gachaRule) {
+                if (gachaRule && isAppPro()) {
                     processRuleWithThreshold(gachaTriggerCounters, '__event_share', 1, gachaRule, (timesTriggered) => {
                         const result = applyGachaRuleAction(gachaRule, timesTriggered, data.uniqueId);
                         if (gachaRule.alert !== false) {
@@ -7624,7 +7747,7 @@
 
                 const { gachaRule, wheelRule } = resolveEventRules('__event_join');
 
-                if (gachaRule) {
+                if (gachaRule && isAppPro()) {
                     processRuleWithThreshold(gachaTriggerCounters, '__event_join', 1, gachaRule, (timesTriggered) => {
                         const result = applyGachaRuleAction(gachaRule, timesTriggered, data.uniqueId);
                         if (gachaRule.alert !== false) {
@@ -7700,7 +7823,7 @@
                 if (globalAvatar) globalAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser.name}&backgroundColor=bc13fe`;
 
                 const isAdmin = currentUser.name.toLowerCase() === 'admin' || currentUser.name === 'Pandy_Puncheroo';
-                const isPro = currentUser.isPro || isAdmin;
+                const isPro = isAppPro();
                 
                 if (isPro) {
                     badge.innerText = 'PRO 👑';
@@ -7753,13 +7876,15 @@
                 el.style.pointerEvents = 'auto';
             });
             
-            const isAdmin = (currentUser.isLoggedIn && (currentUser.name.toLowerCase() === 'admin' || currentUser.name === 'Pandy_Puncheroo')) || isAdminUnlocked;
-            const isPro = currentUser.isLoggedIn && (currentUser.isPro || isAdmin);
+            const isAdmin = isAppAdmin();
+            const isPro = isAppPro();
             
             const btnSidebarAdmin = document.getElementById('btnSidebarAdmin');
             if (btnSidebarAdmin) {
                 btnSidebarAdmin.style.display = isAdmin ? 'flex' : 'none';
             }
+            
+            applyNavAccessLocks();
             
             // 2. หากเป็นสมาชิกธรรมดา (FREE)
             if (!isPro) {
@@ -9322,6 +9447,10 @@
                     openLoginModal();
                     return;
                 }
+                if (!isAppPro()) {
+                    showProUpgradePrompt('กาชา');
+                    return;
+                }
 
                 if (!bypassCoins) {
                     if (userCoins < count) return showCustomMsg('error', 'ไม่มีเหรียญ!', `ต้องการ <b>${count} 🪙</b> แต่มี <b>${userCoins} 🪙</b>`);
@@ -9720,7 +9849,7 @@
                 if (baseOrigin.includes('localhost')) {
                     baseOrigin = baseOrigin.replace('localhost', '127.0.0.1');
                 }
-                const overlayUrl = baseOrigin + '/overlay?token=' + currentUser.streamToken;
+                const overlayUrl = baseOrigin + '/overlay/gacha';
                 panelContent.innerHTML = `
                     <h3 style="color: #00d2ff; letter-spacing: 2px; margin-top:0; font-size: 1.8rem; text-shadow: 0 0 15px #00d2ff;">🎥 ตั้งค่า OBS / TIKTOK STUDIO</h3>
                     
@@ -9812,11 +9941,11 @@
                             const pit = pityEl && pityEl.checked ? '1' : '0';
                             const al = alertEl && alertEl.checked ? '1' : '0';
                             
-                            tikInput.value = `${data.tunnelUrl}/overlay?mode=gacha&token=${currentUser.streamToken}&showSponsor=${sp}&showTotal=${tot}&showPity=${pit}&showAlert=${al}`;
+                            tikInput.value = `${data.tunnelUrl}/overlay/gacha?showSponsor=${sp}&showTotal=${tot}&showPity=${pit}&showAlert=${al}`;
                             tikBtn.disabled = false;
                             
                             if (tikAlertInput && tikAlertBtn) {
-                                tikAlertInput.value = `${data.tunnelUrl}/overlay?mode=alerts&token=${currentUser.streamToken}`;
+                                tikAlertInput.value = `${data.tunnelUrl}/overlay/alerts`;
                                 tikAlertBtn.disabled = false;
                             }
                             
@@ -9854,12 +9983,7 @@
         function updateOBSUrl() {
             const obsUrlInput = document.getElementById('obsUrlInput');
             const obsAlertUrlInput = document.getElementById('obsAlertUrlInput');
-            if (!obsUrlInput || !currentUser || !currentUser.streamToken) return;
-
-            let baseOrigin = window.location.origin;
-            if (baseOrigin.includes('localhost')) {
-                baseOrigin = baseOrigin.replace('localhost', '127.0.0.1');
-            }
+            if (!obsUrlInput) return;
 
             const sponsorEl = document.getElementById('obsOptSponsor');
             const totalEl = document.getElementById('obsOptTotal');
@@ -9870,9 +9994,9 @@
             const pit = pityEl && pityEl.checked ? '1' : '0';
             const al = alertEl && alertEl.checked ? '1' : '0';
             
-            obsUrlInput.value = `${baseOrigin}/overlay?mode=gacha&token=${currentUser.streamToken}&showSponsor=${sp}&showTotal=${tot}&showPity=${pit}&showAlert=${al}`;
+            obsUrlInput.value = buildShortOverlayUrl('gacha', { showSponsor: sp, showTotal: tot, showPity: pit, showAlert: al });
             if (obsAlertUrlInput) {
-                obsAlertUrlInput.value = `${baseOrigin}/overlay?mode=alerts&token=${currentUser.streamToken}`;
+                obsAlertUrlInput.value = buildShortOverlayUrl('alerts');
             }
             
             // อัปเดตฝั่ง TikTok ด้วย (ถ้าอุโมงค์ทำงานอยู่)
@@ -9882,10 +10006,10 @@
                     const tikInput = document.getElementById('tiktokUrlInput');
                     const tikAlertInput = document.getElementById('tiktokAlertUrlInput');
                     if (tikInput && data.tunnelUrl) {
-                        tikInput.value = `${data.tunnelUrl}/overlay?mode=gacha&token=${currentUser.streamToken}&showSponsor=${sp}&showTotal=${tot}&showPity=${pit}&showAlert=${al}`;
+                        tikInput.value = `${data.tunnelUrl}/overlay/gacha?showSponsor=${sp}&showTotal=${tot}&showPity=${pit}&showAlert=${al}`;
                     }
                     if (tikAlertInput && data.tunnelUrl) {
-                        tikAlertInput.value = `${data.tunnelUrl}/overlay?mode=alerts&token=${currentUser.streamToken}`;
+                        tikAlertInput.value = `${data.tunnelUrl}/overlay/alerts`;
                     }
                 }).catch(() => {});
         }
@@ -10305,6 +10429,20 @@
             return base;
         }
 
+        function buildShortOverlayUrl(subpath, query = {}) {
+            const base = getOverlayBaseOrigin();
+            const clean = String(subpath || '').replace(/^\/+/, '');
+            let url = `${base}/overlay/${clean}`;
+            const params = new URLSearchParams();
+            Object.keys(query).forEach((key) => {
+                const val = query[key];
+                if (val !== undefined && val !== null && val !== '') params.set(key, val);
+            });
+            const qs = params.toString();
+            if (qs) url += `?${qs}`;
+            return url;
+        }
+
         function getOverlayStreamToken() {
             return (currentUser && currentUser.streamToken) || '';
         }
@@ -10323,37 +10461,37 @@
 
         const OVERLAY_CATALOG = [
             { id: 'gacha-full', title: 'กาชาครบชุด', desc: 'เปิดการ์ด สปอนเซอร์ ยอดรวม พิติ และแจ้งเตือนของขวัญในหน้าเดียว', icon: '🎴', category: 'gacha', ready: true, settingsTab: 'gacha', previewType: 'gacha',
-              buildUrl: () => { const p = getGachaOverlayParams(); return `${getOverlayBaseOrigin()}/overlay?mode=gacha&token=${getOverlayStreamToken()}&showSponsor=${p.sp}&showTotal=${p.tot}&showPity=${p.pit}&showAlert=${p.al}`; },
+              buildUrl: () => { const p = getGachaOverlayParams(); return buildShortOverlayUrl('gacha', { showSponsor: p.sp, showTotal: p.tot, showPity: p.pit, showAlert: p.al }); },
               previewGradient: 'linear-gradient(145deg, #1a0f2e 0%, #2d1b4e 50%, #0b0b12 100%)' },
             { id: 'gacha-reveal', title: 'เปิดการ์ด / Reveal', desc: 'โอเวอร์เลย์เปิดการ์ดอย่างเดียว ไม่มี UI ส่วนอื่น', icon: '✨', category: 'gacha', ready: true, settingsTab: 'gacha', previewType: 'gacha',
-              buildUrl: () => `${getOverlayBaseOrigin()}/overlay?token=${getOverlayStreamToken()}&showSponsor=0&showTotal=0&showPity=0&showAlert=0`,
+              buildUrl: () => buildShortOverlayUrl('gacha/reveal'),
               previewGradient: 'linear-gradient(145deg, #12081f, #1e1035)' },
             { id: 'wheel', title: 'วงล้อสุ่ม', desc: 'แสดงวงล้อสุ่มรางวัลบน OBS — ควบคุมจากแผงวงล้อ', icon: '🎰', category: 'gacha', ready: true, settingsTab: 'randomwin', previewType: 'wheel', isWheel: true,
-              buildUrl: () => `${getOverlayBaseOrigin()}/random_win.html?overlay&token=${getOverlayStreamToken()}`,
+              buildUrl: () => buildShortOverlayUrl('wheel'),
               previewGradient: 'linear-gradient(145deg, #1a1028, #2a1545)' },
             { id: 'win', title: 'ตัวนับ Win', desc: 'นับจำนวน Win แบบโปร่งใส พร้อมเอฟเฟกต์และเสียง', icon: '🏆', category: 'widget', ready: true, settingsTab: 'win', previewType: 'win',
-              buildUrl: () => `${getOverlayBaseOrigin()}/overlay?mode=win&token=${getOverlayStreamToken()}`,
+              buildUrl: () => buildShortOverlayUrl('win'),
               previewGradient: 'linear-gradient(145deg, #1a1508, #2a2010)' },
             { id: 'timer', title: 'นาฬิกานับถอยหลัง', desc: 'ตัวจับเวลาโปร่งใส รองรับโหมดเตือนเมื่อใกล้หมดเวลา', icon: '⏰', category: 'widget', ready: true, settingsTab: 'timer', previewType: 'timer',
-              buildUrl: () => `${getOverlayBaseOrigin()}/overlay?mode=timer&token=${getOverlayStreamToken()}`,
+              buildUrl: () => buildShortOverlayUrl('timer'),
               previewGradient: 'linear-gradient(145deg, #081a20, #0d2830)' },
             { id: 'vote', title: 'โหวต VS / Coin Match', desc: 'การ์ดโหวตแบบ VS พร้อมตัวจับเวลาและประกาศผู้ชนะ', icon: '🗳️', category: 'event', ready: true, settingsTab: 'vote', previewType: 'vote',
-              buildUrl: () => `${getOverlayBaseOrigin()}/overlay?mode=vote&token=${getOverlayStreamToken()}`,
+              buildUrl: () => buildShortOverlayUrl('vote'),
               previewGradient: 'linear-gradient(145deg, #1a0a20, #2a1040)' },
             { id: 'songrequest', title: 'Spotify Song Request', desc: 'แสดงเพลงที่กำลังเล่นและคิวรีเควสจากผู้ชม', icon: '🎵', category: 'event', ready: true, settingsTab: 'songrequest', previewType: 'songrequest',
-              buildUrl: () => `${getOverlayBaseOrigin()}/overlay?mode=songrequest&token=${getOverlayStreamToken()}`,
+              buildUrl: () => buildShortOverlayUrl('songrequest'),
               previewGradient: 'linear-gradient(145deg, #0a1a10, #102818)' },
             { id: 'stream-credits', title: 'Stream Credits', desc: 'เครดิตปิดท้ายไลฟ์ — TOP 10 ผู้ส่งของขวัญ พร้อมรายละเอียดของขวัญ', icon: '🎬', category: 'event', ready: true, settingsTab: 'credits', previewType: 'rank',
-              buildUrl: () => `${getOverlayBaseOrigin()}/overlay?mode=credits&token=${getOverlayStreamToken()}`,
+              buildUrl: () => buildShortOverlayUrl('credits'),
               previewGradient: 'linear-gradient(145deg, #1a1008, #2a1810)' },
             { id: 'alerts', title: 'แจ้งเตือนของขวัญ', desc: 'แสดงเฉพาะการแจ้งเตือนของขวัญและอีเวนต์ ไม่มีกาชา', icon: '🎁', category: 'alert', ready: true, settingsTab: 'soundalerts', previewType: 'alert',
-              buildUrl: () => `${getOverlayBaseOrigin()}/overlay?mode=alerts&token=${getOverlayStreamToken()}`,
+              buildUrl: () => buildShortOverlayUrl('alerts'),
               previewGradient: 'linear-gradient(145deg, #1a1018, #281020)' },
             { id: 'gacha-alerts-only', title: 'กาชา + แจ้งเตือน', desc: 'เปิดการ์ดพร้อมแจ้งเตือน ไม่แสดงสปอนเซอร์/ยอดรวม/พิติ', icon: '💫', category: 'gacha', ready: true, settingsTab: 'gacha', previewType: 'gacha',
-              buildUrl: () => `${getOverlayBaseOrigin()}/overlay?mode=gacha&token=${getOverlayStreamToken()}&showSponsor=0&showTotal=0&showPity=0&showAlert=1`,
+              buildUrl: () => buildShortOverlayUrl('gacha/alerts'),
               previewGradient: 'linear-gradient(145deg, #150a28, #220f40)' },
             { id: 'coin-jar', title: 'โถเหรียญ / Gift Jar', desc: 'ของขวัญตกลงโหลแบบฟิสิกส์ — เติมตามยอดเหรียญจากผู้ชม', icon: '🏺', category: 'goal', ready: true, previewType: 'jar', previewGradient: 'linear-gradient(145deg, #101828, #182038)', settingsTab: 'jar',
-              buildUrl: () => `${getOverlayBaseOrigin()}/overlay?mode=jar&token=${getOverlayStreamToken()}&_v=18` },
+              buildUrl: () => buildShortOverlayUrl('jar') },
             { id: 'goal-coins', title: 'แถบเป้าหมาย — เหรียญ', desc: 'Progress bar เป้าหมายยอดเหรียญไลฟ์', icon: '🪙', category: 'goal', ready: false, previewType: 'goal', previewGradient: 'linear-gradient(145deg, #181008, #281810)' },
             { id: 'goal-likes', title: 'แถบเป้าหมาย — ไลค์', desc: 'Progress bar เป้าหมายยอดไลค์ไลฟ์', icon: '❤️', category: 'goal', ready: false, previewType: 'goal', previewGradient: 'linear-gradient(145deg, #180810, #281018)' },
             { id: 'coin-rank', title: 'อันดับเหรียญ', desc: 'ลีดเดอร์บอร์ด Top Gifter ตามยอดเหรียญ', icon: '🥇', category: 'widget', ready: false, previewType: 'rank', previewGradient: 'linear-gradient(145deg, #181408, #282010)' },
@@ -10369,7 +10507,7 @@
             { id: 'gift-firework', title: 'พลุของขวัญ', desc: 'เอฟเฟกต์พลุเมื่อได้รับของขวัญพิเศษ', icon: '🎆', category: 'alert', ready: false, previewType: 'fun', previewGradient: 'linear-gradient(145deg, #180818, #281028)' },
             { id: 'heart-float', title: 'Heart Float', desc: 'หัวใจลอยขึ้นเมื่อมีไลค์', icon: '💗', category: 'alert', ready: false, previewType: 'fun', previewGradient: 'linear-gradient(145deg, #180810, #281018)' },
             { id: 'top-gifter', title: 'มงกุฎ Top Gifter', desc: 'แสดงมงกุฎผู้ให้ของขวัญอันดับ 1', icon: '👑', category: 'widget', ready: false, previewType: 'rank', previewGradient: 'linear-gradient(145deg, #181008, #282010)' },
-            { id: 'airdrop-mission', title: 'Airdrop Mission', desc: 'ภารกิจพิเศษ — รวมพลังเติมหลอดรับรางวัลกาชา', icon: '📦', category: 'event', ready: true, previewType: 'goal', previewGradient: 'linear-gradient(145deg, #180818, #281040)', buildUrl: () => `${getOverlayBaseOrigin()}/overlay?mode=airdrop&token=${currentUser.streamToken || ''}&_v=12`, settingsTab: 'airdrop' },
+            { id: 'airdrop-mission', title: 'Airdrop Mission', desc: 'ภารกิจพิเศษ — รวมพลังเติมหลอดรับรางวัลกาชา', icon: '📦', category: 'event', ready: true, previewType: 'goal', previewGradient: 'linear-gradient(145deg, #180818, #281040)', buildUrl: () => buildShortOverlayUrl('airdrop'), settingsTab: 'airdrop' },
             { id: 'stream-quest', title: 'Stream Quest', desc: 'ภารกิจไลฟ์ที่ผู้ชมช่วยทำให้สำเร็จ', icon: '📋', category: 'event', ready: false, previewType: 'goal', previewGradient: 'linear-gradient(145deg, #081018, #101828)' },
             { id: 'emote-rain', title: 'Emote Rain', desc: 'ฝนอีโมจิจากคอมเมนต์หรือของขวัญ', icon: '🌧️', category: 'alert', ready: false, previewType: 'fun', previewGradient: 'linear-gradient(145deg, #101018, #181828)' }
         ];
@@ -10431,11 +10569,10 @@
             }
             grid.innerHTML = items.map(item => {
                 const url = getOverlayItemUrl(item);
-                const tokenMissing = item.ready && !getOverlayStreamToken();
                 const badgeClass = item.badge === 'pro' ? 'pro' : (item.ready ? 'ready' : 'soon');
                 const badgeText = item.badge === 'pro' ? 'PRO' : (item.ready ? 'พร้อมใช้' : 'เร็วๆ นี้');
-                const disabled = !item.ready || tokenMissing;
-                const urlPlaceholder = item.ready ? (tokenMissing ? 'กรุณาเข้าสู่ระบบเพื่อสร้างลิงก์' : url) : 'กำลังพัฒนา — ยังไม่พร้อมใช้งาน';
+                const disabled = !item.ready;
+                const urlPlaceholder = item.ready ? url : 'กำลังพัฒนา — ยังไม่พร้อมใช้งาน';
                 return `<div class="ov-gallery-card${item.ready ? '' : ' is-soon'}" data-ov-id="${item.id}">
                     <div class="ov-gallery-preview" style="background:${item.previewGradient || '#111'};">
                         <div class="ov-gallery-preview-inner">${buildOverlayPreviewHtml(item)}</div>
@@ -10503,7 +10640,7 @@
             if (!url) return;
             const w = item.isWheel ? 800 : 1280;
             const h = item.isWheel ? 800 : 720;
-            window.open(url, 'PandyOverlay_' + id, `width=${w},height=${h},menubar=no,toolbar=no`);
+            window.open(url, 'TokControlOverlay_' + id, `width=${w},height=${h},menubar=no,toolbar=no`);
         }
 
         function openOverlayGalleryNewTab(id) {
@@ -10521,6 +10658,15 @@
         //  VIEW SWITCHER & WIN COUNTER LOGIC
         // ==========================================
         function switchMainTab(viewName) {
+            if (SOON_TABS[viewName] && !isAppAdmin()) {
+                showSoonFeaturePrompt(SOON_TABS[viewName]);
+                return;
+            }
+            if (PRO_ONLY_TABS[viewName] && !isAppPro()) {
+                showProUpgradePrompt(PRO_ONLY_TABS[viewName]);
+                return;
+            }
+
             // Update active state in sidebar navigation links
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             const activeNav = document.getElementById('nav-' + viewName);
@@ -11559,7 +11705,7 @@
             if (baseOrigin.includes('localhost')) {
                 baseOrigin = baseOrigin.replace('localhost', '127.0.0.1');
             }
-            const link = `${baseOrigin}/overlay?mode=win&token=${currentUser.streamToken || ''}`;
+            const link = buildShortOverlayUrl('win');
             copyToClipboard(link);
         }
 
@@ -12267,7 +12413,7 @@
             if (baseOrigin.includes('localhost')) {
                 baseOrigin = baseOrigin.replace('localhost', '127.0.0.1');
             }
-            const link = `${baseOrigin}/overlay?mode=timer&token=${currentUser.streamToken || ''}`;
+            const link = buildShortOverlayUrl('timer');
             copyToClipboard(link);
         }
 
@@ -13944,16 +14090,7 @@
         }
 
         function copyVoteOverlayLink() {
-            let base = window.location.origin;
-            if (base.includes('localhost')) base = base.replace('localhost', '127.0.0.1');
-            const link = `${base}/overlay?mode=vote&token=${currentUser.streamToken || ''}`;
-            copyToClipboard(link);
-            showCustomMsg('success', 'คัดลอกแล้ว', 'นำลิงก์ไปใส่ใน OBS Browser Source');
-        }
-
-        function copyVoteOverlayLink() {
-            const base = getOverlayBaseOrigin();
-            const link = `${base}/overlay?mode=vote&token=${currentUser.streamToken || ''}`;
+            const link = buildShortOverlayUrl('vote');
             copyToClipboard(link);
             showCustomMsg('success', 'คัดลอกแล้ว', 'นำลิงก์ไปใส่ใน OBS Browser Source');
         }
@@ -14281,7 +14418,7 @@
 
         function copySongRequestOverlayLink() {
             const base = getOverlayBaseOrigin();
-            const link = `${base}/overlay?mode=songrequest&token=${currentUser.streamToken || ''}`;
+            const link = buildShortOverlayUrl('songrequest');
             copyToClipboard(link);
             showCustomMsg('success', 'คัดลอกแล้ว', 'นำลิงก์ไปใส่ใน OBS Browser Source');
         }
@@ -15699,6 +15836,7 @@
         }
 
         function handleAirdropFromGift(gift) {
+            if (!isAppPro()) return;
             if (!adIsActive() && airdropRuntime.phase !== 'mission') return;
             if (airdropRuntime.phase !== 'mission') return;
             const s = ensureAirdropStore();
@@ -15910,7 +16048,7 @@
 
         function copyAirdropOverlayLink() {
             const base = typeof getOverlayBaseOrigin === 'function' ? getOverlayBaseOrigin() : window.location.origin.replace('localhost', '127.0.0.1');
-            const link = `${base}/overlay?mode=airdrop&token=${currentUser.streamToken || ''}&_v=19`;
+            const link = buildShortOverlayUrl('airdrop');
             copyToClipboard(link);
             showCustomMsg('success', 'คัดลอกแล้ว', 'นำลิงก์ไปใส่ใน OBS Browser Source');
         }
@@ -16341,7 +16479,7 @@
 
         function copyGiftJarOverlayLink() {
             const base = typeof getOverlayBaseOrigin === 'function' ? getOverlayBaseOrigin() : window.location.origin.replace('localhost', '127.0.0.1');
-            const link = `${base}/overlay?mode=jar&token=${currentUser.streamToken || ''}&_v=18`;
+            const link = buildShortOverlayUrl('jar');
             copyToClipboard(link);
             showCustomMsg('success', 'คัดลอกแล้ว', 'นำลิงก์ไปใส่ใน OBS Browser Source (1080×1920 แนะนำ)');
         }
@@ -16933,6 +17071,7 @@
         }
 
         function recordStreamCreditsGift(gift) {
+            if (!isAppPro()) return;
             const uid = gift.uniqueId || 'unknown';
             if (!streamCreditsGifters[uid]) {
                 streamCreditsGifters[uid] = {
@@ -16964,6 +17103,7 @@
         }
 
         function recordStreamCreditsLike(data) {
+            if (!isAppPro()) return;
             const uid = data.uniqueId || 'unknown';
             const resolvedAv = creditsResolveAvatar(uid, data.avatar || data.profilePictureUrl);
             if (!streamCreditsLikers[uid]) {
@@ -16983,6 +17123,7 @@
         }
 
         function recordStreamCreditsFollow(data) {
+            if (!isAppPro()) return;
             const uid = data?.uniqueId;
             if (!uid) return;
             if (!streamCreditsFollowers[uid]) {
@@ -17285,6 +17426,10 @@
         }
 
         async function playStreamCredits() {
+            if (!isAppPro()) {
+                showProUpgradePrompt('Stream Credits');
+                return;
+            }
             await ensureGiftCatalogLoaded();
             if (!creditsHasPlayableData()) {
                 showCustomMsg('warning', 'ยังไม่มีข้อมูล', 'ยังไม่มีข้อมูลในไลฟ์นี้ (ของขวัญ / ไลค์ / ผู้ติดตามใหม่)');
@@ -17319,7 +17464,7 @@
         function copyCreditsOverlayLink() {
             let base = window.location.origin;
             if (base.includes('localhost')) base = base.replace('localhost', '127.0.0.1');
-            const link = `${base}/overlay?mode=credits&token=${currentUser.streamToken || ''}`;
+            const link = buildShortOverlayUrl('credits');
             copyToClipboard(link);
             showCustomMsg('success', 'คัดลอกแล้ว', 'นำลิงก์ไปใส่ใน OBS Browser Source');
         }

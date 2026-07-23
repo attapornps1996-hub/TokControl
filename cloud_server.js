@@ -236,6 +236,30 @@ app.get('/api/gifts', async (appReq, appRes) => {
     }
 });
 
+// รับของขวัญใหม่จาก client ทั่วโลกเพื่อรวมเข้าคลังกลาง
+app.post('/api/gifts/sync', async (appReq, appRes) => {
+    try {
+        const expectedKey = (process.env.GIFTS_SYNC_KEY || '').trim();
+        if (expectedKey && appReq.body?.syncKey !== expectedKey) {
+            return appRes.status(403).json({ error: 'Invalid sync key' });
+        }
+        const { giftId, giftName, diamondCount, giftIcon } = appReq.body || {};
+        if (!giftId || !giftName) {
+            return appRes.status(400).json({ error: 'ข้อมูลไม่ครบถ้วน' });
+        }
+        const existing = await db.getGift(giftId, giftName);
+        const nowStr = new Date().toISOString();
+        const finalCoins = Math.max(1, parseInt(diamondCount, 10) || existing?.diamondCount || 1);
+        const finalIcon = giftIcon || existing?.giftIcon || '';
+        await db.saveGift(giftId, giftName, finalCoins, finalIcon, nowStr);
+        io.emit('new_gift_discovered', { giftId, giftName, diamondCount: finalCoins, giftIcon: finalIcon });
+        appRes.json({ success: true, action: existing ? 'update' : 'insert' });
+    } catch (e) {
+        console.error('[GiftsSync] cloud sync error:', e);
+        appRes.status(500).json({ error: e.message });
+    }
+});
+
 // [ADMIN] อัปเดตข้อมูลของขวัญ
 app.post('/api/gifts/update', async (appReq, appRes) => {
     try {
@@ -365,7 +389,7 @@ app.post('/api/browser/event', async (appReq, appRes) => {
 app.get('/api/open-tiktok-browser', (req, res) => {
     res.json({
         success: false,
-        error: "Browser Mode is only supported when running the app locally. If you are using the cloud server, please open TikTok Live directly in your Chrome browser and run the Pandy bookmarklet manually."
+        error: "Browser Mode is only supported when running the app locally. If you are using the cloud server, please open TikTok Live directly in your Chrome browser and run the TokControl bookmarklet manually."
     });
 });
 
@@ -686,5 +710,5 @@ io.on('connection', (socket) => {
 });
 
 server.listen(PORT, () => {
-    console.log(`Pandy App Cloud Backend server running on port ${PORT}`);
+    console.log(`TokControl Cloud Backend server running on port ${PORT}`);
 });

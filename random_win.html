@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pandy App - Random Win Wheel</title>
+    <title>TokControl - Random Win Wheel</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -514,8 +514,9 @@
     </div>
 
     <script>
-        const isOverlayMode = new URLSearchParams(window.location.search).has('overlay');
-        const overlayToken = new URLSearchParams(window.location.search).get('token') || '';
+        const isOverlayMode = new URLSearchParams(window.location.search).has('overlay')
+            || /^\/overlay\/wheel\/?$/i.test(window.location.pathname);
+        let overlayToken = new URLSearchParams(window.location.search).get('token') || '';
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let wheelSocket = null;
         let wheelDrawQueue = [];
@@ -1221,11 +1222,23 @@
         }
 
         function getOverlayURL() {
-            const url = new URL(window.location.origin + window.location.pathname);
-            url.searchParams.set('overlay', '1');
-            const token = getStreamToken();
-            if (token) url.searchParams.set('token', token);
-            return url.toString();
+            const base = window.location.origin.replace('localhost', '127.0.0.1');
+            return `${base}/overlay/wheel`;
+        }
+
+        async function resolveOverlayToken() {
+            if (overlayToken) return overlayToken;
+            try {
+                const res = await fetch('/api/overlay/session');
+                const data = await res.json();
+                if (data.success && data.streamToken) {
+                    overlayToken = data.streamToken;
+                    return overlayToken;
+                }
+            } catch (e) {
+                console.warn('[Wheel Overlay] Failed to resolve session token:', e);
+            }
+            return '';
         }
 
         function copyOverlayURL() {
@@ -1341,10 +1354,11 @@
             if (typeof io === 'undefined') return;
             wheelSocket = io();
 
-            wheelSocket.on('connect', () => {
-                if (isOverlayMode && overlayToken) {
-                    wheelSocket.emit('join_overlay', overlayToken);
-                } else if (!isOverlayMode) {
+            wheelSocket.on('connect', async () => {
+                if (isOverlayMode) {
+                    const resolved = await resolveOverlayToken();
+                    if (resolved) wheelSocket.emit('join_overlay', resolved);
+                } else {
                     emitWheelIdleSync();
                 }
             });
@@ -1385,7 +1399,6 @@
                     if (data.displaySettings) applySyncedDisplaySettings(data.displaySettings);
                     if (!overlaySpinProcessing) renderIdleWheel();
                 });
-                if (overlayToken) wheelSocket.emit('join_overlay', overlayToken);
             }
         }
 

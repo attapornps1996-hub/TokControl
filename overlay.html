@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pandy App - OBS Overlay</title>
+    <title>TokControl - OBS Overlay</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
     <script src="/jar-physics.js"></script>
@@ -1564,11 +1564,52 @@
     </div>
 
     <script>
+        function parseOverlayPathConfig() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const parts = window.location.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+            const overlayIdx = parts.indexOf('overlay');
+            const segments = overlayIdx >= 0 ? parts.slice(overlayIdx + 1) : [];
+            const config = {
+                mode: urlParams.get('mode'),
+                showSponsor: urlParams.has('showSponsor') ? urlParams.get('showSponsor') : null,
+                showTotal: urlParams.has('showTotal') ? urlParams.get('showTotal') : null,
+                showPity: urlParams.has('showPity') ? urlParams.get('showPity') : null,
+                showAlert: urlParams.has('showAlert') ? urlParams.get('showAlert') : null
+            };
+            const pathKey = segments.join('/');
+            const PATH_MAP = {
+                'gacha': { mode: 'gacha', showSponsor: '1', showTotal: '1', showPity: '1', showAlert: '1' },
+                'gacha/reveal': { mode: 'gacha', showSponsor: '0', showTotal: '0', showPity: '0', showAlert: '0' },
+                'gacha/alerts': { mode: 'gacha', showSponsor: '0', showTotal: '0', showPity: '0', showAlert: '1' },
+                'reveal': { mode: 'gacha', showSponsor: '0', showTotal: '0', showPity: '0', showAlert: '0' },
+                'win': { mode: 'win' },
+                'timer': { mode: 'timer' },
+                'vote': { mode: 'vote' },
+                'songrequest': { mode: 'songrequest' },
+                'credits': { mode: 'credits' },
+                'alerts': { mode: 'alerts' },
+                'jar': { mode: 'jar' },
+                'airdrop': { mode: 'airdrop' }
+            };
+            const mapped = PATH_MAP[pathKey] || (segments[0] ? PATH_MAP[segments[0]] : null);
+            if (mapped) {
+                if (!config.mode) config.mode = mapped.mode;
+                ['showSponsor', 'showTotal', 'showPity', 'showAlert'].forEach((key) => {
+                    if (config[key] === null && mapped[key] !== undefined) config[key] = mapped[key];
+                });
+            } else if (!config.mode && segments[0]) {
+                config.mode = segments[0];
+            }
+            if (!config.mode && segments.length === 0) config.mode = 'gacha';
+            return config;
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
+        const pathConfig = parseOverlayPathConfig();
+        let token = urlParams.get('token');
         const customServer = urlParams.get('serverUrl');
         const socket = io(customServer || undefined);
-        const mode = urlParams.get('mode');
+        const mode = pathConfig.mode || urlParams.get('mode');
         
         // Remote error reporting for OBS Overlay debugging
         window.onerror = function(message, source, lineno, colno, error) {
@@ -2835,25 +2876,37 @@
         });
         
         // ตัวเลือกเปิด/ปิดการแสดงผลจากสตรีมเมอร์
-        const showPity = urlParams.get('showPity') !== '0';
-        const showSponsor = urlParams.get('showSponsor') !== '0';
-        const showTotal = urlParams.get('showTotal') !== '0';
-        let showAlert = urlParams.get('showAlert') !== '0';
+        const showPity = (pathConfig.showPity !== null ? pathConfig.showPity : urlParams.get('showPity')) !== '0';
+        const showSponsor = (pathConfig.showSponsor !== null ? pathConfig.showSponsor : urlParams.get('showSponsor')) !== '0';
+        const showTotal = (pathConfig.showTotal !== null ? pathConfig.showTotal : urlParams.get('showTotal')) !== '0';
+        let showAlert = (pathConfig.showAlert !== null ? pathConfig.showAlert : urlParams.get('showAlert')) !== '0';
         if (mode === 'alert' || mode === 'alerts') {
             showAlert = true; // Force show alerts if we are explicitly on the alert-only overlay source
         }
 
         const tierColors = { 'd': '#ffffff', 'b': '#2ecc71', 'a': '#00d2ff', 's': '#f1c40f', 'ss': '#ff4757', 'ssr': '#c9fcff' };
 
-        if (!token) {
-            console.error("Token is missing! Example: /overlay?token=YOUR_TOKEN");
-            document.body.innerHTML = `<div style="padding: 20px; font-size: 1.2rem; color: #ff4757; text-align: center; background: rgba(0,0,0,0.8);">
-                ⚠️ กรุณาระบุ token เพื่อเชื่อมโยง OBS Overlay (ตัวอย่าง: /overlay?token=xxxx)
-            </div>`;
-        } else {
-            // เข้าร่วมห้อง WebSocket
+        async function connectOverlayRoom() {
+            if (!token) {
+                try {
+                    const res = await fetch('/api/overlay/session');
+                    const data = await res.json();
+                    if (data.success && data.streamToken) token = data.streamToken;
+                } catch (e) {
+                    console.warn('[Overlay] Failed to resolve local session token:', e);
+                }
+            }
+            if (!token) {
+                console.error('Token is missing! Log in to TokControl first, then reload this overlay.');
+                document.body.innerHTML = `<div style="padding: 20px; font-size: 1.2rem; color: #ff4757; text-align: center; background: rgba(0,0,0,0.8);">
+                    ⚠️ ไม่พบการเชื่อมต่อ — กรุณาเปิดและล็อกอิน TokControl ก่อน แล้วรีเฟรช Overlay นี้<br><br>
+                    <span style="font-size:0.9rem;color:#aaa;">ใช้ URL สั้นได้เลย เช่น /overlay/gacha</span>
+                </div>`;
+                return false;
+            }
             socket.emit('join_overlay', token);
             console.log(`Connected to room: ${token}`);
+            return true;
         }
 
         let overlaySfxVolume = 0.15;
@@ -4139,6 +4192,8 @@
             socket.on('overlay_gift_jar_status', jarOvApplyStatus);
         }
         }
+
+        connectOverlayRoom();
     </script>
 </body>
 </html>

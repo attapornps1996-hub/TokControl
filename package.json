@@ -1,6 +1,6 @@
 {
   "name": "pandy-app",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "main.js",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
     "start": "electron .",
     "build": "electron-builder",
     "publish": "electron-builder --publish always",
-    "package-win": "electron-packager . pandy-app --platform=win32 --arch=x64 --icon=icon.ico --overwrite"
+    "package-win": "electron-packager . TokControl --platform=win32 --arch=x64 --icon=icon.ico --overwrite"
   },
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
@@ -34,8 +34,8 @@
     "electron-packager": "^17.1.2"
   },
   "build": {
-    "appId": "com.yourname.tiktokoverlay",
-    "productName": "TikTok Live Overlay",
+    "appId": "com.attapornps1996-hub.tokcontrol",
+    "productName": "TokControl",
     "publish": [
       {
         "provider": "github",
@@ -44,7 +44,29 @@
       }
     ],
     "win": {
-      "target": "nsis"
-    }
+      "target": "nsis",
+      "executableName": "TokControl",
+      "icon": "icon.png"
+    },
+    "nsis": {
+      "shortcutName": "TokControl",
+      "artifactName": "TokControl-Setup-${version}.${ext}"
+    },
+    "files": [
+      "**/*",
+      "!pandy-app-win32-x64/**",
+      "!dist/**",
+      "!out/**",
+      "!release/**"
+    ],
+    "extraResources": [
+      {
+        "from": "data",
+        "to": "data",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
   }
 }

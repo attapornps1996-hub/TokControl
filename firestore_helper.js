@@ -216,7 +216,7 @@ const firestoreHelper = {
             return true;
         } else {
             await sqliteDb.run(
-                'INSERT INTO tiktok_gifts (giftId, giftName, diamondCount, giftIcon, createdAt) VALUES (?, ?, ?, ?, ?)',
+                'INSERT OR REPLACE INTO tiktok_gifts (giftId, giftName, diamondCount, giftIcon, createdAt) VALUES (?, ?, ?, ?, ?)',
                 [giftId, giftName, diamondCount, giftIcon, createdAt]
             );
             return true;

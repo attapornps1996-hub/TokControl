@@ -1,17 +1,17 @@
 (function() {
-    console.log("Pandy App Browser Connector active!");
+    console.log("TokControl Browser Connector active!");
     
     if (window.PandyObserver) {
         try {
             window.PandyObserver.disconnect();
-            console.log("Pandy App: Old observer disconnected.");
+            console.log("TokControl: Old observer disconnected.");
         } catch(e) {}
     }
     
     // แสดงข้อความยืนยันการเชื่อมต่อสำเร็จ
     const notifyEl = document.createElement("div");
     notifyEl.style.cssText = "position:fixed; top:20px; right:20px; z-index:999999; background:linear-gradient(45deg, #bc13fe, #ff0050); color:#fff; padding:15px 25px; border-radius:12px; font-family:'Kanit', sans-serif; font-weight:bold; box-shadow:0 10px 30px rgba(0,0,0,0.5); border:2px solid #fff; font-size:16px; animation: slideIn 0.3s ease-out;";
-    notifyEl.innerHTML = "⚡ Pandy App Browser Connector: เชื่อมต่อสำเร็จ! ระบบกำลังดักจับแชทและของขวัญ...";
+    notifyEl.innerHTML = "⚡ TokControl Browser Connector: เชื่อมต่อสำเร็จ! ระบบกำลังดักจับแชทและของขวัญ...";
     document.body.appendChild(notifyEl);
     setTimeout(() => { notifyEl.remove(); }, 5000);
 
@@ -35,7 +35,7 @@
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ type, data })
-            }).catch(err => console.error("Pandy App connection error:", err));
+            }).catch(err => console.error("TokControl connection error:", err));
         }
     }
 
@@ -396,7 +396,7 @@
     let bottomScanInterval = setInterval(() => {
         if (scanBottomGiftPanel()) {
             clearInterval(bottomScanInterval);
-            console.log("Pandy App: Bottom gift panel scanned successfully.");
+            console.log("TokControl: Bottom gift panel scanned successfully.");
         }
     }, 3000);
     
