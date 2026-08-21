@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="th" class="dc-control-root">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dance Club — ตั้งค่า</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dance-club.css">
+    <script>
+        (function () {
+            try {
+                if (new URLSearchParams(location.search).get('embed') === '1') {
+                    document.documentElement.classList.add('dc-embed');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body class="dc-control-mode">
+    <div id="dcControlApp">
+        <header class="dc-control-head">
+            <div>
+                <h1>🎛️ ตั้งค่าเวที</h1>
+                <p id="dcConnStatus" class="dc-conn-status">รอเชื่อมต่อหน้าแสดงผล… เปิดหน้าแสดงผลก่อน</p>
+            </div>
+            <div class="dc-control-head-actions">
+                <div class="dc-pill" id="dcRemotePill"><span class="dot"></span><span class="label">ยังไม่เชื่อมต่อ</span></div>
+                <button type="button" class="dc-btn primary" id="dcOpenView">🕺 เปิดหน้าแสดงผล</button>
+            </div>
+        </header>
+
+        <div class="dc-control-tabs" id="dcDrawerTabs">
+            <button type="button" class="active" data-panel="music">🎵 เพลง &amp; บีท</button>
+            <button type="button" data-panel="lights">💡 ไฟ &amp; เวที</button>
+            <button type="button" data-panel="bg">🌌 พื้นหลัง</button>
+            <button type="button" data-panel="camera">🎥 กล้อง</button>
+            <button type="button" data-panel="dancers">👥 นักเต้น</button>
+        </div>
+
+        <main class="dc-control-body">
+            <section class="dc-panel dc-panel-section active" data-panel="music">
+                <div class="dc-split">
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Source</span><span class="dc-block-title">แหล่งเสียง</span></div>
+                        <div class="dc-tabs" id="dcSourceTabs">
+                            <button type="button" class="dc-tab active" data-src="procedural">บีทในตัว</button>
+                            <button type="button" class="dc-tab" data-src="spotify">Spotify</button>
+                            <button type="button" class="dc-tab" data-src="youtube">YouTube</button>
+                            <button type="button" class="dc-tab" data-src="file">ไฟล์เพลง</button>
+                            <button type="button" class="dc-tab" data-src="mic">ไมค์/ระบบ</button>
+                        </div>
+
+                        <div class="dc-src-pane">
+                            <div class="dc-src-body" data-body="procedural">
+                                <div class="dc-actions">
+                                    <button type="button" class="dc-btn primary" id="dcBtnMusic">▶ เปิดบีทคลับ</button>
+                                </div>
+                                <p class="dc-hint">สั่งเล่นที่หน้าแสดงผล — เสียงและภาพจะ sync กัน</p>
+                            </div>
+
+                            <div class="dc-src-body" data-body="spotify" hidden>
+                                <div class="dc-spotify-head">
+                                    <span class="dc-spotify-badge off" id="dcSpBadge">● กำลังตรวจสอบ…</span>
+                                    <div class="dc-row" style="gap:6px;">
+                                        <button type="button" class="dc-btn small" id="dcSpConnect">🔗 เชื่อมต่อ</button>
+                                        <button type="button" class="dc-btn small" id="dcSpRefresh">รีเฟรช</button>
+                                    </div>
+                                </div>
+                                <div class="dc-row">
+                                    <input type="text" id="dcSpSearch" class="dc-input" placeholder="ค้นหาเพลง / ศิลปิน">
+                                    <button type="button" class="dc-btn primary" id="dcSpSearchBtn">ค้นหา</button>
+                                </div>
+                                <div class="dc-spotify-msg" id="dcSpMsg"></div>
+                                <div class="dc-spotify-results" id="dcSpResults">
+                                    <div class="dc-hint">ค้นหาแล้วกด ▶ — เล่นบน Spotify + sync แบนเนอร์/BPM/ไฟที่หน้าแสดงผล</div>
+                                </div>
+                                <div class="dc-divider"></div>
+                                <div class="dc-field">
+                                    <label style="color:#1DB954;">🎧 กำลังเล่น</label>
+                                    <div id="dcSpNowPlaying" class="dc-spotify-now">
+                                        <div class="dc-hint">ยังไม่มีเพลง</div>
+                                    </div>
+                                </div>
+                                <div class="dc-actions">
+                                    <button type="button" class="dc-btn" id="dcSpSkip">⏭ ข้าม</button>
+                                    <button type="button" class="dc-btn small" id="dcSpSyncNow">↻ Sync เวที</button>
+                                </div>
+                                <div class="dc-queue-head">
+                                    <span>📋 คิวร่วม Song Request (<span id="dcSpQueueCount">0</span>)</span>
+                                    <button type="button" class="dc-btn small" id="dcSpQueueClear">ล้างคิว</button>
+                                </div>
+                                <div class="dc-queue-list dc-sp-queue" id="dcSpQueueList">
+                                    <div class="dc-hint">กด ➕ จากผลค้นหาเพื่อเพิ่มคิว · ▶ เล่นทันที</div>
+                                </div>
+                                <div class="dc-divider"></div>
+                                <p class="dc-hint dc-spotify-howto">
+                                    <b>Spotify</b> เสียงเล่นที่แอป Spotify · sync บีทจาก Audio Analysis<br>
+                                    <b>YouTube (Song Request)</b> เสียงเล่นที่ Song Request · Dance Club ซิงก์จอ/บีทเท่านั้น (ไม่เล่นซ้ำ)
+                                </p>
+                                <p class="dc-hint dc-spotify-premium-note">
+                                    บัญชีต้องเป็น <b>Premium</b> ·
+                                    <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">Developer Dashboard</a>
+                                </p>
+                            </div>
+
+                            <div class="dc-src-body" data-body="youtube" hidden>
+                                <div class="dc-row">
+                                    <input type="text" id="dcYtUrl" class="dc-input" placeholder="วางลิงก์ YouTube หรือ Video ID">
+                                    <button type="button" class="dc-btn primary" id="dcYtLoad">โหลด</button>
+                                </div>
+                                <p class="dc-hint">YouTube เล่นที่หน้าแสดงผล · ใช้แค่เสียง · ซิงก์ด้วย BPM (กด Tap)</p>
+                            </div>
+
+                            <div class="dc-src-body" data-body="file" hidden>
+                                <div class="dc-actions">
+                                    <button type="button" class="dc-btn" id="dcBtnPickFile">🎵 เลือกไฟล์เพลง</button>
+                                    <button type="button" class="dc-btn primary" id="dcBtnQueueAdd">➕ เพิ่มเข้าคิว</button>
+                                </div>
+                                <input type="file" id="dcAudioFile" accept="audio/*" hidden>
+                                <input type="file" id="dcAudioQueue" accept="audio/*" multiple hidden>
+                                <p class="dc-hint">เลือกไฟล์ = เล่นทันที · เพิ่มเข้าคิว = ต่อคิวหลายเพลง</p>
+                                <div class="dc-queue-head">
+                                    <span>คิวเพลง</span>
+                                    <div class="dc-row" style="gap:6px;">
+                                        <button type="button" class="dc-btn small" id="dcQueuePrev">⏮</button>
+                                        <button type="button" class="dc-btn small" id="dcQueueNext">⏭</button>
+                                        <button type="button" class="dc-btn small" id="dcQueueClear">ล้างคิว</button>
+                                    </div>
+                                </div>
+                                <div class="dc-queue-list" id="dcQueueList">
+                                    <div class="dc-hint">ยังไม่มีเพลงในคิว</div>
+                                </div>
+                            </div>
+
+                            <div class="dc-src-body" data-body="mic" hidden>
+                                <button type="button" class="dc-btn primary" id="dcBtnMic">🎙️ เริ่มฟังไมค์</button>
+                                <p class="dc-hint">ไมค์ทำงานที่หน้าแสดงผล</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Beat</span><span class="dc-block-title">BPM &amp; ความไว</span></div>
+                        <div class="dc-field">
+                            <label>BPM <b id="dcBpmVal">128</b></label>
+                            <div class="dc-row">
+                                <input type="range" id="dcBpm" min="60" max="200" step="1" value="128">
+                                <button type="button" class="dc-btn small" id="dcBtnTap">Tap</button>
+                                <button type="button" class="dc-btn small" id="dcBtnResync">Resync</button>
+                            </div>
+                        </div>
+                        <div class="dc-field">
+                            <label>ความละเอียดบีท</label>
+                            <div class="dc-seg" id="dcBeatDiv">
+                                <button type="button" data-div="0.5">1/2</button>
+                                <button type="button" class="active" data-div="1">1/4</button>
+                                <button type="button" data-div="2">1/8</button>
+                                <button type="button" data-div="4">1/16</button>
+                            </div>
+                        </div>
+                        <div class="dc-field">
+                            <label>ความไวต่อบีท <b id="dcSensVal">1.0</b></label>
+                            <input type="range" id="dcSens" min="0.3" max="2.5" step="0.1" value="1">
+                        </div>
+                        <div class="dc-field">
+                            <label>ระดับเสียง</label>
+                            <input type="range" id="dcVolume" min="0" max="1" step="0.02" value="0.8">
+                        </div>
+                        <label class="dc-check">
+                            <input type="checkbox" id="dcBpmLock"> ล็อก BPM (ไม่ให้ตรวจจับอัตโนมัติ)
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dc-panel dc-panel-section" data-panel="lights">
+                <div class="dc-split dc-split--lights">
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">AI</span><span class="dc-block-title">โหมดอัตโนมัติ</span></div>
+                        <div class="dc-reactive-box">
+                            <p class="dc-hint" style="margin:0 0 8px;">AI = บีทแรง · N บีท = ทุก N บีท · ปิด = คุมมือ</p>
+                            <div class="dc-field">
+                                <label>ความแรงบีทขั้นต่ำ (AI) <b id="dcStrongBeatVal">40%</b></label>
+                                <input type="range" id="dcStrongBeat" min="0" max="1" step="0.05" value="0.4">
+                            </div>
+                        </div>
+                        <div class="dc-mode-row">
+                            <label>ชุดสีไฟ</label>
+                            <div class="dc-mode-seg" data-reactive="palette">
+                                <button type="button" class="active" data-mode="ai">AI สุ่ม</button>
+                                <button type="button" data-mode="beats">N บีท</button>
+                                <button type="button" data-mode="off">ปิด</button>
+                            </div>
+                        </div>
+                        <div class="dc-mode-row">
+                            <label>เอฟเฟกต์เวที</label>
+                            <div class="dc-mode-seg" data-reactive="dynamicFx">
+                                <button type="button" class="active" data-mode="ai">AI วิเคราะห์</button>
+                                <button type="button" data-mode="beats">N บีท</button>
+                                <button type="button" data-mode="off">ปิด</button>
+                            </div>
+                        </div>
+                        <div class="dc-mode-row">
+                            <label>แพตเทิร์นไฟ</label>
+                            <div class="dc-mode-seg" data-reactive="pattern">
+                                <button type="button" class="active" data-mode="ai">AI</button>
+                                <button type="button" data-mode="beats">N บีท</button>
+                                <button type="button" data-mode="off">ปิด</button>
+                            </div>
+                        </div>
+                        <div class="dc-field">
+                            <label>ความสว่างรวม <b id="dcLightIntensityVal">100%</b></label>
+                            <input type="range" id="dcLightIntensity" min="0.2" max="2" step="0.05" value="1">
+                        </div>
+                        <div class="dc-field">
+                            <label>ไฟเต้นตามบีท <b id="dcBeatReactVal">100%</b></label>
+                            <input type="range" id="dcBeatReact" min="0" max="2" step="0.05" value="1">
+                        </div>
+                        <div class="dc-checks">
+                            <label class="dc-check"><input type="checkbox" id="dcStrobe" checked> สโตรบ</label>
+                            <label class="dc-check"><input type="checkbox" id="dcLasers" checked> เลเซอร์</label>
+                            <label class="dc-check"><input type="checkbox" id="dcBeams" checked> ลำแสงหมอก</label>
+                            <label class="dc-check"><input type="checkbox" id="dcSmokeEnable" checked> ควันเวที</label>
+                            <label class="dc-check"><input type="checkbox" id="dcSmokeOnSong" checked> ควันตอนเปลี่ยนเพลง</label>
+                        </div>
+                    </div>
+
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Look</span><span class="dc-block-title">ชุดสี &amp; เอฟเฟกต์</span></div>
+                        <div class="dc-field">
+                            <label>ชุดสีไฟ</label>
+                            <div class="dc-palette-grid" id="dcPalette"></div>
+                        </div>
+                        <div class="dc-field">
+                            <label>เอฟเฟกต์เวที (Dynamic FX)</label>
+                            <div class="dc-pattern-grid dc-dynamic-fx-grid" id="dcDynamicFx"></div>
+                        </div>
+                        <div class="dc-field">
+                            <label>แพตเทิร์นไฟวิ่ง</label>
+                            <div class="dc-pattern-grid" id="dcPattern"></div>
+                        </div>
+                    </div>
+
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Stage</span><span class="dc-block-title">รูปแบบเวที</span></div>
+                        <div class="dc-field">
+                            <div class="dc-venue-grid" id="dcStageShapeGrid"></div>
+                            <p class="dc-hint" style="margin-top:6px;">Classic = DJ Booth เดิม · Concert Arch = เวทีวงโค้งนีออน</p>
+                        </div>
+                    </div>
+
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Venue</span><span class="dc-block-title">สถานที่</span></div>
+                        <div class="dc-field">
+                            <div class="dc-venue-grid" id="dcVenueGrid"></div>
+                            <button type="button" class="dc-btn small" id="dcVenueNext" style="margin-top:8px;">⟳ สลับ Venue ถัดไป</button>
+                            <label class="dc-check" style="margin-top:10px;"><input type="checkbox" id="dcVenueAuto"> สลับ Venue อัตโนมัติทุก N บีท</label>
+                            <div class="dc-field">
+                                <label>ทุก <b id="dcVenueBarsVal">32</b> บีท</label>
+                                <input type="range" id="dcVenueBars" min="8" max="128" step="4" value="32">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Auto</span><span class="dc-block-title">สลับทุก N บีท</span></div>
+                        <label class="dc-check"><input type="checkbox" id="dcAutoPalette" checked> สลับสีสุ่ม (เมื่อโหมดชุดสี = N บีท)</label>
+                        <div class="dc-field">
+                            <label>เปลี่ยนสีทุก <b id="dcPalBarsVal">8</b> บีท</label>
+                            <input type="range" id="dcPalBars" min="1" max="32" step="1" value="8">
+                        </div>
+                        <button type="button" class="dc-btn small" id="dcPalNext">⟳ สลับสีสุ่มทันที</button>
+
+                        <label class="dc-check" style="margin-top:10px;"><input type="checkbox" id="dcAutoDynamicFx" checked> สลับ FX (เมื่อโหมดเอฟเฟกต์ = N บีท)</label>
+                        <div class="dc-field">
+                            <label>เปลี่ยน FX ทุก <b id="dcDfxBarsVal">8</b> บีท</label>
+                            <input type="range" id="dcDfxBars" min="1" max="32" step="1" value="8">
+                        </div>
+                        <button type="button" class="dc-btn small" id="dcDfxNext">⟳ สลับ FX สุ่มทันที</button>
+
+                        <label class="dc-check" style="margin-top:10px;"><input type="checkbox" id="dcAutoPattern"> สลับแพตเทิร์น (เมื่อโหมด = N บีท)</label>
+                        <div class="dc-field">
+                            <label>เปลี่ยนแพตเทิร์นทุก <b id="dcPatBarsVal">12</b> บีท</label>
+                            <input type="range" id="dcPatBars" min="1" max="32" step="1" value="12">
+                        </div>
+                        <button type="button" class="dc-btn small" id="dcPatNext">⟳ สลับแพตเทิร์นสุ่มทันที</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dc-panel dc-panel-section" data-panel="bg">
+                <div class="dc-split">
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Scene</span><span class="dc-block-title">พื้นหลัง</span></div>
+                        <div class="dc-mode-row">
+                            <label>โหมด</label>
+                            <div class="dc-mode-seg" data-reactive="background">
+                                <button type="button" class="active" data-mode="ai">AI</button>
+                                <button type="button" data-mode="beats">N บีท</button>
+                                <button type="button" data-mode="off">ปิด</button>
+                            </div>
+                        </div>
+                        <div class="dc-bg-grid" id="dcBgGrid"></div>
+                    </div>
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Motion</span><span class="dc-block-title">จังหวะ &amp; วิดีโอ</span></div>
+                        <div class="dc-field">
+                            <label>พื้นหลังเต้นตามเพลง <b id="dcBgReactVal">100%</b></label>
+                            <input type="range" id="dcBgReact" min="0" max="2" step="0.05" value="1">
+                        </div>
+                        <label class="dc-check"><input type="checkbox" id="dcBgAuto"> เปลี่ยนพื้นหลังทุก N บีท</label>
+                        <div class="dc-field">
+                            <label>เปลี่ยนทุก <b id="dcBgBarsVal">16</b> บีท</label>
+                            <input type="range" id="dcBgBars" min="1" max="64" step="1" value="16">
+                        </div>
+                        <button type="button" class="dc-btn small" id="dcBgNext">⟳ สลับพื้นหลังทันที</button>
+                        <div class="dc-divider"></div>
+                        <div class="dc-field">
+                            <label>วิดีโอฉาก (จอโค้ง + พื้น)</label>
+                            <div class="dc-actions">
+                                <button type="button" class="dc-btn" id="dcBtnPickVideo">🎬 อัปโหลดวิดีโอ</button>
+                                <button type="button" class="dc-btn small" id="dcBtnClearVideo">ลบวิดีโอ</button>
+                            </div>
+                            <input type="file" id="dcVideoFile" accept="video/*" hidden>
+                            <p class="dc-hint">แสดงบนจอด้านหลังโค้งและแถบพื้น · แนะนำไฟล์สั้น loop</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dc-panel dc-panel-section" data-panel="camera">
+                <div class="dc-split">
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Shot</span><span class="dc-block-title">มุมกล้อง</span></div>
+                        <div class="dc-cam-grid" id="dcCamGrid"></div>
+                        <div class="dc-mode-row">
+                            <label>ตัดมุมกล้อง</label>
+                            <div class="dc-mode-seg" data-reactive="camera">
+                                <button type="button" class="active" data-mode="ai">AI</button>
+                                <button type="button" data-mode="beats">N บีท</button>
+                                <button type="button" data-mode="off">ปิด</button>
+                            </div>
+                        </div>
+                        <div class="dc-field dc-legacy-field">
+                            <label>ตัดทุก <b id="dcCutBarsVal">16</b> บีท (โหมด N บีท)</label>
+                            <input type="range" id="dcCutBars" min="1" max="64" step="1" value="16">
+                        </div>
+                        <label class="dc-check"><input type="checkbox" id="dcBeatShakeEnable" checked> สั่นกล้องตามบีทแรง</label>
+                        <label class="dc-check"><input type="checkbox" id="dcCameraStabilize"> 📷 ปิดกระตุกกล้อง (นิ่งทั้งหมด)</label>
+                        <div class="dc-field">
+                            <label>สั่นกล้องตามบีท <b id="dcShakeVal">35%</b></label>
+                            <input type="range" id="dcShake" min="0" max="1.5" step="0.05" value="0.35">
+                        </div>
+                    </div>
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Screen</span><span class="dc-block-title">จอเวที &amp; แบรนด์</span></div>
+                        <div class="dc-field">
+                            <label>วิดีโอบนจอเวที (ไม่แสดงพื้น)</label>
+                            <input type="text" id="dcStageYtUrl" class="dc-input" placeholder="ลิงก์ YouTube เช่น https://youtube.com/watch?v=...">
+                            <div class="dc-actions" style="margin-top:8px;">
+                                <button type="button" class="dc-btn primary small" id="dcStageYtLoad">▶ ฉาย YouTube</button>
+                                <button type="button" class="dc-btn small" id="dcStageLocalPick">📁 อัปโหลดวิดีโอ</button>
+                                <button type="button" class="dc-btn small" id="dcStageYtClear">หยุด</button>
+                            </div>
+                            <input type="file" id="dcStageLocalFile" accept="video/*" hidden>
+                            <p class="dc-hint">แสดงเฉพาะจอ LED หลังเวที · มีเสียง</p>
+                        </div>
+                        <div class="dc-field">
+                            <label>ไฟตอนฉาย YouTube</label>
+                            <div class="dc-seg" id="dcYtLightPreset">
+                                <button type="button" class="active" data-yt-preset="screen">โฟกัสจอ</button>
+                                <button type="button" data-yt-preset="off">ปิดทั้งหมด</button>
+                                <button type="button" data-yt-preset="custom">กำหนดเอง</button>
+                            </div>
+                        </div>
+                        <div class="dc-yt-light-grid" id="dcYtLightGrid">
+                            <label class="dc-check"><input type="checkbox" id="dcYtMaskHeads" checked> ไฟหัว</label>
+                            <label class="dc-check"><input type="checkbox" id="dcYtMaskWashes" checked> ไฟ Wash</label>
+                            <label class="dc-check"><input type="checkbox" id="dcYtMaskStrobes" checked> Strobe</label>
+                            <label class="dc-check"><input type="checkbox" id="dcYtMaskLasers" checked> Laser</label>
+                            <label class="dc-check"><input type="checkbox" id="dcYtMaskBeams" checked> Beam</label>
+                            <label class="dc-check"><input type="checkbox" id="dcYtMaskFloor" checked> พื้น LED</label>
+                        </div>
+                        <div class="dc-divider"></div>
+                        <div class="dc-field">
+                            <label>ชื่อไลฟ์ / โลโก้ (แท่น DJ)</label>
+                            <input type="text" id="dcBrandText" class="dc-input" placeholder="ชื่อไลฟ์ เช่น DJ Pao Remix">
+                            <div class="dc-row" style="margin-top:8px; gap:8px;">
+                                <button type="button" class="dc-btn small" id="dcBrandPickLogo">🖼️ เลือกโลโก้</button>
+                                <button type="button" class="dc-btn small" id="dcBrandClear">ล้าง</button>
+                                <button type="button" class="dc-btn primary small" id="dcBrandApply">ใช้</button>
+                            </div>
+                            <input type="file" id="dcBrandLogoFile" accept="image/*" hidden>
+                            <p class="dc-hint">แสดงถาวรบนแท่น DJ</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dc-panel dc-panel-section" data-panel="dancers">
+                <div class="dc-split">
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Cast</span><span class="dc-block-title">นักเต้น</span></div>
+                        <div class="dc-actions">
+                            <button type="button" class="dc-btn primary" id="dcBtnGift">🎁 ทดสอบของขวัญ</button>
+                            <button type="button" class="dc-btn" id="dcBtnFocus">🎥 โฟกัสที่เลือก</button>
+                        </div>
+                        <div class="dc-field">
+                            <label>หน้าตัวละคร</label>
+                            <div class="dc-seg" id="dcFaceMode">
+                                <button type="button" class="active" data-face="mascot">หน้าการ์ตูน</button>
+                                <button type="button" data-face="avatar">รูปโปรไฟล์</button>
+                            </div>
+                        </div>
+                        <div class="dc-field">
+                            <label>บังคับท่าเต้นทุกคน</label>
+                            <div class="dc-move-grid" id="dcMoveGrid"></div>
+                        </div>
+                        <label class="dc-check"><input type="checkbox" id="dcNameTags" checked> แสดงชื่อบนหัว</label>
+                    </div>
+                    <div class="dc-block">
+                        <div class="dc-block-head"><span class="dc-block-kicker">Roster</span><span class="dc-block-title">รายชื่อบนเวที</span></div>
+                        <div class="dc-roster" id="dcRoster"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        /* Immediate UI — works even if ES module fails to load */
+        (function () {
+            function openDcView() {
+                if (window.PandyBridge?.openDanceClubGame) {
+                    window.PandyBridge.openDanceClubGame();
+                    return;
+                }
+                var url = new URL('index.html', location.href).href;
+                window.open(url, 'dc-view', 'width=1100,height=720');
+            }
+            document.addEventListener('click', function (e) {
+                if (e.target.closest('#dcOpenView')) {
+                    e.preventDefault();
+                    openDcView();
+                }
+                var tab = e.target.closest('#dcDrawerTabs button[data-panel]');
+                if (tab) {
+                    var panel = tab.dataset.panel;
+                    document.querySelectorAll('.dc-panel-section').forEach(function (sec) {
+                        sec.classList.toggle('active', sec.dataset.panel === panel);
+                    });
+                    document.querySelectorAll('#dcDrawerTabs button[data-panel]').forEach(function (b) {
+                        b.classList.toggle('active', b === tab);
+                    });
+                }
+                var srcTab = e.target.closest('#dcSourceTabs button[data-src]');
+                if (srcTab) {
+                    var src = srcTab.dataset.src;
+                    document.querySelectorAll('#dcSourceTabs .dc-tab').forEach(function (t) {
+                        t.classList.toggle('active', t === srcTab);
+                    });
+                    document.querySelectorAll('[data-body]').forEach(function (body) {
+                        body.hidden = body.dataset.body !== src;
+                    });
+                }
+            });
+            window.addEventListener('error', function () {
+                var el = document.getElementById('dcConnStatus');
+                if (el) el.textContent = 'โหลดสคริปต์ไม่สำเร็จ — รีเฟรชหน้านี้ (F5)';
+            });
+        })();
+    </script>
+    <script type="module" src="js/control-main.js"></script>
+</body>
+</html>

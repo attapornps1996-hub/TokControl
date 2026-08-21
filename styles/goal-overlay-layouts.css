@@ -1,0 +1,295 @@
+/* Goal Overlay — 5 new layouts (not classic bar reskins) */
+
+.gl-layout {
+    font-family: 'Kanit', sans-serif;
+    color: #fff;
+    --gl-accent: #ff0050;
+    --gl-accent-dim: color-mix(in srgb, var(--gl-accent) 35%, transparent);
+}
+
+/* ── 1. RING GAUGE ── */
+.gl-ring {
+    width: min(280px, 78vw);
+    text-align: center;
+}
+.gl-ring-svg {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    display: block;
+    filter: drop-shadow(0 0 18px var(--gl-accent-dim));
+}
+.gl-ring-track {
+    fill: none;
+    stroke: rgba(255,255,255,0.1);
+    stroke-width: 12;
+}
+.gl-ring-fill {
+    fill: none;
+    stroke: var(--gl-accent);
+    stroke-width: 12;
+    stroke-linecap: round;
+    stroke-dasharray: 565.5;
+    stroke-dashoffset: 565.5;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gl-ring-center {
+    position: relative;
+    margin-top: -148px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+.gl-ring-icon { font-size: 1.6rem; line-height: 1; margin-bottom: 4px; }
+.gl-ring-pct { font-size: 2.4rem; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+.gl-ring-label {
+    margin-top: 18px;
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--gl-accent);
+}
+.gl-ring-nums {
+    margin-top: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+}
+.gl-ring-foot {
+    margin-top: 8px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.45);
+}
+
+/* ── 2. CAPSULE (vertical thermometer) ── */
+.gl-capsule {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    max-width: min(320px, 90vw);
+}
+.gl-capsule-tube {
+    width: 56px;
+    height: 220px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,255,255,0.14);
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 24px rgba(0,0,0,0.45);
+}
+.gl-capsule-fill {
+    position: absolute;
+    left: 4px; right: 4px; bottom: 4px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #fff 0%, var(--gl-accent) 28%, color-mix(in srgb, var(--gl-accent) 70%, #000) 100%);
+    height: 0%;
+    transition: height 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 0 20px var(--gl-accent-dim);
+}
+.gl-capsule-bubbles {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent 0 14px, rgba(255,255,255,0.06) 14px 16px);
+    pointer-events: none;
+}
+.gl-capsule-meta { flex: 1; min-width: 0; padding-bottom: 8px; }
+.gl-capsule-icon { font-size: 1.8rem; margin-bottom: 6px; }
+.gl-capsule-label {
+    font-size: 0.7rem; font-weight: 900; letter-spacing: 1.5px;
+    color: var(--gl-accent); margin-bottom: 8px;
+}
+.gl-capsule-nums { font-size: 1.35rem; font-weight: 900; line-height: 1.15; }
+.gl-capsule-pct {
+    margin-top: 6px; font-size: 0.95rem; font-weight: 800;
+    color: rgba(255,255,255,0.65);
+}
+.gl-capsule-foot {
+    margin-top: 10px; font-size: 0.68rem; font-weight: 700;
+    color: rgba(255,255,255,0.45);
+}
+
+/* ── 3. NEON ARC ── */
+.gl-arc {
+    width: min(300px, 84vw);
+    text-align: center;
+}
+.gl-arc-svg {
+    width: 240px; height: 140px;
+    margin: 0 auto -8px;
+    display: block;
+    filter: drop-shadow(0 0 14px var(--gl-accent-dim));
+}
+.gl-arc-track {
+    fill: none; stroke: rgba(255,255,255,0.1);
+    stroke-width: 14; stroke-linecap: round;
+}
+.gl-arc-fill {
+    fill: none; stroke: var(--gl-accent);
+    stroke-width: 14; stroke-linecap: round;
+    stroke-dasharray: 314; stroke-dashoffset: 314;
+    transition: stroke-dashoffset 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gl-arc-icon { font-size: 1.5rem; margin-top: -4px; }
+.gl-arc-pct { font-size: 2.2rem; font-weight: 900; line-height: 1; margin-top: 2px; }
+.gl-arc-label {
+    margin-top: 10px; font-size: 0.7rem; font-weight: 900;
+    letter-spacing: 2px; color: var(--gl-accent);
+}
+.gl-arc-nums {
+    margin-top: 4px; font-size: 0.82rem; font-weight: 700;
+    color: rgba(255,255,255,0.7);
+}
+.gl-arc-foot {
+    margin-top: 8px; font-size: 0.66rem; font-weight: 700;
+    color: rgba(255,255,255,0.45);
+}
+
+/* ── 4. SEGMENT BLOCKS ── */
+.gl-blocks {
+    width: min(360px, 92vw);
+}
+.gl-blocks-head {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; margin-bottom: 12px;
+}
+.gl-blocks-title {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.78rem; font-weight: 900; letter-spacing: 1.5px;
+    color: var(--gl-accent);
+}
+.gl-blocks-pct { font-size: 1.4rem; font-weight: 900; }
+.gl-blocks-row {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 5px;
+}
+.gl-blocks-cell {
+    height: 28px;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.gl-blocks-cell.is-on {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--gl-accent) 85%, #fff), var(--gl-accent));
+    border-color: color-mix(in srgb, var(--gl-accent) 70%, #fff);
+    box-shadow: 0 0 12px var(--gl-accent-dim);
+}
+.gl-blocks-nums {
+    margin-top: 12px;
+    display: flex; justify-content: space-between;
+    font-size: 0.78rem; font-weight: 700;
+    color: rgba(255,255,255,0.7);
+}
+.gl-blocks-foot {
+    margin-top: 6px; font-size: 0.66rem; font-weight: 700;
+    color: rgba(255,255,255,0.45);
+}
+
+/* ── 5. HUD RADAR ── */
+.gl-hud {
+    width: min(300px, 86vw);
+    position: relative;
+    padding: 22px 20px 18px;
+    background:
+        linear-gradient(135deg, rgba(8,10,18,0.92), rgba(4,6,12,0.96));
+    border: 1px solid color-mix(in srgb, var(--gl-accent) 45%, transparent);
+    clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px), 0 12px);
+    box-shadow: 0 0 28px var(--gl-accent-dim), inset 0 0 40px rgba(0,0,0,0.35);
+}
+.gl-hud::before,
+.gl-hud::after {
+    content: '';
+    position: absolute;
+    width: 14px; height: 14px;
+    border: 2px solid var(--gl-accent);
+}
+.gl-hud::before { top: 6px; left: 6px; border-right: none; border-bottom: none; }
+.gl-hud::after { bottom: 6px; right: 6px; border-left: none; border-top: none; }
+.gl-hud-scan {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent 0 3px,
+        rgba(255,255,255,0.02) 3px 4px
+    );
+    pointer-events: none;
+    animation: gl-hud-scan 4s linear infinite;
+}
+@keyframes gl-hud-scan {
+    0% { opacity: 0.35; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.35; }
+}
+.gl-hud-top {
+    display: flex; align-items: center; justify-content: space-between;
+    position: relative; z-index: 1;
+    margin-bottom: 14px;
+}
+.gl-hud-tag {
+    font-size: 0.58rem; font-weight: 900; letter-spacing: 2px;
+    color: var(--gl-accent);
+    border: 1px solid color-mix(in srgb, var(--gl-accent) 40%, transparent);
+    padding: 3px 8px;
+}
+.gl-hud-icon { font-size: 1.2rem; }
+.gl-hud-main {
+    position: relative; z-index: 1;
+    text-align: center; margin-bottom: 14px;
+}
+.gl-hud-pct {
+    font-size: 2.8rem; font-weight: 900; line-height: 1;
+    text-shadow: 0 0 20px var(--gl-accent-dim);
+}
+.gl-hud-label {
+    margin-top: 6px; font-size: 0.72rem; font-weight: 800;
+    letter-spacing: 1.5px; color: rgba(255,255,255,0.75);
+}
+.gl-hud-bar {
+    position: relative; z-index: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    overflow: hidden;
+}
+.gl-hud-bar-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, transparent, var(--gl-accent));
+    box-shadow: 0 0 12px var(--gl-accent);
+    transition: width 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gl-hud-nums {
+    position: relative; z-index: 1;
+    margin-top: 10px;
+    display: flex; justify-content: space-between;
+    font-size: 0.72rem; font-weight: 700;
+    color: rgba(255,255,255,0.65);
+    font-variant-numeric: tabular-nums;
+}
+.gl-hud-foot {
+    position: relative; z-index: 1;
+    margin-top: 8px; text-align: center;
+    font-size: 0.62rem; font-weight: 700;
+    color: rgba(255,255,255,0.4); letter-spacing: 1px;
+}
+
+/* Card preview framing */
+html.ov-card-preview .gl-layout,
+body.ov-card-preview .gl-layout {
+    transform: scale(0.92);
+    transform-origin: center center;
+}
+
+body.overlay-portrait-reflow .gl-ring { width: min(260px, 86vw); }
+body.overlay-portrait-reflow .gl-ring-svg { width: 180px; height: 180px; }
+body.overlay-portrait-reflow .gl-ring-center { margin-top: -134px; height: 110px; }
+body.overlay-portrait-reflow .gl-capsule-tube { height: 200px; }
+body.overlay-portrait-reflow .gl-arc-svg { width: 210px; height: 122px; }
+body.overlay-portrait-reflow .gl-blocks { width: min(320px, 90vw); }
+body.overlay-portrait-reflow .gl-hud { width: min(280px, 88vw); }

@@ -1,0 +1,39 @@
+{
+  "blocks": [
+    { "id": "obsidian", "block": "minecraft:obsidian", "emoji": "⬛", "label": "Obsidian", "type": "troll" },
+    { "id": "lava", "block": "minecraft:lava", "emoji": "🌋", "label": "Lava", "type": "troll" },
+    { "id": "tnt", "block": "minecraft:tnt", "emoji": "💣", "label": "TNT", "type": "troll" },
+    { "id": "bedrock", "block": "minecraft:bedrock", "emoji": "🪨", "label": "Bedrock", "type": "troll" },
+    { "id": "water", "block": "minecraft:water", "emoji": "💧", "label": "Water", "type": "troll" },
+    { "id": "anvil", "block": "minecraft:anvil", "emoji": "🔨", "label": "Anvil", "type": "troll" },
+    { "id": "cobweb", "block": "minecraft:cobweb", "emoji": "🕸️", "label": "Cobweb", "type": "troll" },
+    { "id": "slime", "block": "minecraft:slime_block", "emoji": "🟢", "label": "Slime", "type": "help" },
+    { "id": "gold", "block": "minecraft:gold_block", "emoji": "🟨", "label": "Gold Block", "type": "help" },
+    { "id": "glass", "block": "minecraft:glass", "emoji": "🪟", "label": "Glass", "type": "neutral" }
+  ],
+  "traps": [],
+  "zone_actions": [
+    { "id": "build_bedrock", "cmd": "mc_build_bedrock_map", "level": 4, "emoji": "🧱", "label": "สร้างแมพ 9×9", "type": "zone" },
+    { "id": "expand", "cmd": "mc_expand_map", "emoji": "🔺", "label": "ขยายแมพ", "type": "help" },
+    { "id": "shrink", "cmd": "mc_shrink_map", "emoji": "🔻", "label": "บีบแมพ", "type": "troll" },
+    { "id": "lava_melt", "cmd": "mc_lava_melt", "emoji": "🌋", "label": "ลาวาหลอมจากบน", "type": "troll" },
+    { "id": "villager_help", "cmd": "mc_villager_help", "emoji": "🧑‍🌾", "label": "ช่วยต่อเต็มทันที", "type": "help" },
+    { "id": "help_one_layer", "cmd": "mc_help_one_layer", "emoji": "🧱", "label": "ช่วยต่อ 1 ชั้น", "type": "help" },
+    { "id": "help_ten_rows", "cmd": "mc_help_ten_rows", "emoji": "📏", "label": "ช่วยต่อ 1 แถว", "type": "help" },
+    { "id": "minus_win", "cmd": "mc_minus_win", "emoji": "🐉", "label": "ลบวิน", "type": "troll" },
+    { "id": "plus_win", "cmd": "mc_plus_win", "emoji": "🦾", "label": "บวกวิน", "type": "help" },
+    { "id": "admin_mode", "cmd": "mc_admin_mode", "emoji": "🛠️", "label": "โหมดแอดมินตกแต่ง", "type": "zone" },
+    { "id": "tnt", "cmd": "mc_summon_tnt", "emoji": "💣", "label": "TNT บนหัว", "type": "troll" },
+    { "id": "tnt_strong", "cmd": "mc_summon_tnt_strong", "emoji": "💥", "label": "TNT แรงพิเศษ", "type": "troll" }
+  ],
+  "time_actions": [
+    { "id": "stun_add", "cmd": "stun_add", "seconds": 10, "emoji": "🧊", "label": "ห้องขัง", "type": "troll" },
+    { "id": "stun_reduce", "cmd": "stun_reduce", "seconds": 10, "emoji": "➖", "label": "ลดเวลาห้องขัง", "type": "help" }
+  ],
+  "placements": [
+    { "id": "near_player", "label": "ใกล้สตรีมเมอร์" },
+    { "id": "above_player", "label": "เหนือหัว" },
+    { "id": "in_front", "label": "ข้างหน้า" },
+    { "id": "random_near", "label": "สุ่มรอบตัว" }
+  ]
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokControl Virtual Camera</title>
+    <style>
+        html, body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Kanit', system-ui, sans-serif;
+            color: #bc13fe;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+        .wait {
+            position: absolute;
+            text-align: center;
+            opacity: 0.85;
+            pointer-events: none;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+        .wait.hide { display: none; }
+    </style>
+</head>
+<body>
+    <div class="wait" id="waitMsg">รอภาพจาก Camera Studio…<br><small style="opacity:.7">กด Start Virtual Cam ใน TokControl</small></div>
+    <canvas id="out" width="1280" height="720"></canvas>
+    <script>
+        (function () {
+            const canvas = document.getElementById('out');
+            const ctx = canvas.getContext('2d');
+            const wait = document.getElementById('waitMsg');
+            const FRAME_CHANNEL = 'tokcontrol-camera-frames';
+            let bc = null;
+
+            function showFrame(buf) {
+                const blob = new Blob([buf], { type: 'image/jpeg' });
+                const url = URL.createObjectURL(blob);
+                const img = new Image();
+                img.onload = () => {
+                    if (img.width && img.height && (canvas.width !== img.width || canvas.height !== img.height)) {
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                    }
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    URL.revokeObjectURL(url);
+                    if (wait) wait.classList.add('hide');
+                };
+                img.onerror = () => URL.revokeObjectURL(url);
+                img.src = url;
+            }
+
+            try {
+                bc = new BroadcastChannel(FRAME_CHANNEL);
+                bc.onmessage = (ev) => {
+                    if (ev.data) showFrame(ev.data);
+                };
+            } catch (e) {
+                console.warn('BroadcastChannel unavailable', e);
+            }
+
+            // Electron mirror window: also accept IPC frames
+            try {
+                const { ipcRenderer } = window.electron || {};
+                if (!ipcRenderer) return;
+                ipcRenderer.on('camera:mirror-frame', (_e, payload) => {
+                    if (!payload?.data) return;
+                    const binary = atob(payload.data);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+                    showFrame(bytes.buffer);
+                });
+                ipcRenderer.send('camera:mirror-ready');
+            } catch (_) { /* browser source mode */ }
+        })();
+    </script>
+</body>
+</html>

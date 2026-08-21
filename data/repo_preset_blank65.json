@@ -1,0 +1,40 @@
+{
+  "RandomEventsCategories": {
+    "spawn_creatures": {
+      "IsEnabled": false,
+      "TargetEventID": null,
+      "TargetEventsCategoryID": "spawn_creatures",
+      "Sources": [],
+      "IsCategoryEvent": true
+    },
+    "solo_effects": {
+      "IsEnabled": false,
+      "TargetEventID": null,
+      "TargetEventsCategoryID": "solo_effects",
+      "Sources": [],
+      "IsCategoryEvent": true
+    },
+    "spawn_loot": {
+      "IsEnabled": false,
+      "TargetEventID": null,
+      "TargetEventsCategoryID": "spawn_loot",
+      "Sources": [],
+      "IsCategoryEvent": true
+    },
+    "spawn_items": {
+      "IsEnabled": false,
+      "TargetEventID": null,
+      "TargetEventsCategoryID": "spawn_items",
+      "Sources": [],
+      "IsCategoryEvent": true
+    },
+    "mass_effects": {
+      "IsEnabled": false,
+      "TargetEventID": null,
+      "TargetEventsCategoryID": "mass_effects",
+      "Sources": [],
+      "IsCategoryEvent": true
+    }
+  },
+  "CustomEvents": []
+}

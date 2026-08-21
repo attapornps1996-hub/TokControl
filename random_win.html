@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TokControl - Random Win Wheel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --purple: #9d00ff;
@@ -12,61 +12,248 @@
             --green: #00ff88;
             --red: #ff4d4d;
             --white: #ffffff;
-            --bg: #0b0b12;
-            --card: #161625;
-            --border: #2a2a3a;
-            --input-bg: #000;
+            --bg: #07060c;
+            --card: rgba(12, 8, 22, 0.9);
+            --border: rgba(188, 19, 254, 0.18);
+            --input-bg: #0a0812;
         }
 
         body {
-            margin: 0; font-family: 'Inter', 'Kanit', sans-serif;
+            margin: 0; font-family: 'Kanit', sans-serif;
             background: var(--bg); color: white;
-            min-height: 100vh; overflow-x: hidden;
+            min-height: 100vh; overflow: hidden;
         }
 
-        /* --- Panel Layout (แบบกาชา) --- */
+        /* --- Modern panel (Vote / Credits style) --- */
         .wheel-app-layout {
             display: flex; flex-direction: column;
             width: 100%; height: 100vh; box-sizing: border-box;
-            padding: 24px 28px; gap: 20px; overflow: hidden;
-            background: radial-gradient(circle at 20% 30%, #0d0a1e 0%, #050507 100%);
+            padding: 10px 22px 16px; gap: 10px; overflow: hidden;
+            background:
+                radial-gradient(ellipse at 18% 0%, rgba(126, 63, 242, 0.16), transparent 42%),
+                radial-gradient(ellipse at 92% 10%, rgba(0, 210, 255, 0.07), transparent 36%),
+                #07060c;
+            font-family: 'Kanit', sans-serif;
         }
-        .wheel-page-header { flex-shrink: 0; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px; }
-        .wheel-page-header h2 { margin: 0; font-size: 1.6rem; font-weight: 800; color: #fff; font-family: 'Kanit', sans-serif; }
-        .wheel-page-header p { margin: 4px 0 0; font-size: 0.85rem; color: #888; font-family: 'Kanit', sans-serif; }
-        .wheel-two-col { display: flex; gap: 24px; flex: 1; min-height: 0; align-items: stretch; }
-        .wheel-settings-col { flex: 1; min-width: 360px; max-width: 460px; display: flex; flex-direction: column; }
-        .wheel-preview-col { flex: 1.4; min-width: 0; display: flex; flex-direction: column; }
-        .settings-card {
-            background: var(--card); border-radius: 24px; padding: 20px;
-            border: 1px solid rgba(157, 0, 255, 0.25); box-sizing: border-box;
-            display: flex; flex-direction: column; height: 100%; overflow: hidden;
-            box-shadow: 0 0 30px rgba(157, 0, 255, 0.08);
+        .wheel-page-header {
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
-        .wheel-tab-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .wheel-page-kicker {
+            display: block;
+            font-size: 0.64rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #c084fc;
+            margin-bottom: 2px;
+        }
+        .wheel-page-header h2 {
+            margin: 0;
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #f5f0ff;
+            font-family: 'Kanit', sans-serif;
+        }
+        .wheel-page-header p {
+            margin: 4px 0 0;
+            font-size: 0.74rem;
+            color: #8b949e;
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.4;
+        }
+        .wheel-win-badge {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-family: 'Kanit', sans-serif;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.03);
+            color: #888;
+        }
+        .wheel-header-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(8, 6, 16, 0.72);
+        }
+        .wheel-toolbar-btn {
+            min-height: 36px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: #e6edf3;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
+        .wheel-toolbar-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .wheel-toolbar-btn--go {
+            border-color: rgba(188, 19, 254, 0.5);
+            background: linear-gradient(135deg, rgba(155, 92, 255, 0.4), rgba(126, 63, 242, 0.22));
+            color: #fff;
+        }
+        .wheel-toolbar-btn--cyan {
+            border-color: rgba(0, 210, 255, 0.4);
+            background: rgba(0, 210, 255, 0.1);
+            color: #7de8ff;
+        }
+        .wheel-toolbar-btn--gold {
+            border-color: rgba(241, 196, 15, 0.4);
+            background: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+        .wheel-toolbar-btn--ghost { background: transparent; color: #9aa3af; }
+
+        .wheel-workspace {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+        }
+        .wheel-top-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            padding: 6px;
+            border-radius: 14px;
+            background: rgba(8, 6, 16, 0.72);
+            border: 1px solid rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
         .wheel-tab-btn {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: #888;
-            padding: 10px 6px; border-radius: 10px; cursor: pointer; font-size: 0.72rem;
-            font-weight: 800; font-family: 'Kanit', sans-serif; transition: 0.2s;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            min-height: 42px;
+            padding: 8px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #8b949e;
+            font-size: 0.76rem;
+            font-weight: 800;
+            font-family: 'Kanit', sans-serif;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
-        .wheel-tab-btn:hover { background: rgba(188,19,254,0.1); color: #fff; }
-        .wheel-tab-btn.active { background: rgba(188,19,254,0.15); border-color: #bc13fe; color: #fff; box-shadow: 0 0 12px rgba(188,19,254,0.2); }
-        .wheel-settings-scroll { flex: 1; overflow-y: auto; padding-right: 4px; }
+        .wheel-tab-btn:hover { color: #e6edf3; background: rgba(255,255,255,0.04); }
+        .wheel-tab-btn.active {
+            color: #fff;
+            border-color: rgba(188, 19, 254, 0.5);
+            background: linear-gradient(135deg, rgba(155, 92, 255, 0.38), rgba(126, 63, 242, 0.2));
+            box-shadow: inset 0 0 0 1px rgba(188, 19, 254, 0.12);
+        }
+
+        .wheel-two-col {
+            display: grid;
+            grid-template-columns: minmax(300px, 0.95fr) minmax(0, 1.2fr);
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+        @media (max-width: 1000px) {
+            .wheel-two-col { grid-template-columns: 1fr; overflow-y: auto; scrollbar-width: none; }
+            .wheel-two-col::-webkit-scrollbar { display: none; }
+            .preview-box { min-height: 360px; }
+        }
+        .wheel-settings-col { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+        .wheel-preview-col { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+        .settings-card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+        .wheel-settings-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 2px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .wheel-settings-scroll::-webkit-scrollbar { display: none; }
         .wheel-settings-section { display: none; }
         .wheel-settings-section.active { display: block; }
-        .preview-box {
-            flex: 1; background: rgba(0,0,0,0.4); border: 1.5px solid rgba(255,255,255,0.05);
-            border-radius: 18px; display: flex; align-items: center; justify-content: center;
-            position: relative; overflow: hidden; min-height: 420px;
+        .wheel-set-block {
+            margin-bottom: 12px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.28);
+            border: 1px solid rgba(255,255,255,0.05);
         }
+        .preview-box {
+            flex: 1;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(188, 19, 254, 0.16);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 280px;
+        }
+        .wheel-preview-card {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .wheel-preview-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .wheel-card-kicker {
+            font-size: 0.58rem;
+            font-weight: 900;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #00d2ff;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid rgba(0, 210, 255, 0.28);
+        }
+        .wheel-card-title { font-size: 0.88rem; font-weight: 800; color: #f5f0ff; }
         .switch { position: relative; display: inline-block; width: 42px; height: 22px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; inset: 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); transition: .3s; border-radius: 20px; }
         .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: #fff; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background: #bc13fe; border-color: #fff; }
         input:checked + .slider:before { transform: translateX(20px); }
-        .field-label { font-size: 0.7rem; color: #aaa; margin-bottom: 8px; display: block; font-weight: 800; letter-spacing: 1px; font-family: 'Kanit', sans-serif; }
+        .field-label { font-size: 0.7rem; color: #aaa; margin-bottom: 8px; display: block; font-weight: 800; letter-spacing: 0.04em; font-family: 'Kanit', sans-serif; }
 
         .gacha-section {
             background: radial-gradient(circle at center, #1c1c30 0%, transparent 100%);
@@ -83,7 +270,7 @@
 
         .slot-viewport {
             position: relative; width: 100%; max-width: 800px; height: 180px; background: #000;
-            border: 2px solid var(--border); border-radius: 20px;
+            border: 2px solid rgba(188,19,254,0.35); border-radius: 20px;
             overflow: hidden; display: flex; align-items: center;
             box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
@@ -210,12 +397,11 @@
             to { transform: scale(1); opacity: 1; }
         }
         .obs-copy-area { background: #1c1c30; border: 1px solid var(--purple); border-radius: 12px; padding: 15px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;}
-        .wheel-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
-        
-        ::-webkit-scrollbar { height: 8px; width: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+        .wheel-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+        .wheel-tabs::-webkit-scrollbar { display: none; }
+        ::-webkit-scrollbar { width: 0; height: 0; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: transparent; }
 
         .tab { background: #1e1e30; border: 1px solid var(--border); color: #777; padding: 10px 20px; border-radius: 10px; cursor: pointer; white-space: nowrap; transition: 0.2s;}
         .tab:hover { background: #2a2a3a; }
@@ -288,6 +474,7 @@
         .ui-btn-select-group { display:flex; flex-wrap:wrap; gap:8px; width:100%; }
         .ui-btn-select-group.compact { gap:6px; max-height:220px; overflow-y:auto; padding:4px 2px; }
         .ui-btn-select-option { display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.05); color:#aaa; font-weight:700; font-size:0.78rem; cursor:pointer; font-family:'Inter','Kanit',sans-serif; transition:0.18s; text-align:center; line-height:1.3; }
+        .btn-sm.active, [data-wheel-size].active { background:rgba(188,19,254,0.22) !important; border-color:#bc13fe !important; color:#fff !important; }
         button.ui-btn-select-option:hover:not(:disabled):not(.active) { color:#ddd; border-color:rgba(255,255,255,0.22); background:rgba(255,255,255,0.09); }
         button.ui-btn-select-option.active,
         button.ui-btn-select-option[aria-pressed="true"] { border-color:var(--purple) !important; background:linear-gradient(135deg,rgba(157,0,255,0.45),rgba(0,255,136,0.15)) !important; color:#fff !important; box-shadow:0 0 16px rgba(157,0,255,0.5), inset 0 0 0 1px rgba(255,255,255,0.12) !important; transform:translateY(-1px); }
@@ -295,51 +482,69 @@
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/media-guard.js"></script>
+    <link rel="stylesheet" href="/styles/overlay-brand.css">
+    <script src="/js/overlay-brand.js" defer></script>
 </head>
 <body>
+<script src="/js/overlay-widget-boot.js"></script>
 
     <div id="overlayRoot" style="display:none;">
         <div id="wheelResultSummary" class="wheel-result-summary">
             <div class="wheel-result-summary-card">
                 <div class="wheel-result-summary-title">🎉 ผลการสุ่ม</div>
                 <div id="wheelResultSummaryBody"></div>
-            </div>
+        </div>
         </div>
     </div>
 
     <div id="wheelAppLayout" class="wheel-app-layout">
         <div class="wheel-page-header">
-            <h2>วงล้อ (Lucky Draw)</h2>
-            <p>ตั้งค่าและสุ่มวงล้อสำหรับไลฟ์ของคุณ</p>
+            <div>
+                <span class="wheel-page-kicker">Lucky Draw</span>
+                <h2>วงล้อ</h2>
+                <p>สุ่มรางวัล · ของขวัญอัตโนมัติ · OBS Overlay</p>
+                <div id="wheelWinLinkBadge" class="wheel-win-badge">⚪ ยังไม่เชื่อมต่อตัวนับ WIN</div>
+            </div>
+            <div class="wheel-header-actions">
+                <button type="button" class="wheel-toolbar-btn wheel-toolbar-btn--go" id="spinBtnHeader" onclick="spin()">▶ Spin</button>
+                <button type="button" class="wheel-toolbar-btn wheel-toolbar-btn--cyan" onclick="copyOverlayURL()">📋 OBS</button>
+                <button type="button" class="wheel-toolbar-btn" data-wheel-size="landscape" onclick="setWheelOverlaySize('landscape')">16:9</button>
+                <button type="button" class="wheel-toolbar-btn" data-wheel-size="portrait" onclick="setWheelOverlaySize('portrait')">9:16</button>
+                <button type="button" class="wheel-toolbar-btn" onclick="openWheelGiftRules()">🎁 Gift Rules</button>
+                <button type="button" class="wheel-toolbar-btn wheel-toolbar-btn--gold" id="wheelWinLinkBtnPage" onclick="toggleWheelWinLinkFromPage()">🔗 Win Link</button>
+            </div>
         </div>
 
-        <div class="wheel-two-col">
+        <div class="wheel-workspace">
+            <div class="wheel-top-tabs" role="tablist">
+                <button class="wheel-tab-btn active" id="wheelTab-general" type="button" onclick="switchWheelSettingsTab('general')"><span>🎰</span><span>General</span></button>
+                <button class="wheel-tab-btn" id="wheelTab-wheels" type="button" onclick="switchWheelSettingsTab('wheels')"><span>🔮</span><span>Wheels</span></button>
+                <button class="wheel-tab-btn" id="wheelTab-sound" type="button" onclick="switchWheelSettingsTab('sound')"><span>🔊</span><span>Sound</span></button>
+            </div>
+
+            <div class="wheel-two-col">
             <!-- LEFT: Settings Panel -->
             <div class="wheel-settings-col">
                 <div class="settings-card">
-                    <div class="wheel-tab-grid">
-                        <button class="wheel-tab-btn active" id="wheelTab-general" type="button" onclick="switchWheelSettingsTab('general')"><span>🎰</span><span>General</span></button>
-                        <button class="wheel-tab-btn" id="wheelTab-wheels" type="button" onclick="switchWheelSettingsTab('wheels')"><span>🔮</span><span>Wheels</span></button>
-                        <button class="wheel-tab-btn" id="wheelTab-sound" type="button" onclick="switchWheelSettingsTab('sound')"><span>🔊</span><span>Sound</span></button>
-                    </div>
                     <div class="wheel-settings-scroll">
 
                         <!-- TAB: General -->
                         <div class="wheel-settings-section active" id="wheelSec-general">
-                            <div style="margin-bottom: 18px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div class="wheel-set-block">
                                 <span class="field-label" style="color:#f1c40f;">🎲 จำนวนใบต่อการหมุน 1 ครั้ง</span>
                                 <div style="display:flex; align-items:center; gap:10px; margin-top:8px;">
                                     <input type="number" id="draws-per-spin" class="input-style" value="1" min="1" max="20" style="width:72px; font-weight:bold;" oninput="updateDrawsPerSpin(this.value)">
                                     <span style="font-size:0.78rem; color:#888; font-family:'Kanit',sans-serif; line-height:1.4;">สุ่ม 1 ครั้ง จับการ์ดทีละใบจนครบ (ตั้งค่าเพิ่มได้ที่ Gift Rules วงล้อ)</span>
                                 </div>
                             </div>
-                            <div id="wheel-queue-status" style="display:none; margin-bottom: 18px; background: rgba(157,0,255,0.08); padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(157,0,255,0.25);">
+                            <div id="wheel-queue-status" class="wheel-set-block" style="display:none; background: rgba(157,0,255,0.08); border-color: rgba(157,0,255,0.25);">
                                 <div style="font-size:0.82rem; color:#bc13fe; font-family:'Kanit',sans-serif; font-weight:700;">
                                     ⏳ คิวรอสุ่ม: <span id="wheel-queue-count">0</span> รายการ
                                 </div>
                                 <div id="wheel-queue-active" style="display:none; font-size:0.75rem; color:#888; margin-top:4px; font-family:'Kanit',sans-serif;">กำลังสุ่ม...</div>
                             </div>
-                            <div style="margin-bottom: 18px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div class="wheel-set-block">
                                 <span class="field-label" style="color:#00d4ff;">👁️ การแสดงผลตอนสุ่ม (Overlay / Preview)</span>
                                 <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
                                     <label style="display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:0.82rem; color:#ccc; font-family:'Kanit',sans-serif; cursor:pointer;">
@@ -387,7 +592,7 @@
                                 </div>
                                 <div style="font-size:0.72rem; color:#666; margin-top:10px; font-family:'Kanit',sans-serif; line-height:1.4;">ปิดตัวเลขตอนหมุน = แสดง ??? | ปิดภาพตอนหมุน = ซ่อนรูปเงาดำ</div>
                             </div>
-                            <div style="margin-bottom: 18px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div class="wheel-set-block">
                                 <span class="field-label" style="color:#ff0050;">🤖 สุ่มอัตโนมัติเมื่อได้ของขวัญ</span>
                                 <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
                                     <span style="font-size:0.8rem; color:#aaa; font-family:'Kanit',sans-serif;">Auto Spin on Gift</span>
@@ -397,95 +602,103 @@
                                     </label>
                                 </div>
                                 <button class="btn-sm" style="width:100%; background:rgba(188,19,254,0.15); border-color:#bc13fe; color:#bc13fe;" onclick="openWheelGiftRules()">🎁 ตั้งค่าแอคชั่นของขวัญ (Gift Rules)</button>
-                                <button class="btn-sm" id="wheelWinLinkBtnPage" style="width:100%; margin-top:8px; background:rgba(241,196,15,0.12); border-color:#f1c40f; color:#f1c40f;" onclick="toggleWheelWinLinkFromPage()">🔗 เชื่อมต่อตัวนับ WIN</button>
                             </div>
-                            <div class="obs-copy-area">
-                                <div style="font-size: 0.85rem; color: #aaa; font-family:'Kanit',sans-serif;"><strong>Overlay URL:</strong> OBS 1920×1080</div>
-                                <button class="btn-sm" style="background:var(--purple); border:none;" onclick="copyOverlayURL()">🔗 Copy</button>
+                            <div class="obs-copy-area wheel-set-block" style="flex-direction:column; align-items:stretch;">
+                                <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+                                    <div style="font-size: 0.85rem; color: #aaa; font-family:'Kanit',sans-serif;"><strong>Overlay URL:</strong> OBS / TikTok</div>
+                                    <button class="btn-sm" style="background:var(--purple); border:none;" onclick="copyOverlayURL()">📋 คัดลอก</button>
+                                </div>
                             </div>
-                            <div style="margin-bottom: 15px; background: rgba(0,0,0,0.25); padding: 14px; border-radius: 12px; border: 1px solid var(--border);">
+                            <div class="wheel-set-block">
                                 <span class="field-label">💾 Profile Preset</span>
                                 <select id="profile-select" class="input-style" style="width:100%; text-align:left; cursor:pointer; margin-bottom:8px;" onchange="switchProfile(this.value)"></select>
                                 <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
-                                    <button class="btn-sm" onclick="promptNewProfile()">➕ New</button>
-                                    <button class="btn-sm" onclick="promptRenameProfile()">✏️ Rename</button>
-                                    <button class="btn-sm" style="border-color:var(--red); color:var(--red); background:none;" onclick="confirmDeleteProfile()">🗑️ Delete</button>
-                                </div>
+                    <button class="btn-sm" onclick="promptNewProfile()">➕ New</button>
+                    <button class="btn-sm" onclick="promptRenameProfile()">✏️ Rename</button>
+                    <button class="btn-sm" style="border-color:var(--red); color:var(--red); background:none;" onclick="confirmDeleteProfile()">🗑️ Delete</button>
+                </div>
                                 <div style="display:flex; gap:6px;">
                                     <button class="btn-sm" onclick="exportProfile()" style="flex:1; background:#1c1c30;">📥 Export</button>
                                     <button class="btn-sm" onclick="document.getElementById('import-upload').click()" style="flex:1; background:#1c1c30;">📤 Import</button>
-                                    <input type="file" id="import-upload" accept=".json" style="display:none;" onchange="importProfile(this)">
-                                </div>
-                            </div>
-                        </div>
+                    <input type="file" id="import-upload" accept=".json" style="display:none;" onchange="importProfile(this)">
+                </div>
+            </div>
+        </div>
 
                         <!-- TAB: Wheels -->
                         <div class="wheel-settings-section" id="wheelSec-wheels">
-                            <div class="wheel-tabs" id="tabs-container"></div>
+        <div class="wheel-tabs" id="tabs-container"></div>
                             <div class="config-card" style="padding:16px; margin-bottom:12px;">
                                 <div class="header-row" style="margin-bottom:12px;">
                                     <input type="text" id="wheel-title" class="wheel-name-input" placeholder="Wheel Name" oninput="updateWheelName(this.value)" style="font-size:1.1rem;">
                                     <button onclick="addRow()" style="background:var(--purple); border:none; color:white; padding:8px 14px; border-radius:10px; font-weight:700; cursor:pointer; font-size:0.85rem;">+ Add</button>
-                                </div>
+            </div>
                                 <div style="display:flex; gap:10px; align-items:center; margin-bottom:14px; background:rgba(0,0,0,0.3); padding:10px 14px; border-radius:10px; flex-wrap:wrap;">
                                     <span style="font-size:0.8rem; color:#888; font-weight:600;">Duration (Sec):</span>
                                     <input type="text" id="spin-duration" value="6" class="input-style" style="width:50px; font-weight:bold;" onfocus="this.value=''" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
                                     <button onclick="deleteCurrentWheel()" style="margin-left:auto; background:none; border:1px solid var(--red); color:var(--red); padding:6px 12px; border-radius:8px; font-size:0.8rem; cursor:pointer;">🗑️ Delete Wheel</button>
-                                </div>
-                                <div class="table-container">
+                </div>
+            <div class="table-container">
                                     <table style="min-width:600px;">
-                                        <thead>
-                                            <tr>
+                    <thead>
+                        <tr>
                                                 <th>Mode</th>
                                                 <th style="text-align:center;">Color</th>
                                                 <th>Images</th>
                                                 <th>Value</th>
                                                 <th>Prob.</th>
                                                 <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="tbody"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+        </div>
+            </div>
 
                         <!-- TAB: Sound -->
                         <div class="wheel-settings-section" id="wheelSec-sound">
-                            <div style="margin-bottom:14px; background:rgba(0,0,0,0.2); padding:14px; border-radius:12px; border:1px solid var(--border);">
+                            <div class="wheel-set-block">
                                 <label style="display:block; margin-bottom:8px; color:#aaa; font-size:0.85rem;">Master Volume: <span id="vol-display" style="color:white; font-weight:bold;">50%</span></label>
                                 <input type="range" id="vol-slider" min="0" max="100" value="50" oninput="updateVolume(this.value)" style="width:100%; accent-color:var(--purple);">
-                            </div>
-                            <div style="margin-bottom:14px; background:rgba(0,0,0,0.2); padding:14px; border-radius:12px; border:1px solid var(--border);">
+                </div>
+                            <div class="wheel-set-block">
                                 <label style="display:block; margin-bottom:8px; color:#aaa; font-size:0.85rem;">Tick Sound (Spinning)</label>
                                 <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                                    <input type="file" id="tick-upload" accept="audio/*" style="display:none;" onchange="handleAudioUpload(this, 'tickSound')">
-                                    <button onclick="document.getElementById('tick-upload').click()" class="btn-sm">📁 Upload</button>
-                                    <button onclick="playTick(0)" class="btn-sm" style="background:#1c1c30;">▶️ Test</button>
-                                    <button onclick="clearAudio('tickSound')" class="btn-sm" style="border-color:var(--red); color:var(--red); background:none;">Reset</button>
-                                </div>
-                                <div id="tick-status" style="font-size:0.75rem; color:#888; margin-top:8px;">Using Default</div>
-                            </div>
-                            <div style="background:rgba(0,0,0,0.2); padding:14px; border-radius:12px; border:1px solid var(--border);">
+                        <input type="file" id="tick-upload" accept="audio/*" style="display:none;" onchange="handleAudioUpload(this, 'tickSound')">
+                        <button onclick="document.getElementById('tick-upload').click()" class="btn-sm">📁 Upload</button>
+                        <button onclick="playTick(0)" class="btn-sm" style="background:#1c1c30;">▶️ Test</button>
+                        <button onclick="clearAudio('tickSound')" class="btn-sm" style="border-color:var(--red); color:var(--red); background:none;">Reset</button>
+                    </div>
+                    <div id="tick-status" style="font-size:0.75rem; color:#888; margin-top:8px;">Using Default</div>
+                </div>
+                            <div class="wheel-set-block">
                                 <label style="display:block; margin-bottom:8px; color:#aaa; font-size:0.85rem;">Victory Sound (Result)</label>
                                 <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                                    <input type="file" id="victory-upload" accept="audio/*" style="display:none;" onchange="handleAudioUpload(this, 'victorySound')">
-                                    <button onclick="document.getElementById('victory-upload').click()" class="btn-sm">📁 Upload</button>
-                                    <button onclick="playVictory()" class="btn-sm" style="background:#1c1c30;">▶️ Test</button>
-                                    <button onclick="clearAudio('victorySound')" class="btn-sm" style="border-color:var(--red); color:var(--red); background:none;">Reset</button>
-                                </div>
-                                <div id="victory-status" style="font-size:0.75rem; color:#888; margin-top:8px;">Using Default</div>
-                            </div>
-                        </div>
-
+                        <input type="file" id="victory-upload" accept="audio/*" style="display:none;" onchange="handleAudioUpload(this, 'victorySound')">
+                        <button onclick="document.getElementById('victory-upload').click()" class="btn-sm">📁 Upload</button>
+                        <button onclick="playVictory()" class="btn-sm" style="background:#1c1c30;">▶️ Test</button>
+                        <button onclick="clearAudio('victorySound')" class="btn-sm" style="border-color:var(--red); color:var(--red); background:none;">Reset</button>
                     </div>
+                    <div id="victory-status" style="font-size:0.75rem; color:#888; margin-top:8px;">Using Default</div>
+                            </div>
                 </div>
+
+            </div>
+        </div>
             </div>
 
             <!-- RIGHT: Wheel Preview -->
             <div class="wheel-preview-col">
-                <div class="preview-box" id="wheelPreviewHost"></div>
+                <div class="wheel-preview-card">
+                    <div class="wheel-preview-head">
+                        <span class="wheel-card-kicker">Live</span>
+                        <span class="wheel-card-title">พรีวิววงล้อ</span>
+                    </div>
+                    <div class="preview-box" id="wheelPreviewHost"></div>
+                </div>
             </div>
+        </div>
         </div>
     </div>
 
@@ -515,8 +728,13 @@
 
     <script>
         const isOverlayMode = new URLSearchParams(window.location.search).has('overlay')
-            || /^\/overlay\/wheel\/?$/i.test(window.location.pathname);
-        let overlayToken = new URLSearchParams(window.location.search).get('token') || '';
+            || /^\/overlay\/wheel\/?$/i.test(window.location.pathname)
+            || /^\/widget\/wheel(\/|$)/i.test(window.location.pathname)
+            || !!(window.__TC_WIDGET__ && window.__TC_WIDGET__.type === 'wheel');
+        let overlayToken = new URLSearchParams(window.location.search).get('cid')
+            || new URLSearchParams(window.location.search).get('token')
+            || (window.__TC_WIDGET__ && window.__TC_WIDGET__.cid)
+            || '';
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         let wheelSocket = null;
         let wheelDrawQueue = [];
@@ -547,26 +765,43 @@
         let defaultWheels = [{ id: Date.now(), name: "Main Wheel", items: [{ mode: '+', val: "100", prob: 100, images: [], color: "#00ff88" }] }];
         let defaultProfile = { id: 'prof_' + Date.now(), name: 'Default Profile', wheels: defaultWheels, settings: defaultSettings };
 
-        let profiles = JSON.parse(localStorage.getItem('gacha_v8_profiles')) || null;
-        let activeProfileId = localStorage.getItem('gacha_v8_active_profile') || null;
+        let profiles = null;
+        let activeProfileId = null;
+        let activeProfile = null;
+        let wheels = [];
+        let globalSettings = defaultSettings;
+        let activeWheelId = null;
+        let _wheelSaveTimer = null;
 
-        // Migration and initialization
+        async function initWheelStorage() {
+            const MG = window.MediaGuard;
+            const loaded = await MG.wheelLoad();
+            if (loaded.profiles && loaded.profiles.length) {
+                profiles = loaded.profiles;
+                activeProfileId = loaded.activeProfileId;
+            }
         if (!profiles) {
-            profiles = [defaultProfile];
+                profiles = [JSON.parse(JSON.stringify(defaultProfile))];
             activeProfileId = defaultProfile.id;
-            try {
-                localStorage.setItem('gacha_v8_profiles', JSON.stringify(profiles));
-                localStorage.setItem('gacha_v8_active_profile', activeProfileId);
-            } catch(e) {}
+                await MG.wheelSave(profiles, activeProfileId);
+        }
+            activeProfile = profiles.find(p => p.id === activeProfileId) || profiles[0];
+        activeProfileId = activeProfile.id;
+            if (!activeProfile.settings) activeProfile.settings = { ...defaultSettings };
+            if (!activeProfile.settings.drawsPerSpin) activeProfile.settings.drawsPerSpin = 1;
+            wheels = activeProfile.wheels;
+            globalSettings = activeProfile.settings;
+            activeWheelId = wheels[0] ? wheels[0].id : null;
         }
 
-        let activeProfile = profiles.find(p => p.id === activeProfileId) || profiles[0];
-        activeProfileId = activeProfile.id;
-        if (!activeProfile.settings.drawsPerSpin) activeProfile.settings.drawsPerSpin = 1;
-
-        let wheels = activeProfile.wheels;
-        let globalSettings = activeProfile.settings;
-        let activeWheelId = wheels[0] ? wheels[0].id : null;
+        function saveProfiles() {
+            if (_wheelSaveTimer) clearTimeout(_wheelSaveTimer);
+            _wheelSaveTimer = setTimeout(async () => {
+                const MG = window.MediaGuard;
+                const ok = await MG.wheelSave(profiles, activeProfileId);
+                if (!ok) showToast("Storage Full! Cannot save profile.", "error");
+            }, 500);
+        }
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
@@ -584,13 +819,13 @@
             }, 3000);
         }
 
-        function saveProfiles() {
-            try {
-                localStorage.setItem('gacha_v8_profiles', JSON.stringify(profiles));
-                localStorage.setItem('gacha_v8_active_profile', activeProfileId);
-            } catch (e) {
-                showToast("Storage Full! Cannot save profile.", "error");
-            }
+        function saveProfilesSync() {
+            return window.MediaGuard.wheelSave(profiles, activeProfileId);
+        }
+
+        function saveProfilesImmediate() {
+            if (_wheelSaveTimer) { clearTimeout(_wheelSaveTimer); _wheelSaveTimer = null; }
+            return saveProfilesSync();
         }
 
         function saveData() { saveProfiles(); renderTabs(); }
@@ -700,6 +935,11 @@
                     // Legacy support: ensure color property exists
                     imported.wheels.forEach(w => w.items.forEach(i => { if(!i.color) i.color = i.mode==='+'?'#00ff88':i.mode==='-'?'#ff4d4d':'#ffffff'; }));
 
+                    const imgTotal = window.MediaGuard.countWheelImages([imported]);
+                    if (imgTotal > window.MediaGuard.LIMITS.wheelMaxTotal) {
+                        showToast(`โปรไฟล์มีรูป ${imgTotal} ใบ (เกินขีดจำกัด ${window.MediaGuard.LIMITS.wheelMaxTotal}) — อาจทำให้ค้าง`, "error");
+                    }
+
                     imported.id = 'prof_' + Date.now();
                     imported.name = imported.name + " (Imported)";
                     profiles.push(imported); switchProfile(imported.id);
@@ -716,6 +956,19 @@
             const sec = document.getElementById('wheelSec-' + tab);
             if (btn) btn.classList.add('active');
             if (sec) sec.classList.add('active');
+        }
+
+        function getSpinButtons() {
+            return [document.getElementById('spinBtn'), document.getElementById('spinBtnHeader')].filter(Boolean);
+        }
+
+        function setSpinButtonsDisabled(disabled) {
+            getSpinButtons().forEach(btn => { btn.disabled = !!disabled; });
+        }
+
+        function isSpinButtonBusy() {
+            const btn = document.getElementById('spinBtn') || document.getElementById('spinBtnHeader');
+            return !!(btn && btn.disabled);
         }
 
         function toggleWheelAutoDraw(val) {
@@ -735,11 +988,19 @@
 
         function updateWheelWinLinkBtnPage(linked) {
             const btn = document.getElementById('wheelWinLinkBtnPage');
-            if (!btn) return;
-            btn.textContent = linked ? '✅ เชื่อมต่อตัวนับ WIN แล้ว' : '🔗 เชื่อมต่อตัวนับ WIN';
-            btn.style.background = linked ? 'rgba(46,204,113,0.15)' : 'rgba(241,196,15,0.12)';
-            btn.style.borderColor = linked ? '#2ecc71' : '#f1c40f';
-            btn.style.color = linked ? '#2ecc71' : '#f1c40f';
+            if (btn) {
+                btn.textContent = linked ? '✅ เชื่อมต่อตัวนับ WIN แล้ว' : '🔗 เชื่อมต่อตัวนับ WIN';
+                btn.style.background = linked ? 'rgba(46,204,113,0.15)' : 'rgba(241,196,15,0.12)';
+                btn.style.borderColor = linked ? '#2ecc71' : '#f1c40f';
+                btn.style.color = linked ? '#2ecc71' : '#f1c40f';
+            }
+            const badge = document.getElementById('wheelWinLinkBadge');
+            if (badge) {
+                badge.textContent = linked ? '✅ เชื่อมต่อตัวนับ WIN แล้ว' : '⚪ ยังไม่เชื่อมต่อตัวนับ WIN';
+                badge.style.color = linked ? '#2ecc71' : '#888';
+                badge.style.borderColor = linked ? 'rgba(46,204,113,0.45)' : 'rgba(255,255,255,0.12)';
+                badge.style.background = linked ? 'rgba(46,204,113,0.1)' : 'rgba(255,255,255,0.03)';
+            }
         }
 
         function mountWheelStage() {
@@ -932,8 +1193,7 @@
         function toggleDisplaySetting(key, val) {
             globalSettings[key] = !!val;
             saveSettings();
-            const btn = document.getElementById('spinBtn');
-            if (btn && !btn.disabled) renderIdleWheel();
+            if (!isSpinButtonBusy()) renderIdleWheel();
             if (!isOverlayMode) emitWheelIdleSync();
         }
 
@@ -1221,9 +1481,32 @@
             return overlayToken || '';
         }
 
+        function getOverlaySizeFromStorage() {
+            const key = localStorage.getItem('tokcontrol_overlay_size') || 'landscape';
+            return key === 'portrait' ? { w: 1080, h: 1920 } : { w: 1920, h: 1080 };
+        }
+
+        function applyOverlayViewportFromQuery() {
+            const params = new URLSearchParams(window.location.search);
+            const fallback = getOverlaySizeFromStorage();
+            const ovW = Math.max(320, parseInt(params.get('w'), 10) || fallback.w);
+            const ovH = Math.max(320, parseInt(params.get('h'), 10) || fallback.h);
+            document.documentElement.style.width = ovW + 'px';
+            document.documentElement.style.height = ovH + 'px';
+            document.documentElement.style.overflow = 'hidden';
+            document.body.style.width = ovW + 'px';
+            document.body.style.height = ovH + 'px';
+            document.body.classList.toggle('overlay-portrait', ovH > ovW);
+        }
+
         function getOverlayURL() {
-            const base = window.location.origin.replace('localhost', '127.0.0.1');
-            return `${base}/overlay/wheel`;
+            const port = window.location.port || '3000';
+            const base = `http://localhost:${port}`;
+            const token = getStreamToken();
+            const size = getOverlaySizeFromStorage();
+            let url = `${base}/widget/wheel?w=${size.w}&h=${size.h}`;
+            if (token) url += `&cid=${encodeURIComponent(token)}`;
+            return url;
         }
 
         async function resolveOverlayToken() {
@@ -1241,25 +1524,70 @@
             return '';
         }
 
-        function copyOverlayURL() {
-            const token = getStreamToken();
-            if (!token) {
-                showToast("กรุณาล็อกอินก่อนคัดลอก Overlay URL", "error");
-                return;
-            }
-            const url = getOverlayURL();
+        function copyTextToClipboard(text, onSuccess, onFail) {
+            const ok = () => { if (onSuccess) onSuccess(); };
+            const fail = () => { if (onFail) onFail(); };
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(url).then(() => showToast("คัดลอก Overlay URL แล้ว!"));
+                navigator.clipboard.writeText(text).then(ok).catch(() => {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.left = '-9999px';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try { document.execCommand('copy') ? ok() : fail(); }
+                    catch (e) { fail(); }
+                    document.body.removeChild(textArea);
+                });
             } else {
-                const textArea = document.createElement("textarea");
-                textArea.value = url;
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-9999px';
                 document.body.appendChild(textArea);
                 textArea.focus();
                 textArea.select();
-                try { document.execCommand('copy'); showToast("คัดลอก Overlay URL แล้ว!"); }
-                catch (err) { showToast("คัดลอก URL ไม่สำเร็จ", "error"); }
+                try { document.execCommand('copy') ? ok() : fail(); }
+                catch (e) { fail(); }
                 document.body.removeChild(textArea);
             }
+        }
+
+        async function copyOverlayURL() {
+            try {
+                if (window.parent && window.parent !== window && typeof window.parent.copyOverlayRouteLink === 'function') {
+                    window.parent.copyOverlayRouteLink('wheel', {}, 'Wheel Overlay');
+                    return;
+                }
+            } catch (e) {}
+
+            let token = getStreamToken();
+            if (!token) token = await resolveOverlayToken();
+            if (!token) {
+                showToast('กรุณาล็อกอินก่อนคัดลอก Overlay URL', 'error');
+                return;
+            }
+            const url = getOverlayURL();
+            if (!/^https?:\/\/.+\.html(\?|$)/i.test(url)) {
+                showToast('ลิงก์ไม่ถูกต้อง — ต้องเป็นไฟล์ .html', 'error');
+                return;
+            }
+            const size = getOverlaySizeFromStorage();
+            const doneMsg = `คัดลอกแล้ว — ตั้งขนาด ${size.w}×${size.h}`;
+            copyTextToClipboard(url, () => showToast(doneMsg), () => showToast('คัดลอก URL ไม่สำเร็จ', 'error'));
+        }
+
+        function setWheelOverlaySize(sizeId) {
+            localStorage.setItem('tokcontrol_overlay_size', sizeId === 'portrait' ? 'portrait' : 'landscape');
+            updateWheelSizeButtons();
+        }
+
+        function updateWheelSizeButtons() {
+            const current = localStorage.getItem('tokcontrol_overlay_size') || 'landscape';
+            document.querySelectorAll('[data-wheel-size]').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.wheelSize === current);
+            });
         }
 
         function emitWheelIdleSync() {
@@ -1483,11 +1811,17 @@
             if (file.size > 800 * 1024) { showToast("File too large! Please use audio under 800KB.", "error"); input.value = ""; return; }
 
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 const backup = globalSettings[type];
                 globalSettings[type] = e.target.result;
-                try { saveSettings(); showToast("Custom audio saved successfully!"); } 
-                catch (err) { globalSettings[type] = backup; showToast("Storage Full! Could not save audio.", "error"); saveSettings(); }
+                const ok = await saveProfilesImmediate();
+                if (ok) {
+                    renderSettings();
+                    showToast("Custom audio saved successfully!");
+                } else {
+                    globalSettings[type] = backup;
+                    showToast("Storage Full! Could not save audio.", "error");
+                }
             };
             reader.readAsDataURL(file); input.value = "";
         }
@@ -1556,31 +1890,66 @@
         async function handleImageUpload(input, idx) {
             const files = input.files;
             if (!files || files.length === 0) return;
+            input.value = "";
             
+            const MG = window.MediaGuard;
+            const L = MG.LIMITS;
             const wheel = wheels.find(w => w.id === activeWheelId);
             if (!wheel.items[idx].images) wheel.items[idx].images = [];
             
+            const itemCount = wheel.items[idx].images.length;
+            const totalCount = MG.countWheelImages(profiles);
+            const maxForItem = L.wheelMaxPerItem - itemCount;
+            const maxForTotal = L.wheelMaxTotal - totalCount;
+            const allowed = Math.min(maxForItem, maxForTotal, files.length);
+
+            if (allowed <= 0) {
+                showToast(itemCount >= L.wheelMaxPerItem
+                    ? `สูงสุด ${L.wheelMaxPerItem} รูปต่อช่อง`
+                    : `ถึงขีดจำกัดรวม ${L.wheelMaxTotal} รูปแล้ว`, "error");
+                return;
+            }
+
+            const pre = document.getElementById('tbody');
+            let notice = null;
+            if (pre && allowed > 3) {
+                notice = document.createElement('tr');
+                notice.id = 'wheel-upload-notice';
+                notice.innerHTML = `<td colspan="5" style="color:#f1c40f;font-size:0.8rem;text-align:center;padding:10px;">⏳ กำลังประมวลผล 0/${allowed}...</td>`;
+                pre.prepend(notice);
+            }
+
+            const maxBytes = L.wheelMaxFileMB * 1024 * 1024;
             let successCount = 0;
-            // Process files sequentially to avoid memory spikes
-            for(let i = 0; i < files.length; i++) {
+
+            for (let i = 0; i < allowed; i++) {
                 const file = files[i];
                 if (!file.type.startsWith('image/')) continue;
+                if (file.size > maxBytes) {
+                    showToast(`ข้าม ${file.name} (ใหญ่กว่า ${L.wheelMaxFileMB}MB)`, "error");
+                    continue;
+                }
+                if (notice) notice.querySelector('td').innerText = `⏳ กำลังประมวลผล ${i + 1}/${allowed}...`;
                 try {
                     const webpData = await processSingleImage(file);
                     wheel.items[idx].images.push(webpData);
                     successCount++;
-                } catch(e) { console.error(e); }
+                } catch (e) { console.error(e); }
+                await new Promise(r => setTimeout(r, 0));
             }
 
-            input.value = "";
+            if (notice) notice.remove();
+
             if (successCount > 0) {
                 try {
-                    saveData(); renderRows();
-                    showToast(`Added ${successCount} image(s)!`);
-                } catch(err) {
-                    // Revert last additions if full
+                    const ok = await saveProfilesImmediate();
+                    if (!ok) throw new Error('storage');
+                    renderRows();
+                    showToast(`เพิ่ม ${successCount} รูป`);
+                } catch (err) {
                     wheel.items[idx].images.splice(-successCount, successCount);
                     showToast("Storage limit exceeded! Too many images.", "error");
+                    renderRows();
                 }
             }
         }
@@ -1625,7 +1994,7 @@
 
                 let imagesHtml = imgs.map((imgData, imgIdx) => `
                     <div style="position:relative; flex-shrink:0;">
-                        <img src="${imgData}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; border:1px solid #444;">
+                        ${window.MediaGuard.lazyThumbTag(imgData, 40)}
                         <button onclick="removeImage(${idx}, ${imgIdx})" style="position:absolute; top:-6px; right:-6px; background:var(--red); color:white; border:none; border-radius:50%; width:16px; height:16px; font-size:12px; cursor:pointer; line-height:1; padding:0; display:flex; justify-content:center; align-items:center; z-index:2; transition:0.2s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">&times;</button>
                     </div>
                 `).join('');
@@ -1676,11 +2045,11 @@
                     </tr>
                 `;
             }).join('');
+            window.MediaGuard.observeLazy(tbody);
 
             // อัพเดทหน้าจอตอนรอหมุน (แสดงผลตัวแรร์สุดตรงกลาง) ทันทีที่ตารางเปลี่ยน
             requestAnimationFrame(() => {
-                const btn = document.getElementById('spinBtn');
-                if(btn && !btn.disabled) renderIdleWheel();
+                if (!isSpinButtonBusy()) renderIdleWheel();
             });
         }
 
@@ -1704,11 +2073,30 @@
 
         function renderTabs() {
             const container = document.getElementById('tabs-container');
-            container.innerHTML = wheels.map(w => `<div class="tab ${w.id === activeWheelId ? 'active' : ''}" onclick="switchWheel(${w.id})">${w.name}</div>`).join('') + `<div class="tab" onclick="addNewWheel()" style="border:1px dashed #666; background:none; color:#aaa;">+ New Wheel</div>`;
+            let canAdd = true;
+            try {
+                if (window.parent && window.parent !== window && typeof window.parent.isAppPro === 'function') {
+                    canAdd = window.parent.isAppPro() || wheels.length < 1;
+                }
+            } catch (e) { /* ignore */ }
+            const addTab = canAdd
+                ? `<div class="tab" onclick="addNewWheel()" style="border:1px dashed #666; background:none; color:#aaa;">+ New Wheel</div>`
+                : `<div class="tab" onclick="addNewWheel()" style="border:1px dashed rgba(241,196,15,0.45); background:rgba(241,196,15,0.08); color:#f1c40f;" title="อัปเกรด PRO เพื่อเพิ่ม Wheel">🔒 PRO · + Wheel</div>`;
+            container.innerHTML = wheels.map(w => `<div class="tab ${w.id === activeWheelId ? 'active' : ''}" onclick="switchWheel(${w.id})">${w.name}</div>`).join('') + addTab;
         }
 
         function switchWheel(id) { activeWheelId = id; renderRows(); renderTabs(); }
         function addNewWheel() { 
+            try {
+                if (window.parent && window.parent !== window && typeof window.parent.isAppPro === 'function'
+                    && !window.parent.isAppPro()) {
+                    if (wheels.length >= 1) {
+                        showToast('แพ็กฟรีใช้ได้ 1 วงล้อ — อัปเกรด PRO เพื่อเพิ่ม Wheel', 'error');
+                        try { window.parent.showProUpgradePrompt?.('วงล้อ — เพิ่ม Wheel'); } catch (e) {}
+                        return;
+                    }
+                }
+            } catch (e) { /* ignore */ }
             const newW = { id: Date.now(), name: "Wheel " + (wheels.length + 1), items: [{ mode: '+', val: "100", prob: 100, images: [], color: "#00ff88" }] }; 
             wheels.push(newW); activeWheelId = newW.id; saveData(); renderRows(); 
         }
@@ -1787,8 +2175,7 @@
 
         // จัดหน้าต่างใหม่เมื่อย่อ-ขยายเบราว์เซอร์
         window.addEventListener('resize', () => {
-            const btn = document.getElementById('spinBtn');
-            if(btn && !btn.disabled) renderIdleWheel();
+            if (!isSpinButtonBusy()) renderIdleWheel();
         });
 
         async function runSequentialPicks(picks, pool) {
@@ -1807,9 +2194,8 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const container = document.getElementById('slot-container');
             const viewport = document.getElementById('viewport');
-            const btn = document.getElementById('spinBtn');
             const baseDuration = parseInt(document.getElementById('spin-duration')?.value || 6, 10);
-            if (btn) btn.disabled = true;
+            setSpinButtonsDisabled(true);
 
             const fullItemWidth = 180;
             const gapBetweenStops = 10;
@@ -1877,8 +2263,8 @@
                 if (p < picks.length - 1) await delay(280);
             }
 
-            if (spinGen === wheelSpinGeneration && btn && !wheelQueueProcessing && wheelDrawQueue.length === 0) {
-                btn.disabled = false;
+            if (spinGen === wheelSpinGeneration && !wheelQueueProcessing && wheelDrawQueue.length === 0) {
+                setSpinButtonsDisabled(false);
             }
         }
 
@@ -1887,14 +2273,13 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
             const container = document.getElementById('slot-container');
             const viewport = document.getElementById('viewport');
-            const btn = document.getElementById('spinBtn');
             const baseDuration = parseInt(document.getElementById('spin-duration')?.value || 6, 10);
             const totalPicks = opts.totalPicks || 1;
             const pickIndex = opts.pickIndex || 1;
             const duration = opts.fastMode
                 ? Math.max(2.5, baseDuration * 0.45)
                 : (totalPicks > 1 ? Math.max(3.5, baseDuration * 0.65) : baseDuration);
-            if (btn) btn.disabled = true;
+            setSpinButtonsDisabled(true);
 
             const total = 80; const stopIdx = total - 10;
             const fullItemWidth = 180; // 160 width + 20 margin
@@ -1963,23 +2348,23 @@
             check();
 
             return new Promise(resolve => {
-                setTimeout(() => {
+            setTimeout(() => {
                     if (spinGen !== wheelSpinGeneration) {
                         resolve();
                         return;
                     }
-                    const winnerEl = document.getElementById(`it-${stopIdx}`);
+                const winnerEl = document.getElementById(`it-${stopIdx}`);
                     if (winnerEl) {
-                        winnerEl.innerHTML = realWinnerHTML.content;
-                        winnerEl.classList.add('winner-highlight');
+                    winnerEl.innerHTML = realWinnerHTML.content;
+                    winnerEl.classList.add('winner-highlight');
                         applyWinnerColorToElement(winnerEl, winner);
-                        playVictory();
-                    }
-                    if (btn && !wheelQueueProcessing && wheelDrawQueue.length === 0) {
-                        btn.disabled = false;
+                    playVictory();
+                }
+                    if (!wheelQueueProcessing && wheelDrawQueue.length === 0) {
+                        setSpinButtonsDisabled(false);
                     }
                     resolve();
-                }, duration * 1000);
+            }, duration * 1000);
             });
         }
 
@@ -1990,9 +2375,9 @@
             if (sum <= 0) return null;
             let r = Math.random() * sum;
             let winner = wheel.items[0];
-            for (let item of wheel.items) {
-                if (r < parseFloat(item.prob)) { winner = item; break; }
-                r -= parseFloat(item.prob);
+            for (let item of wheel.items) { 
+                if (r < parseFloat(item.prob)) { winner = item; break; } 
+                r -= parseFloat(item.prob); 
             }
             return normalizeItemMode({ ...winner });
         }
@@ -2039,7 +2424,7 @@
                 sessions: 1,
                 drawsPerSpin: 1,
                 winMode: (opts?.winMode === 'plus' || opts?.winMode === 'minus') ? opts.winMode : null,
-                coins: parseInt(opts?.coins, 10) || 0
+                coins: 0
             });
             updateWheelQueueUI();
             processWheelQueue();
@@ -2121,8 +2506,7 @@
         async function processWheelQueue() {
             if (wheelQueueProcessing) return;
             wheelQueueProcessing = true;
-            const btn = document.getElementById('spinBtn');
-            if (btn) btn.disabled = true;
+            setSpinButtonsDisabled(true);
             let jobIndex = 0;
 
             try {
@@ -2147,7 +2531,7 @@
                 wheelQueueProcessing = false;
                 isWheelSpinning = false;
                 updateWheelQueueUI();
-                if (btn) btn.disabled = false;
+                setSpinButtonsDisabled(false);
             }
         }
 
@@ -2159,20 +2543,23 @@
         }
 
         function spin() {
-            const btn = document.getElementById('spinBtn');
             if (isWheelSpinning || wheelQueueProcessing || wheelDrawQueue.length > 0) return;
-            if (btn) btn.disabled = true;
+            setSpinButtonsDisabled(true);
             enqueueWheelJob();
         }
 
         // Initialize UI
-        mountWheelStage();
-        if (isOverlayMode) {
+        (async function initWheelApp() {
+            await initWheelStorage();
+            mountWheelStage();
+            if (isOverlayMode) {
             document.body.classList.add('overlay-mode');
+            applyOverlayViewportFromQuery();
             initWheelSocket();
             renderIdleWheel();
         } else {
-            renderProfiles(); renderTabs(); renderRows(); renderSettings();
+            updateWheelSizeButtons();
+        renderProfiles(); renderTabs(); renderRows(); renderSettings();
             initAllSelectAsButtons();
             initWheelSocket();
             renderIdleWheel();
@@ -2200,7 +2587,7 @@
                     for (let i = 0; i < rounds; i++) {
                         enqueueWheelTriggerJob({
                             winMode: e.data.winMode,
-                            coins: parseInt(e.data.coins, 10) || 0
+                            coins: 0
                         });
                     }
                 }
@@ -2209,6 +2596,7 @@
                 if (e.key === 'pandy_stream_token' && e.newValue) emitWheelIdleSync();
             });
         }
+        })();
 
         function patchSelectValueSync(selectEl, updateActive) {
             if (selectEl._btnSelectValuePatched) return;

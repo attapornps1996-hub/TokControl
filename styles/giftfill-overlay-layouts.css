@@ -1,0 +1,367 @@
+/* Gift Fill / Accumulate Overlay — fill containers with gifts (like water fill) */
+
+.gfill-layout {
+    font-family: 'Kanit', sans-serif;
+    color: #fff;
+    --gfill-accent: #ffcc00;
+    --gfill-pct: 65%;
+    width: min(280px, 70vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.gfill-label {
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: var(--gfill-accent);
+    text-transform: uppercase;
+}
+
+.gfill-nums {
+    font-size: 0.85rem;
+    font-weight: 800;
+}
+
+.gfill-nums b { color: var(--gfill-accent); }
+
+.gfill-pct-big {
+    font-size: 1.6rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.gfill-icons {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.gfill-icon {
+    position: absolute;
+    font-size: 1.1rem;
+    animation: gfill-float 2.8s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    opacity: 0.9;
+}
+
+@keyframes gfill-float {
+    0%,100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-8px) rotate(4deg); }
+}
+
+@keyframes gfill-shine {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+}
+
+@keyframes gfill-wave {
+    0%,100% { transform: translateX(-6%); }
+    50% { transform: translateX(6%); }
+}
+
+@keyframes gfill-wiggle {
+    0%,100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+}
+
+@keyframes gfill-pour {
+    0% { transform: translateY(-12px); opacity: 0; }
+    40% { opacity: 1; }
+    100% { transform: translateY(0); opacity: 0.9; }
+}
+
+@keyframes gfill-lid {
+    0%,100% { transform: rotateX(0deg); }
+    50% { transform: rotateX(-18deg); }
+}
+
+@keyframes gfill-drop {
+    0% { transform: translateY(-8px); opacity: 0; }
+    20% { opacity: 1; }
+    100% { transform: translateY(60px); opacity: 0; }
+}
+
+@keyframes gfill-block-pop {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes gfill-spin { to { transform: rotate(360deg); } }
+
+/* ── 1. CLASSIC BAR ── */
+.gfill-classic { width: min(360px, 90vw); }
+.gfill-classic-bar {
+    width: 100%;
+    height: 28px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    overflow: hidden;
+    position: relative;
+}
+.gfill-classic-fill {
+    height: 100%;
+    width: var(--gfill-pct);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--gfill-accent) 60%, #000), var(--gfill-accent));
+    border-radius: 999px;
+    transition: width 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+}
+.gfill-classic-fill::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    animation: gfill-shine 2s linear infinite;
+}
+.gfill-classic-gifts {
+    display: flex; gap: 4px; justify-content: center; margin-top: 6px;
+    font-size: 1.1rem;
+}
+.gfill-classic-gifts span { animation: gfill-float 2.4s ease-in-out infinite; }
+.gfill-classic-gifts span:nth-child(2) { animation-delay: 0.3s; }
+.gfill-classic-gifts span:nth-child(3) { animation-delay: 0.6s; }
+
+/* ── 2. TANK ── */
+.gfill-tank-wrap {
+    width: 140px; height: 200px;
+    border: 3px solid rgba(255,255,255,0.35);
+    border-radius: 12px 12px 18px 18px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(0,0,0,0.25));
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 24px rgba(0,0,0,0.35), 0 8px 24px rgba(0,0,0,0.4);
+}
+.gfill-tank-wrap::before {
+    content: '';
+    position: absolute; left: 8px; top: 10px; bottom: 10px; width: 10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent);
+    border-radius: 8px;
+    z-index: 3;
+    pointer-events: none;
+}
+.gfill-tank-liquid {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: var(--gfill-pct);
+    background: linear-gradient(180deg,
+        color-mix(in srgb, var(--gfill-accent) 75%, #fff),
+        color-mix(in srgb, var(--gfill-accent) 55%, #000));
+    transition: height 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+}
+.gfill-tank-liquid::before {
+    content: '';
+    position: absolute; left: -20%; right: -20%; top: -8px; height: 16px;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.45), transparent 70%);
+    animation: gfill-wave 2.2s ease-in-out infinite;
+}
+.gfill-tank-liquid .gfill-icon { font-size: 1.25rem; }
+
+/* ── 3. BOTTLE ── */
+.gfill-bottle-wrap { width: 100px; height: 200px; position: relative; }
+.gfill-bottle-cork {
+    width: 28px; height: 12px; margin: 0 auto 2px;
+    background: #8b5a2b;
+    border-radius: 3px;
+    animation: gfill-wiggle 2.5s ease-in-out infinite;
+}
+.gfill-bottle-neck {
+    width: 36px; height: 28px; margin: 0 auto;
+    background: rgba(255,255,255,0.12);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+}
+.gfill-bottle-body {
+    width: 100px; height: 168px;
+    border: 3px solid rgba(255,255,255,0.35);
+    border-radius: 18px 18px 28px 28px;
+    background: rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+.gfill-bottle-liquid {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: var(--gfill-pct);
+    background: linear-gradient(180deg, var(--gfill-accent), color-mix(in srgb, var(--gfill-accent) 50%, #000));
+    transition: height 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+}
+
+/* ── 4. CHEST ── */
+.gfill-chest { width: 180px; }
+.gfill-chest-lid {
+    height: 36px;
+    background: linear-gradient(180deg, #c9a227, #8b6914);
+    border-radius: 12px 12px 0 0;
+    border: 2px solid #ffd76a;
+    transform-origin: bottom center;
+    animation: gfill-lid 3s ease-in-out infinite;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+}
+.gfill-chest-body {
+    height: 110px;
+    background: linear-gradient(180deg, #6b4423, #3d2412);
+    border: 2px solid #c9a227;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    position: relative;
+    overflow: hidden;
+}
+.gfill-chest-fill {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: var(--gfill-pct);
+    background: radial-gradient(ellipse at 50% 100%,
+        color-mix(in srgb, var(--gfill-accent) 80%, #fff),
+        color-mix(in srgb, var(--gfill-accent) 40%, #000));
+    transition: height 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+}
+.gfill-chest-lock {
+    position: absolute; left: 50%; top: 40%; transform: translate(-50%,-50%);
+    font-size: 1.4rem; z-index: 2;
+}
+
+/* ── 5. BOWL ── */
+.gfill-bowl { width: 180px; height: 140px; position: relative; }
+.gfill-bowl-pile {
+    position: absolute; left: 10%; right: 10%; bottom: 28px;
+    height: var(--gfill-pct);
+    max-height: 100px;
+    transition: height 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+    display: flex; flex-wrap: wrap; align-content: flex-end; justify-content: center;
+    gap: 2px;
+}
+.gfill-bowl-pile .gfill-icon {
+    position: static;
+    font-size: 1.35rem;
+    animation: gfill-pour 0.6s ease both;
+}
+.gfill-bowl-base {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 36px;
+    background: radial-gradient(ellipse at 50% 0%, transparent 40%, rgba(255,255,255,0.15) 41%, rgba(255,255,255,0.1) 100%);
+    border: 3px solid rgba(255,255,255,0.3);
+    border-top: none;
+    border-radius: 0 0 90px 90px;
+}
+
+/* ── 6. TUBE ── */
+.gfill-tube { display: flex; align-items: flex-end; gap: 14px; }
+.gfill-tube-meter {
+    width: 48px; height: 180px;
+    border-radius: 999px;
+    border: 3px solid rgba(255,255,255,0.35);
+    background: rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+}
+.gfill-tube-fill {
+    position: absolute; left: 4px; right: 4px; bottom: 4px;
+    height: calc(var(--gfill-pct) - 4px);
+    max-height: calc(100% - 8px);
+    border-radius: 999px;
+    background: linear-gradient(180deg, #fff, var(--gfill-accent));
+    transition: height 0.8s cubic-bezier(0.22,1,0.36,1);
+    overflow: hidden;
+}
+.gfill-tube-meta { text-align: left; padding-bottom: 8px; }
+.gfill-tube-meta .gfill-pct-big { font-size: 2rem; }
+
+/* ── 7. HOPPER ── */
+.gfill-hopper { width: 160px; display: flex; flex-direction: column; align-items: center; }
+.gfill-hopper-funnel {
+    width: 140px; height: 70px;
+    clip-path: polygon(0 0, 100% 0, 62% 100%, 38% 100%);
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.25);
+    position: relative;
+    overflow: hidden;
+}
+.gfill-hopper-fall {
+    position: absolute; inset: 0;
+    display: flex; justify-content: center; gap: 4px; padding-top: 6px;
+    font-size: 1rem;
+}
+.gfill-hopper-fall span { animation: gfill-drop 1.4s linear infinite; }
+.gfill-hopper-fall span:nth-child(2) { animation-delay: 0.35s; }
+.gfill-hopper-fall span:nth-child(3) { animation-delay: 0.7s; }
+.gfill-hopper-bin {
+    width: 90px; height: 100px;
+    margin-top: -2px;
+    border: 3px solid rgba(255,255,255,0.35);
+    border-radius: 0 0 12px 12px;
+    background: rgba(0,0,0,0.25);
+    position: relative;
+    overflow: hidden;
+}
+.gfill-hopper-fill {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: var(--gfill-pct);
+    background: linear-gradient(180deg, var(--gfill-accent), color-mix(in srgb, var(--gfill-accent) 45%, #000));
+    transition: height 1.35s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+}
+
+/* ── 8. BLOCKS ── */
+.gfill-blocks { width: min(260px, 88vw); }
+.gfill-blocks-row {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+}
+.gfill-block {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem;
+    transition: background 0.3s, transform 0.3s;
+}
+.gfill-block.on {
+    background: var(--gfill-accent);
+    border-color: color-mix(in srgb, var(--gfill-accent) 80%, #fff);
+    box-shadow: 0 0 10px color-mix(in srgb, var(--gfill-accent) 40%, transparent);
+    animation: gfill-block-pop 0.4s ease;
+}
+
+/* ── 9. VORTEX ── */
+.gfill-vortex {
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    border: 3px solid color-mix(in srgb, var(--gfill-accent) 45%, transparent);
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle, rgba(0,0,0,0.2), rgba(0,0,0,0.55));
+}
+.gfill-vortex-spin {
+    position: absolute; inset: -20%;
+    background: conic-gradient(from 0deg,
+        transparent,
+        color-mix(in srgb, var(--gfill-accent) 35%, transparent),
+        transparent 40%);
+    animation: gfill-spin 4s linear infinite;
+    opacity: 0.7;
+}
+.gfill-vortex-core {
+    position: absolute; inset: 22%;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--gfill-accent), color-mix(in srgb, var(--gfill-accent) 30%, #000));
+    clip-path: circle(calc(var(--gfill-pct) * 0.5) at 50% 50%);
+    transition: clip-path 1.45s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+}
+.gfill-vortex-icons {
+    position: absolute; inset: 0;
+    animation: gfill-spin 6s linear infinite reverse;
+}
+.gfill-vortex-icons .gfill-icon { font-size: 1rem; }
+
+body.overlay-portrait-reflow .gfill-classic { width: min(300px, 90vw); }
+body.overlay-portrait-reflow .gfill-tank-wrap { width: 120px; height: 170px; }

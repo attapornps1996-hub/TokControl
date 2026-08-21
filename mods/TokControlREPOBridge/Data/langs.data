@@ -1,0 +1,818 @@
+{
+    "%template_msg%": {
+        "ru": "активировал",
+        "en": "activates"
+    },
+    "test_event": {
+        "ru": "Тестовое событие",
+        "en": "Test Event"
+    },
+    "spawn_duck": {
+        "ru": "Утка",
+        "en": "Duck"
+    },
+    "spawn_spewer": {
+        "ru": "Блевальщик",
+        "en": "Spewer"
+    },
+    "spawn_upscream": {
+        "ru": "Человекопаук",
+        "en": "Upscream"
+    },
+    "spawn_alien": {
+        "ru": "Пришелец",
+        "en": "Alien"
+    },
+    "spawn_animal": {
+        "ru": "Животное",
+        "en": "Animal"
+    },
+    "spawn_baby": {
+        "ru": "Ох уж эти детки!",
+        "en": "Baby Monster"
+    },
+    "spawn_thinman": {
+        "ru": "Ребенок-тень",
+        "en": "Shadow Child"
+    },
+    "spawn_hidden": {
+        "ru": "Невидимка",
+        "en": "Hidden"
+    },
+    "spawn_frog": {
+        "ru": "Жаба",
+        "en": "Frog"
+    },
+    "spawn_bowtie": {
+        "ru": "Крикун",
+        "en": "Bowtie"
+    },
+    "spawn_huntsman": {
+        "ru": "Дед охотник",
+        "en": "Huntsman"
+    },
+    "spawn_head": {
+        "ru": "Голова",
+        "en": "Floating Head"
+    },
+    "spawn_trudge": {
+        "ru": "Трудж",
+        "en": "Trudge"
+    },
+    "spawn_clown": {
+        "ru": "Клоун",
+        "en": "Clown"
+    },
+    "spawn_robe": {
+        "ru": "Роба",
+        "en": "Robe"
+    },
+    "spawn_reaper": {
+        "ru": "Кукла-Жнец",
+        "en": "Reaper"
+    },
+    "solo_buff_heal": {
+        "ru": "Небольшое лечение",
+        "en": "Minor Heal"
+    },
+    "solo_buff_energy": {
+        "ru": "Восстановить энергию",
+        "en": "Restore Energy"
+    },
+    "solo_buff_full_restore": {
+        "ru": "Полное восстановление",
+        "en": "Full Restore"
+    },
+    "solo_debuff_hurt": {
+        "ru": "Пощечина",
+        "en": "Slap"
+    },
+    "solo_debuff_energy": {
+        "ru": "Выкачать энергию",
+        "en": "Drain Energy"
+    },
+    "solo_debuff_knockdown": {
+        "ru": "Сбить с ног",
+        "en": "Knockdown"
+    },
+    "solo_debuff_grab": {
+        "ru": "Отключить захват",
+        "en": "Disable Grab"
+    },
+    "solo_debuff_crouch": {
+        "ru": "Красться",
+        "en": "Stealth Sneak"
+    },
+    "solo_debuff_wasd": {
+        "ru": "Перемешать WASD",
+        "en": "Shuffle WASD"
+    },
+    "solo_debuff_camera": {
+        "ru": "Блок камеры",
+        "en": "Camera Lock"
+    },
+    "solo_buff_jump": {
+        "ru": "Мега прыжки",
+        "en": "Mega Jumps"
+    },
+    "solo_buff_speed": {
+        "ru": "Мега скорость",
+        "en": "Mega Speed"
+    },
+    "solo_buff_energymode": {
+        "ru": "Бесконечная энергия",
+        "en": "Infinite Energy"
+    },
+    "solo_buff_godmode": {
+        "ru": "Бессмертие",
+        "en": "Invincibility"
+    },
+    "solo_buff_gravity": {
+        "ru": "Снизить гравитацию",
+        "en": "Lower Gravity"
+    },
+    "solo_debuff_gravity": {
+        "ru": "Усилить гравитацию",
+        "en": "Increase Gravity"
+    },
+    "solo_debuff_push_up": {
+        "ru": "Подбросить",
+        "en": "Launch Upwards"
+    },
+    "solo_debuff_push_front": {
+        "ru": "Толкнуть вперед",
+        "en": "Push Forward"
+    },
+    "solo_debuff_push_back": {
+        "ru": "Толкнуть назад",
+        "en": "Push Backward"
+    },
+    "solo_debuff_slow": {
+        "ru": "Замедлить",
+        "en": "Slow Speed"
+    },
+    "solo_debuff_freez": {
+        "ru": "Заморозить",
+        "en": "Freeze"
+    },
+    "solo_debuff_item_boom": {
+        "ru": "Подрыв предмета",
+        "en": "Detonate Item"
+    },
+    "solo_upgrade_roll": {
+        "ru": "Улучшить кувырок",
+        "en": "Upgrade Launch"
+    },
+    "solo_upgrade_speed": {
+        "ru": "Улучшить скорость",
+        "en": "Upgrade Speed"
+    },
+    "solo_upgrade_energy": {
+        "ru": "Улучшить энергию",
+        "en": "Upgrade Energy"
+    },
+    "solo_upgrade_health": {
+        "ru": "Улучшить здоровье",
+        "en": "Upgrade Health"
+    },
+    "solo_upgrade_range": {
+        "ru": "Улучшить дальность",
+        "en": "Upgrade Range"
+    },
+    "solo_upgrade_strength": {
+        "ru": "Улучшить силу",
+        "en": "Upgrade Strength"
+    },
+    "solo_upgrade_jump": {
+        "ru": "Дополнительный прыжок",
+        "en": "Extra Jump"
+    },
+    "solo_teleport_start": {
+        "ru": "Телепорт на старт",
+        "en": "Teleport to Start"
+    },
+    "solo_teleport_rand": {
+        "ru": "Случайный телепорт",
+        "en": "Random Teleport"
+    },
+    "solo_buff_resurrect": {
+        "ru": "Воскресить",
+        "en": "Revive"
+    },
+    "solo_debuff_kill": {
+        "ru": "Самоуничтожение",
+        "en": "Self-Destruct"
+    },
+    "all_buff_heal": {
+        "ru": "Небольшое лечение",
+        "en": "Minor Heal"
+    },
+    "all_buff_full_restore": {
+        "ru": "Полное восстановление",
+        "en": "Full Restore"
+    },
+    "all_debuff_hurt": {
+        "ru": "Пощечина",
+        "en": "Slap"
+    },
+    "all_debuff_hp_shuffle": {
+        "ru": "Перемешать ХП игроков",
+        "en": "Shuffle Players HP"
+    },
+    "all_buff_hp_average": {
+        "ru": "Усреднить ХП игроков",
+        "en": "Average Players HP"
+    },
+    "all_goal_dec": {
+        "ru": "Уменьшить денежную цель",
+        "en": "Lower Loot Goal"
+    },
+    "all_goal_inc": {
+        "ru": "Увеличить денежную цель",
+        "en": "Increase Loot Goal"
+    },
+    "all_teleport_shuffle": {
+        "ru": "Перемешать игроков",
+        "en": "Shuffle Players"
+    },
+    "all_teleport_start": {
+        "ru": "Телепорт на старт",
+        "en": "Teleport to Start"
+    },
+    "all_teleport_rand": {
+        "ru": "Случайный телепорт",
+        "en": "Random Teleport"
+    },
+    "all_cart_teleport_start": {
+        "ru": "Телепорт тележки на старт",
+        "en": "Teleport Cart to Start"
+    },
+    "all_cart_teleport_rand": {
+        "ru": "Случайный телепорт тележки",
+        "en": "Random Cart Teleport"
+    },
+    "all_cart_spread": {
+        "ru": "Раскидать лут в тележке",
+        "en": "Scatter Cart Loot"
+    },
+    "all_buff_resurrect_rand": {
+        "ru": "Воскресить случ. игрока",
+        "en": "Revive Random Player"
+    },
+    "all_buff_resurrect_all": {
+        "ru": "Воскресить всех",
+        "en": "Revive All Players"
+    },
+    "all_debuff_kill_rand": {
+        "ru": "Уничтожить случ. игрока",
+        "en": "Destruct Random Player"
+    },
+    "item_health_small": {
+        "ru": "Аптечка: Малая",
+        "en": "Health Pack: Small"
+    },
+    "item_health_med": {
+        "ru": "Аптечка: Средняя",
+        "en": "Health Pack: Medium"
+    },
+    "item_health_big": {
+        "ru": "Аптечка: Большая",
+        "en": "Health Pack: Large"
+    },
+    "item_crystal": {
+        "ru": "Энергетический Кристалл",
+        "en": "Power Crystal"
+    },
+    "item_nade_stun": {
+        "ru": "Оглушающая граната",
+        "en": "Grenade: Stun"
+    },
+    "item_nade_shock": {
+        "ru": "Шоковая граната",
+        "en": "Grenade: Shockwave"
+    },
+    "item_nade_expl": {
+        "ru": "Граната",
+        "en": "Grenade: Explosion"
+    },
+    "item_nade_f1": {
+        "ru": "Лимонка",
+        "en": "Grenade: Frag"
+    },
+    "item_nade_duck_f1": {
+        "ru": "Связка гранат",
+        "en": "Grenade: Duct Taped"
+    },
+    "item_mine_stun": {
+        "ru": "Капкан",
+        "en": "Mine: Stun"
+    },
+    "item_mine_shock": {
+        "ru": "Шоковая мина",
+        "en": "Mine: Shockwave"
+    },
+    "item_mine_expl": {
+        "ru": "Противопехотная мина",
+        "en": "Mine: Explosive"
+    },
+    "item_rubber_duck": {
+        "ru": "Резиновая утя",
+        "en": "Rubber Duck"
+    },
+    "item_drone_roll": {
+        "ru": "Дрон: Кувырок",
+        "en": "Drone: Launch"
+    },
+    "item_drone_gravity": {
+        "ru": "Дрон: 0 Гравитации",
+        "en": "Drone: Zero Gravity"
+    },
+    "item_drone_feather": {
+        "ru": "Дрон: Перышко",
+        "en": "Drone: Feather"
+    },
+    "item_drone_energy": {
+        "ru": "Дрон: Батарейка",
+        "en": "Drone: Battery"
+    },
+    "item_drone_shield": {
+        "ru": "Дрон: Щит",
+        "en": "Drone: Shield"
+    },
+    "item_sphere_gravity": {
+        "ru": "Шар: 0 Гравитации",
+        "en": "Orb: Zero Gravity"
+    },
+    "item_book_roll": {
+        "ru": "Улучшение: Кувырок",
+        "en": "Upgrade: Tumble"
+    },
+    "item_book_speed": {
+        "ru": "Улучшение: Скорость",
+        "en": "Upgrade: Speed"
+    },
+    "item_book_energy": {
+        "ru": "Улучшение: Энергия",
+        "en": "Upgrade: Energy"
+    },
+    "item_book_health": {
+        "ru": "Улучшение: Здоровья",
+        "en": "Upgrade: Health"
+    },
+    "item_book_range": {
+        "ru": "Улучшение: Дальности",
+        "en": "Upgrade: Grab Range"
+    },
+    "item_book_strength": {
+        "ru": "Улучшение: Силы",
+        "en": "Upgrade: Strength"
+    },
+    "item_book_jump": {
+        "ru": "Улучшение: +1 Прыжок",
+        "en": "Upgrade: +1 Jump"
+    },
+    "item_frying_pan": {
+        "ru": "Сковорода",
+        "en": "Frying Pan"
+    },
+    "item_inflatable_hammer": {
+        "ru": "Надувной Молоток",
+        "en": "Inflatable Hammer"
+    },
+    "item_sword": {
+        "ru": "Меч",
+        "en": "Sword"
+    },
+    "item_baseball_bat": {
+        "ru": "Бейсбольная бита",
+        "en": "Baseball Bat"
+    },
+    "item_sledge_hammer": {
+        "ru": "Кувалда",
+        "en": "Sledgehammer"
+    },
+    "item_valuable_tracker": {
+        "ru": "Детектор Предметов",
+        "en": "Valuable Tracker"
+    },
+    "item_extraction_tracker": {
+        "ru": "Детектор Пункта Сдачи",
+        "en": "Extraction Tracker"
+    },
+    "item_cart_small": {
+        "ru": "Телега: Маленькая",
+        "en": "Cart: Small"
+    },
+    "item_cart_medium": {
+        "ru": "Телега: Большая",
+        "en": "Cart: Large"
+    },
+    "item_tranq": {
+        "ru": "Транкливизатор",
+        "en": "Tranquilizer Gun"
+    },
+    "item_handgun": {
+        "ru": "Пистолет",
+        "en": "Handgun"
+    },
+    "item_shotgun": {
+        "ru": "Дробовик",
+        "en": "Shotgun"
+    },
+    "loot_rand_small": {
+        "ru": "Небольшая безделушка",
+        "en": "Small Valuables"
+    },
+    "loot_rand_med": {
+        "ru": "Средняя безделушка",
+        "en": "Medium Valuables"
+    },
+    "loot_rand_big": {
+        "ru": "Большая безделушка",
+        "en": "Large Valuables"
+    },
+    "loot_money_rain": {
+        "ru": "Пачки денег",
+        "en": "Cash"
+    },
+    "loot_rand_enemy": {
+        "ru": "Вражеская сфера",
+        "en": "Enemy Sphere"
+    },
+    "loot_frog": {
+        "ru": "Лягушка",
+        "en": "Frog"
+    },
+    "loot_bottle": {
+        "ru": "Шампанское",
+        "en": "Champagne"
+    },
+    "loot_love_potion": {
+        "ru": "Любовный эликсир",
+        "en": "Love Potion"
+    },
+    "loot_gramophone": {
+        "ru": "Граммофон",
+        "en": "Gramophone"
+    },
+    "loot_power_crystal": {
+        "ru": "Кристалл",
+        "en": "Crystal"
+    },
+    "loot_fan": {
+        "ru": "Вентилятор",
+        "en": "Fan"
+    },
+    "loot_clown": {
+        "ru": "Клоун",
+        "en": "Clown"
+    },
+    "loot_guitar": {
+        "ru": "Гитара",
+        "en": "Guitar"
+    },
+    "loot_propane_tank": {
+        "ru": "Баллон пропана",
+        "en": "Propane Tank"
+    },
+    "loot_music_box": {
+        "ru": "Музыкальная шкатулка",
+        "en": "Music Box"
+    },
+    "loot_television": {
+        "ru": "Телевизор",
+        "en": "Television"
+    },
+    "loot_flamethrower": {
+        "ru": "Огнемет",
+        "en": "Flamethrower"
+    },
+    "loot_saw": {
+        "ru": "Циркулярная пила",
+        "en": "Circular Saw"
+    },
+    "loot_time_glass": {
+        "ru": "Песочные часы",
+        "en": "Time Glass"
+    },
+    "loot_doll": {
+        "ru": "Одержимая кукла",
+        "en": "Possessed Doll"
+    },
+    "loot_barrel": {
+        "ru": "Взрывоопасная бочка",
+        "en": "Explosive Barrel"
+    },
+    "loot_sword": {
+        "ru": "Гигантский меч",
+        "en": "Giant Sword"
+    },
+    "loot_staff": {
+        "ru": "Магический посох",
+        "en": "Magic Staff"
+    },
+    "loot_animal_crate": {
+        "ru": "Запечатанная коробка",
+        "en": "Sealed Crate"
+    },
+    "loot_creature_leg": {
+        "ru": "Нога чудища",
+        "en": "Creature Leg"
+    },
+    "loot_ice_block": {
+        "ru": "Ледяная глыба",
+        "en": "Ice Block"
+    },
+    "loot_broom": {
+        "ru": "Волшебная метла",
+        "en": "Magic Broom"
+    },
+    "loot_painting": {
+        "ru": "Картина",
+        "en": "Painting"
+    },
+    "loot_harp": {
+        "ru": "Арфа",
+        "en": "Harp"
+    },
+    "loot_grandfather_clock": {
+        "ru": "Напольные часы",
+        "en": "Grandfather Clock"
+    },
+    "loot_golden_statue": {
+        "ru": "Золотая статуя",
+        "en": "Golden Statue"
+    },
+    "loot_science_station": {
+        "ru": "Научная станция",
+        "en": "Science Station"
+    },
+    "loot_server_rack": {
+        "ru": "Серверная стойка",
+        "en": "Server Rack"
+    },
+    "loot_dinosaur": {
+        "ru": "Динозавр",
+        "en": "Dinosaur"
+    },
+    "loot_griffin_statue": {
+        "ru": "Статуя грифона",
+        "en": "Griffin Statue"
+    },
+    "loot_piano": {
+        "ru": "Пианино",
+        "en": "Piano"
+    },
+    "active_nade_stun": {
+        "ru": "Бросить стан гранату",
+        "en": "Activate Stun-nade"
+    },
+    "active_nade_shock": {
+        "ru": "Бросить шоковую гранату",
+        "en": "Activate Shock-nade"
+    },
+    "active_nade_expl": {
+        "ru": "Бросить гранату",
+        "en": "Activate Explosive-nade"
+    },
+    "active_nade_duck": {
+        "ru": "Бросить уточку",
+        "en": "Activate Duck"
+    },
+    "solo_frogs_around": {
+        "ru": "Окружить жабками",
+        "en": "Frog Surround"
+    },
+    "solo_debuff_drop_inv": {
+        "ru": "Выбросить инвентарь",
+        "en": "Drop Inventory"
+    },
+    "solo_poop_diamonds": {
+        "ru": "Какать алмазами",
+        "en": "Poop Diamonds"
+    },
+    "solo_poop_mines": {
+        "ru": "Какать минами",
+        "en": "Poop Mines"
+    },
+    "solo_poop_nades": {
+        "ru": "Какать гранатами",
+        "en": "Poop Grenades"
+    },
+    "all_stun_enemies": {
+        "ru": "Уронить врагов",
+        "en": "Stun the Enemies"
+    },
+    "all_speak_random": {
+        "ru": "Говорят все",
+        "en": "Everyone Speaks"
+    },
+    "all_nade_burst": {
+        "ru": "Гранаты у всех",
+        "en": "Grenades From All Players"
+    },
+    "all_nade_duck": {
+        "ru": "Утки у всех",
+        "en": "Ducks From All Players"
+    },
+    "item_duck_bucket": {
+        "ru": "Анти-утка ведро",
+        "en": "Duck Bucket"
+    },
+    "item_melee_prodzap": {
+        "ru": "Шок-палка",
+        "en": "Prodzap"
+    },
+    "item_gun_boltzap": {
+        "ru": "Болтзар",
+        "en": "Boltzar"
+    },
+    "item_gun_pulse": {
+        "ru": "Импульсный пистолет",
+        "en": "Pulse Pistol"
+    },
+    "loot_rand_beta_small": {
+        "ru": "Небольшая безделушка",
+        "en": "Small Valuables"
+    },
+    "loot_rand_beta_med": {
+        "ru": "Средняя безделушка",
+        "en": "Medium Valuables"
+    },
+    "loot_mug_deluxe": {
+        "ru": "Люкс-чашка",
+        "en": "Mug Deluxe"
+    },
+    "loot_baby_head": {
+        "ru": "Голова куклы",
+        "en": "Baby Doll Head"
+    },
+    "loot_gem_burger": {
+        "ru": "Драгоценный бургер",
+        "en": "Gem Burger"
+    },
+    "loot_ac_gumball": {
+        "ru": "Жвачкомат",
+        "en": "Gumball"
+    },
+    "loot_ac_boombox": {
+        "ru": "Бумбокс",
+        "en": "Boombox"
+    },
+    "loot_milk": {
+        "ru": "Молоко",
+        "en": "Milk"
+    },
+    "loot_golden_swirl": {
+        "ru": "Золотая куча",
+        "en": "Golden Poop"
+    },
+    "loot_ac_blender": {
+        "ru": "Блендер",
+        "en": "Blender"
+    },
+    "loot_horse": {
+        "ru": "Конь",
+        "en": "Horse"
+    },
+    "loot_ac_trafic_light": {
+        "ru": "Светофор",
+        "en": "Traffic Light"
+    },
+    "solo_upgrade_wings": {
+        "ru": "Улучшить крылья",
+        "en": "Upgrade Wings"
+    },
+    "solo_upgrade_rest": {
+        "ru": "Улучшить отдых",
+        "en": "Upgrade Rest"
+    },
+    "item_book_wings": {
+        "ru": "Улучшение: Крылья",
+        "en": "Upgrade: Wings"
+    },
+    "item_book_rest": {
+        "ru": "Улучшение: Отдых",
+        "en": "Upgrade: Rest"
+    },
+    "item_cart_cannon": {
+        "ru": "Телега: Пушка",
+        "en": "Cart: Cannon"
+    },
+    "item_cart_laser": {
+        "ru": "Телега: Лазер",
+        "en": "Cart: Laser"
+    },
+    "item_bridge": {
+        "ru": "Фазовый мост",
+        "en": "Phase Bridge"
+    },
+    "item_photon_blaster": {
+        "ru": "Фотонный бластер",
+        "en": "Photon Blaster"
+    },
+    "spawn_dogo": {
+        "ru": "Эльза",
+        "en": "Elsa Dogo"
+    },
+    "spawn_tick": {
+        "ru": "Клещ",
+        "en": "Tick"
+    },
+    "spawn_birthday_boy": {
+        "ru": "Именинник",
+        "en": "Birthday Boy"
+    },
+    "spawn_gambit": {
+        "ru": "Гамбит",
+        "en": "Gambit"
+    },
+    "spawn_headgrab": {
+        "ru": "Хедхраб",
+        "en": "Headgrab"
+    },
+    "spawn_heart_hugger": {
+        "ru": "Обниматель сердец",
+        "en": "Heart Hugger"
+    },
+    "spawn_cleanup_crew": {
+        "ru": "Команда уборки",
+        "en": "Cleanup Crew"
+    },
+    "spawn_bella": {
+        "ru": "Белла",
+        "en": "Bella"
+    },
+    "spawn_oogly": {
+        "ru": "Уродец",
+        "en": "Oogly"
+    },
+    "spawn_loom": {
+        "ru": "Ткачиха",
+        "en": "Loom"
+    },
+    "item_book_battery": {
+        "ru": "Улучшение: Батарея",
+        "en": "Upgrade: Head Battery"
+    },
+    "item_book_climb": {
+        "ru": "Улучшение: Карабканье",
+        "en": "Upgrade: Tumble Climb"
+    },
+    "loot_rand_huge": {
+        "ru": "Огромная безделушка",
+        "en": "Huge Valuables"
+    },
+    "loot_star_wand": {
+        "ru": "Волшебная палочка",
+        "en": "Star Wand"
+    },
+    "loot_lev_potion": {
+        "ru": "Зелье левитации",
+        "en": "Levitation Potion"
+    },
+    "loot_jackhammer": {
+        "ru": "Отбойный молоток",
+        "en": "Jackhammer"
+    },
+    "loot_coffin": {
+        "ru": "Гроб",
+        "en": "Coffin"
+    },
+    "loot_tray": {
+        "ru": "Музейный поднос",
+        "en": "Museum Tray"
+    },
+    "loot_dragon_skull": {
+        "ru": "Череп Дракона",
+        "en": "Dragon Skull"
+    },
+    "item_cart_scooter": {
+        "ru": "Телега: Гоночная",
+        "en": "Cart: Semiscooter"
+    },
+    "item_cart_scooter_small": {
+        "ru": "Телега: Скутер",
+        "en": "Cart: Semiscooter Small"
+    },
+    "item_staff_gravity": {
+        "ru": "Посох: Гравитации",
+        "en": "Staff: Zero Gravity"
+    },
+    "item_staff_torque": {
+        "ru": "Посох: Закручивания",
+        "en": "Staff: Torque"
+    },
+    "item_staff_void": {
+        "ru": "Посох: Пустоты",
+        "en": "Staff: Void"
+    },
+    "item_walkie_talkie": {
+        "ru": "Полубот связи",
+        "en": "Semibot Walkie"
+    },
+    "item_revive": {
+        "ru": "Дефибро",
+        "en": "Defibro"
+    }
+}

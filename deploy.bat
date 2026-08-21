@@ -22,14 +22,20 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo [INFO] กำลังเปิดการใช้งาน Cloud Build API (หากยังไม่ได้เปิด)...
+echo [INFO] กำลังเปิดการใช้งาน API ที่จำเป็น (หากยังไม่ได้เปิด)...
 call gcloud services enable cloudbuild.googleapis.com
 call gcloud services enable run.googleapis.com
+call gcloud services enable containerregistry.googleapis.com
+call gcloud services enable artifactregistry.googleapis.com
+call gcloud services enable iam.googleapis.com
+call gcloud services enable serviceusage.googleapis.com
+
+call gcloud services enable firestore.googleapis.com
 
 echo.
 echo [INFO] กำลังเตรียมอัปโหลดและสร้าง Container บน Google Cloud Build...
 echo.
-call gcloud builds submit --config cloudbuild.yaml .
+call gcloud builds submit --config cloudbuild.yaml --substitutions=_IMAGE_TAG=latest .
 if %errorlevel% neq 0 (
     echo.
     echo [ERROR] ส่งคำสั่งสร้าง Cloud Build ล้มเหลว!
@@ -40,6 +46,15 @@ if %errorlevel% neq 0 (
     pause
     exit /b %errorlevel%
 )
+
+echo.
+echo [INFO] เปิดสิทธิ์ Firestore ให้ Cloud Run service account...
+for /f %%i in ('gcloud projects describe pandy-app-502306 --format^="value(projectNumber)"') do set PROJECT_NUM=%%i
+call gcloud projects add-iam-policy-binding pandy-app-502306 --member=serviceAccount:%PROJECT_NUM%-compute@developer.gserviceaccount.com --role=roles/datastore.user --quiet
+
+echo.
+echo [INFO] เปิดสิทธิ์เรียก Cloud Run จากภายนอก (หากขั้นตอน build ยังไม่ได้ทำ)...
+call gcloud run services add-iam-policy-binding pandy-backend --region=asia-southeast1 --member=allUsers --role=roles/run.invoker --quiet
 
 echo.
 echo =======================================================

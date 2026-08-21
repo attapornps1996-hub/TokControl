@@ -1,0 +1,245 @@
+
+/* ==========================================
+   NEW NAME EFFECTS (CSS KEYFRAMES)
+   ========================================== */
+
+.name-effect-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.name-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Animations */
+@keyframes fx-shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(3px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(3px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(1px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+@keyframes fx-glitch-anim {
+    0% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 2px); }
+    20% { clip-path: inset(40% 0 20% 0); transform: translate(2px, -2px); }
+    40% { clip-path: inset(80% 0 10% 0); transform: translate(-2px, 2px); }
+    60% { clip-path: inset(20% 0 40% 0); transform: translate(2px, -2px); }
+    80% { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 2px); }
+    100% { clip-path: inset(30% 0 60% 0); transform: translate(2px, -2px); }
+}
+
+@keyframes fx-flicker {
+    0%, 100% { opacity: 1; }
+    3% { opacity: 0.4; }
+    6% { opacity: 1; }
+    7% { opacity: 0.4; }
+    8% { opacity: 1; }
+    9% { opacity: 1; }
+    10% { opacity: 0.1; }
+    11% { opacity: 1; }
+}
+
+@keyframes fx-flip {
+    0% { transform: perspective(400px) rotateY(0); }
+    100% { transform: perspective(400px) rotateY(360deg); }
+}
+
+@keyframes fx-sparkle-float {
+    0% { transform: translateY(0) scale(1); opacity: 1; }
+    50% { transform: translateY(-20px) scale(1.5); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 0; }
+}
+
+/* Base Classes */
+.fx-rainbow {
+    background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3, #ff0000);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: flowGradient 3s linear infinite;
+}
+
+.fx-cherry {
+    color: #ffb7c5;
+    text-shadow: 0 0 5px #ffb7c5, 0 0 10px #ffb7c5;
+}
+
+.fx-glow {
+    color: white;
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--primary);
+}
+
+.fx-shake {
+    animation: fx-shake 0.5s infinite;
+}
+
+.fx-glitch {
+    position: relative;
+    color: white;
+}
+.fx-glitch::before, .fx-glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.fx-glitch::before {
+    left: 2px;
+    text-shadow: -1px 0 red;
+    animation: fx-glitch-anim 2s infinite linear alternate-reverse;
+}
+.fx-glitch::after {
+    left: -2px;
+    text-shadow: -1px 0 blue;
+    animation: fx-glitch-anim 3s infinite linear alternate-reverse;
+}
+
+.fx-flames {
+    color: #ff4500;
+    text-shadow: 0 -2px 4px #ff4500, 0 -4px 10px #ff8c00, 0 -6px 15px #ffff00;
+    animation: fx-flicker 3s infinite;
+}
+
+.fx-shuffle {
+    animation: fx-flicker 2s infinite; 
+}
+
+.fx-fuzzy {
+    color: transparent;
+    text-shadow: 0 0 8px rgba(255,255,255,0.8);
+}
+
+.fx-flicker {
+    animation: fx-flicker 1.5s infinite;
+}
+
+.fx-flip {
+    display: inline-block;
+    animation: fx-flip 5s infinite;
+}
+
+.fx-loading {
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: flowGradient 2s linear infinite;
+}
+
+.sparkle-particle {
+    position: absolute;
+    pointer-events: none;
+    animation: fx-sparkle-float 1s infinite;
+}
+
+/* Mouse Decor */
+.custom-mouse-decor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 999999;
+    transform: translate(-50%, -50%); /* center it on cursor */
+}
+
+/* Hide default cursor if mouse decor is enabled */
+body.has-mouse-decor {
+    cursor: none;
+}
+body.has-mouse-decor a, body.has-mouse-decor button {
+    cursor: none;
+}
+
+/* =========================================
+   USER EFFECTS (PANDY STUDIO)
+   ========================================= */
+.fx-neon-purple {
+  color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #a855f7, 0 0 15px #a855f7; animation: pulsate-purple 1.5s infinite alternate;
+}
+@keyframes pulsate-purple {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.7; transform: scale(1.02); }
+}
+
+.fx-neon-orange {
+  color: #fff; text-shadow: 0 0 5px #fff, 0 0 10px #ff8c00, 0 0 15px #ff8c00; animation: pulsate-orange 1.5s infinite alternate;
+}
+@keyframes pulsate-orange {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.7; transform: scale(1.02); }
+}
+
+.fx-shine {
+  background: linear-gradient(90deg, #444 0%, #fff 50%, #444 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shine-sweep 3s linear infinite;
+}
+@keyframes shine-sweep {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.fx-typewriter {
+  font-family: monospace;
+  display: inline-block;
+  border-right: 4px solid #ff8c00;
+  white-space: nowrap;
+  animation: typing-clip 3s steps(30, end) infinite, blink-anim 0.75s step-end infinite;
+}
+@keyframes blink-anim {
+  0%, 100% { border-color: #ff8c00; }
+  50% { border-color: transparent; }
+}
+@keyframes typing-clip {
+  0% { clip-path: inset(0 100% 0 0); }
+  50% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 0 0 0); }
+}
+
+.fx-glitch-v2 {
+  position: relative;
+  color: white;
+}
+.fx-glitch-v2::before, .fx-glitch-v2::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.fx-glitch-v2::before {
+  left: 2px;
+  text-shadow: -2px 0 #a855f7;
+  clip: rect(24px, 550px, 90px, 0);
+  animation: glitch-anim-v2 3s infinite linear alternate-reverse;
+}
+.fx-glitch-v2::after {
+  left: -2px;
+  text-shadow: -2px 0 #ff8c00;
+  clip: rect(85px, 550px, 140px, 0);
+  animation: glitch-anim-v2-after 2.5s infinite linear alternate-reverse;
+}
+@keyframes glitch-anim-v2-after {
+  0% { clip: rect(15px, 9999px, 71px, 0); }
+  100% { clip: rect(42px, 9999px, 93px, 0); }
+}
+@keyframes glitch-anim-v2 {
+  0% { clip: rect(65px, 9999px, 100px, 0); }
+  100% { clip: rect(12px, 9999px, 54px, 0); }
+}

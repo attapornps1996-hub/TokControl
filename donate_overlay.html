@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TokDonate Overlay</title>
+  <link rel="icon" type="image/png" href="/assets/tokcontrol-icon.png">
+  <style>
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent !important; font-family: "IBM Plex Sans Thai", "Segoe UI", sans-serif; }
+    #stage { position: fixed; inset: 0; pointer-events: none; display: flex; align-items: flex-end; justify-content: center; padding: 4vh 3vw 6vh; box-sizing: border-box; }
+    #goalBox { position: fixed; left: 50%; transform: translateX(-50%); top: 4vh; width: min(560px, 92vw); pointer-events: none; }
+    #lbBox { position: fixed; left: 2vw; bottom: 4vh; width: min(420px, 92vw); pointer-events: none; }
+    #recentBox { position: fixed; right: 2vw; bottom: 4vh; width: min(420px, 92vw); pointer-events: none; }
+
+    .alert {
+      width: min(740px, 94vw);
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 14px;
+      align-items: center;
+      transform: translateY(48px) scale(0.94);
+      opacity: 0;
+      transition: transform .5s cubic-bezier(.2,.9,.2,1), opacity .35s ease;
+      background: linear-gradient(135deg, rgba(18,12,28,.96), rgba(20,28,28,.94));
+      border: 1px solid rgba(168,85,247,.45);
+      border-radius: 22px;
+      padding: 16px 20px;
+      color: #fff;
+      box-shadow: 0 22px 55px rgba(0,0,0,.4), 0 0 40px rgba(168,85,247,.18);
+    }
+    .alert.show { opacity: 1; transform: translateY(0) scale(1); }
+    .alert.hide { opacity: 0; transform: translateY(-28px) scale(.98); }
+    .panda {
+      width: 72px; height: 72px; border-radius: 20px;
+      display: grid; place-items: center;
+      font-size: 42px; line-height: 1;
+      background: radial-gradient(circle at 30% 30%, #ef4444, #7f1d1d);
+      box-shadow: 0 0 0 3px rgba(239,68,68,.35), 0 10px 24px rgba(239,68,68,.35);
+      animation: bounce 1.1s ease infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) rotate(-4deg); }
+      50% { transform: translateY(-6px) rotate(4deg); }
+    }
+    .alert-kicker { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #c4b5fd; margin: 0 0 4px; font-weight: 700; }
+    .alert-title { margin: 0; font-size: clamp(20px, 3vw, 32px); font-weight: 800; line-height: 1.2; }
+    .alert-amount { color: #6ee7b7; text-shadow: 0 0 18px rgba(16,185,129,.45); }
+    .alert-msg { margin: 8px 0 0; font-size: clamp(14px, 1.8vw, 18px); opacity: .9; }
+
+    .goal-card, .lb-card, .recent-card {
+      background: rgba(12,10,18,.9);
+      border: 1px solid rgba(168,85,247,.28);
+      border-radius: 18px;
+      padding: 14px 16px;
+      color: #fff;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 14px 36px rgba(0,0,0,.32), 0 0 28px rgba(16,185,129,.12);
+    }
+    .goal-label { font-size: 13px; opacity: .8; margin-bottom: 8px; letter-spacing: .04em; }
+    .goal-bar { height: 16px; border-radius: 999px; background: rgba(255,255,255,.1); overflow: hidden; box-shadow: inset 0 0 12px rgba(0,0,0,.35); }
+    .goal-fill {
+      height: 100%; width: 0;
+      background: linear-gradient(90deg, #a855f7, #10b981);
+      box-shadow: 0 0 18px rgba(16,185,129,.65);
+      transition: width .55s ease;
+    }
+    .goal-meta { margin-top: 8px; display: flex; justify-content: space-between; font-weight: 700; }
+    .lb-card h3, .recent-card h3 { margin: 0 0 8px; font-size: 15px; color: #c4b5fd; }
+    .lb-card ol, .recent-card ol { margin: 0; padding: 0 0 0 1.1rem; }
+    .lb-card li, .recent-card li { margin: 5px 0; display: flex; justify-content: space-between; gap: 1rem; }
+    .recent-card li span.msg { opacity: .65; font-size: 12px; max-width: 55%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="goalBox" hidden></div>
+  <div id="lbBox" hidden></div>
+  <div id="recentBox" hidden></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+(function () {
+  const params = new URLSearchParams(location.search);
+  const segs = location.pathname.split('/').filter(Boolean);
+  // /widget/alert?slug=xxx  |  /overlay/donate/:key?widget=alert
+  let widget = String(params.get('widget') || '').toLowerCase();
+  let slug = String(params.get('slug') || '').trim().toLowerCase();
+  let key = String(params.get('key') || '').trim();
+
+  if (segs[0] === 'widget' && segs[1]) {
+    widget = String(segs[1]).toLowerCase();
+  }
+  if (segs[0] === 'overlay' && segs[1] === 'donate' && segs[2] && !key) {
+    key = segs[2];
+  }
+  if (!widget) widget = 'alert';
+
+  const stage = document.getElementById('stage');
+  const goalBox = document.getElementById('goalBox');
+  const lbBox = document.getElementById('lbBox');
+  const recentBox = document.getElementById('recentBox');
+
+  let minTtsAmount = 20;
+  const queue = [];
+  let busy = false;
+  const joinId = slug || key;
+
+  function money(n) {
+    return Number(n || 0).toLocaleString('th-TH', { maximumFractionDigits: 2 });
+  }
+  function escapeHtml(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+  function playBeep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.setValueAtTime(523, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.16);
+      g.gain.setValueAtTime(0.0001, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
+      o.connect(g); g.connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 0.42);
+      setTimeout(() => ctx.close().catch(() => {}), 600);
+    } catch (e) {}
+  }
+
+  function speak(text) {
+    return new Promise((resolve) => {
+      try {
+        if (!window.speechSynthesis) return resolve();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'th-TH'; u.rate = 1.05;
+        u.onend = () => resolve(); u.onerror = () => resolve();
+        window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+        setTimeout(resolve, 12000);
+      } catch (e) { resolve(); }
+    });
+  }
+
+  async function showOne(item) {
+    if (widget !== 'alert' && widget !== 'all') return;
+    const el = document.createElement('div');
+    el.className = 'alert';
+    el.innerHTML =
+      '<div class="panda" aria-hidden="true">🐼</div>' +
+      '<div><p class="alert-kicker">TokDonate Alert</p>' +
+      '<p class="alert-title"><span class="alert-amount">฿' + money(item.amount) + '</span> จาก ' +
+      escapeHtml(item.donorName || 'ผู้ไม่ประสงค์ออกนาม') + '</p>' +
+      (item.message ? '<p class="alert-msg">' + escapeHtml(item.message) + '</p>' : '') +
+      '</div>';
+    stage.appendChild(el);
+    playBeep();
+    requestAnimationFrame(() => el.classList.add('show'));
+    const ttsFloor = item.minTtsAmount != null ? Number(item.minTtsAmount) : minTtsAmount;
+    if (Number(item.amount) >= ttsFloor) {
+      await speak((item.donorName || 'ผู้ไม่ประสงค์ออกนาม') + ' โดเนท ' + money(item.amount) + ' บาท' + (item.message ? ' ข้อความว่า ' + item.message : ''));
+    } else {
+      await wait(4500);
+    }
+    el.classList.add('hide');
+    await wait(420);
+    el.remove();
+  }
+
+  async function pump() {
+    if (busy) return;
+    busy = true;
+    while (queue.length) {
+      try { await showOne(queue.shift()); } catch (e) {}
+    }
+    busy = false;
+  }
+
+  function enqueue(payload) {
+    queue.push({
+      donorName: payload.donorName || payload.donor_name,
+      amount: payload.amount,
+      message: payload.message || '',
+      minTtsAmount: payload.minTtsAmount
+    });
+    if (widget === 'alert' || widget === 'all') pump();
+    if (widget === 'goal' || widget === 'leaderboard' || widget === 'recent' || widget === 'all') {
+      refreshWidgets();
+    }
+  }
+
+  function widgetApiUrl() {
+    if (slug) return '/api/donate/public-by-slug/' + encodeURIComponent(slug) + '/widget';
+    if (key) return '/api/donate/public/' + encodeURIComponent(key) + '/widget';
+    return '';
+  }
+
+  async function refreshWidgets() {
+    const url = widgetApiUrl();
+    if (!url) return;
+    try {
+      const res = await fetch(url);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return;
+      if (widget === 'goal' || widget === 'all') {
+        const g = data.goal || {};
+        goalBox.hidden = false;
+        goalBox.innerHTML =
+          '<div class="goal-card"><div class="goal-label">' + escapeHtml(g.label || 'เป้าหมาย') +
+          '</div><div class="goal-bar"><div class="goal-fill" style="width:' + Math.min(100, Number(g.percent)||0) +
+          '%"></div></div><div class="goal-meta"><span>฿' + money(g.current) + '</span><span>฿' + money(g.amount) + '</span></div></div>';
+      }
+      if (widget === 'leaderboard' || widget === 'all') {
+        const list = data.topDonors || [];
+        lbBox.hidden = false;
+        lbBox.innerHTML =
+          '<div class="lb-card"><h3>🏆 Top Donors</h3><ol>' +
+          (list.length
+            ? list.slice(0, 5).map((d) => '<li><span>' + escapeHtml(d.name) + '</span><strong>฿' + money(d.total) + '</strong></li>').join('')
+            : '<li>ยังไม่มีข้อมูล</li>') +
+          '</ol></div>';
+      }
+      if (widget === 'recent' || widget === 'all') {
+        const list = data.recent || [];
+        recentBox.hidden = false;
+        recentBox.innerHTML =
+          '<div class="recent-card"><h3>🕒 Recent</h3><ol>' +
+          (list.length
+            ? list.slice(0, 6).map((d) =>
+                '<li><span>' + escapeHtml(d.donorName || d.name || 'Anonymous') +
+                (d.message ? ' <span class="msg">' + escapeHtml(d.message) + '</span>' : '') +
+                '</span><strong>฿' + money(d.amount) + '</strong></li>'
+              ).join('')
+            : '<li>ยังไม่มีข้อมูล</li>') +
+          '</ol></div>';
+      }
+      if (data.minTtsAmount != null) minTtsAmount = Number(data.minTtsAmount) || 20;
+    } catch (e) {}
+  }
+
+  async function boot() {
+    if (!joinId) return;
+    if (widget === 'goal' || widget === 'leaderboard' || widget === 'recent') {
+      stage.style.display = 'none';
+      await refreshWidgets();
+      setInterval(refreshWidgets, 15000);
+    } else if (widget === 'all') {
+      await refreshWidgets();
+      setInterval(refreshWidgets, 15000);
+    } else if (key && !slug) {
+      try {
+        const res = await fetch('/api/donate/overlay/' + encodeURIComponent(key));
+        const data = await res.json().catch(() => ({}));
+        if (data.minTtsAmount != null) minTtsAmount = Number(data.minTtsAmount) || 20;
+      } catch (e) {}
+    } else {
+      await refreshWidgets();
+    }
+
+    const q = slug ? { slug } : { key };
+    const socket = io({ transports: ['websocket', 'polling'], query: q });
+    socket.on('connect', () => socket.emit('join_donate_overlay', joinId));
+    socket.on('new_donation', enqueue);
+  }
+
+  boot();
+})();
+  </script>
+</body>
+</html>

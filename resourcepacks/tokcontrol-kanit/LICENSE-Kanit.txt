@@ -1,0 +1,3 @@
+Kanit is licensed under the SIL Open Font License, Version 1.1.
+Copyright 2020 The Kanit Project Authors (https://github.com/cadsondemak/kanit)
+See https://scripts.sil.org/OFL

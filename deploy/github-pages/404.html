@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>Redirecting…</title>
+  <script>
+    (function () {
+      var CLOUD = 'https://pandy-backend-302414976454.asia-southeast1.run.app';
+      var path = location.pathname + location.search + location.hash;
+      // GitHub Pages 404 → ส่ง path ไป Cloud backend
+      if (/^\/(profile|donate|widget|biolink|b)\b/i.test(location.pathname)) {
+        location.replace(CLOUD + path);
+        return;
+      }
+      location.replace('/');
+    })();
+  </script>
+  <meta http-equiv="refresh" content="0;url=/" />
+</head>
+<body>
+  <p>กำลังเปลี่ยนเส้นทาง…</p>
+</body>
+</html>

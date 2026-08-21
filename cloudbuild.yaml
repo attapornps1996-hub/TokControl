@@ -1,11 +1,14 @@
+substitutions:
+  _IMAGE_TAG: 'latest'
+
 steps:
   # 1. Build Docker image ใน Google Cloud Build
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/pandy-app-502306/pandy-backend:$SHORT_SHA', '.']
+    args: ['build', '-t', 'gcr.io/pandy-app-502306/pandy-backend:${_IMAGE_TAG}', '.']
 
   # 2. Push image ไปยัง Container Registry ของโปรเจกต์
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/pandy-app-502306/pandy-backend:$SHORT_SHA']
+    args: ['push', 'gcr.io/pandy-app-502306/pandy-backend:${_IMAGE_TAG}']
 
   # 3. สั่ง Deploy ขึ้น Google Cloud Run อัตโนมัติ
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -15,16 +18,16 @@ steps:
       - 'deploy'
       - 'pandy-backend'
       - '--image'
-      - 'gcr.io/pandy-app-502306/pandy-backend:$SHORT_SHA'
+      - 'gcr.io/pandy-app-502306/pandy-backend:${_IMAGE_TAG}'
       - '--region'
       - 'asia-southeast1' # ใช้งานเซิร์ฟเวอร์สิงคโปร์เพื่อความเร็วและดีเลย์ต่ำสุดในไทย
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--set-env-vars'
-      - 'NODE_ENV=production,PORT=8080'
+      - '--update-env-vars'
+      - 'NODE_ENV=production,GC_ACCESS_MODE=beta_addon,GC_PURCHASE_ENABLED=1,GC_EARLY_ACCESS_DAYS=30,GC_EARLY_ACCESS_PRICE_THB=299,GC_BETA_ENDS_AT=2026-09-30T16:59:59.999Z,SIGNUP_PRO_TRIAL_START=2026-08-13T00:00:00.000Z,SIGNUP_PRO_TRIAL_END=2026-09-30T16:59:59.999Z,SIGNUP_PRO_TRIAL_DAYS=3'
       - '--port'
       - '8080'
 
 images:
-  - 'gcr.io/pandy-app-502306/pandy-backend:$SHORT_SHA'
+  - 'gcr.io/pandy-app-502306/pandy-backend:${_IMAGE_TAG}'

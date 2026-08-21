@@ -1,0 +1,325 @@
+{
+  "game": "Super Battle Golf",
+  "mod": "TokControl_BattleGolf_Tiktoklive",
+  "version": "1.0.0",
+  "wsPort": 13715,
+  "protocol": "tokcontrol-event",
+  "gameId": "tok_sbg_mod",
+  "events": [
+    {
+      "id": "debuff_kick_forward",
+      "name": "เตะไปข้างหน้า",
+      "nameEn": "Kick Forward",
+      "category": "debuffs",
+      "commandLine": "apply_force_to_player_forward 7500 45000 1; apply_force_to_player_up 1500 35000 1"
+    },
+    {
+      "id": "debuff_kick_backward",
+      "name": "เตะไปข้างหลัง",
+      "nameEn": "Kick Backward",
+      "category": "debuffs",
+      "commandLine": "apply_force_to_player_forward 7500 45000 -1; apply_force_to_player_up 1500 35000 1"
+    },
+    {
+      "id": "debuff_kick_right_side",
+      "name": "เตะไปขวา",
+      "nameEn": "Kick Right",
+      "category": "debuffs",
+      "commandLine": "apply_force_to_player_right 7500 45000 1; apply_force_to_player_up 1500 35000 1"
+    },
+    {
+      "id": "debuff_kick_left_side",
+      "name": "เตะไปซ้าย",
+      "nameEn": "Kick Left",
+      "category": "debuffs",
+      "commandLine": "apply_force_to_player_right 7500 45000 -1; apply_force_to_player_up 1500 35000 1"
+    },
+    {
+      "id": "debuff_kick_ass",
+      "name": "เด้งขึ้นฟ้า",
+      "nameEn": "Launch",
+      "category": "debuffs",
+      "commandLine": "apply_force_to_player_up 7500 90000 1"
+    },
+    {
+      "id": "debuff_high_gravity",
+      "name": "แรงโน้มถ่วงสูง",
+      "nameEn": "High Gravity",
+      "category": "debuffs",
+      "commandLine": "change_gravity 30 -64"
+    },
+    {
+      "id": "debuff_clear_inventory",
+      "name": "ล้างช่องของ",
+      "nameEn": "Clear Inventory",
+      "category": "debuffs",
+      "commandLine": "clear_inventory"
+    },
+    {
+      "id": "debuff_knock_out",
+      "name": "น็อกเอาต์",
+      "nameEn": "Knock Out",
+      "category": "debuffs",
+      "commandLine": "knock_out"
+    },
+    {
+      "id": "debuff_high_sens",
+      "name": "เซนส์สูง",
+      "nameEn": "Ultra Sensitivity",
+      "category": "debuffs",
+      "commandLine": "change_mouse_move_sens 30 5 5"
+    },
+    {
+      "id": "debuff_low_sens",
+      "name": "เซนส์ต่ำ",
+      "nameEn": "Low Sensitivity",
+      "category": "debuffs",
+      "commandLine": "change_mouse_move_sens 30 0.15 0.15"
+    },
+    {
+      "id": "debuff_invert_mouse",
+      "name": "กลับเมาส์",
+      "nameEn": "Invert Mouse",
+      "category": "debuffs",
+      "commandLine": "controller_invert_x 30; controller_invert_y 30; mouse_invert_x 30; mouse_invert_y 30;"
+    },
+    {
+      "id": "debuff_cam_lock",
+      "name": "ล็อกกล้อง",
+      "nameEn": "Camera Lock",
+      "category": "debuffs",
+      "commandLine": "lock_camera 15"
+    },
+    {
+      "id": "debuff_shuffle_wasd",
+      "name": "สลับปุ่มเดิน",
+      "nameEn": "Shuffle Controls",
+      "category": "debuffs",
+      "commandLine": "shuffle_player_movement 30"
+    },
+    {
+      "id": "debuff_mine",
+      "name": "วางระเบิด",
+      "nameEn": "Plant Mine",
+      "category": "debuffs",
+      "commandLine": "mines_surround 0 0 1"
+    },
+    {
+      "id": "debuff_minefield",
+      "name": "ทุ่นระเบิด",
+      "nameEn": "Minefield",
+      "category": "debuffs",
+      "commandLine": "mines_surround 0 21 15"
+    },
+    {
+      "id": "debuff_laser_strike",
+      "name": "เลเซอร์จากฟ้า",
+      "nameEn": "Laser Strike",
+      "category": "debuffs",
+      "commandLine": "laser_strike 0 0 1"
+    },
+    {
+      "id": "debuff_laser_multi",
+      "name": "ฝนเลเซอร์",
+      "nameEn": "Laser Rain",
+      "category": "debuffs",
+      "commandLine": "laser_strike 0 0 1; laser_strike 3 12 5"
+    },
+    {
+      "id": "debuff_laser_auto",
+      "name": "เลเซอร์เล็งอัตโนมัติ",
+      "nameEn": "Sniper Laser",
+      "category": "debuffs",
+      "commandLine": "laser_strike_auto_aim"
+    },
+    {
+      "id": "debuff_laser_armageddon",
+      "name": "อาร์มาเกดดอน",
+      "nameEn": "Armageddon",
+      "category": "debuffs",
+      "commandLine": "laser_strike 0 1 3; laser_strike 3 90 30"
+    },
+    {
+      "id": "buff_activate_shield",
+      "name": "เปิดโล่",
+      "nameEn": "Activate Shield",
+      "category": "buffs",
+      "commandLine": "activate_shield"
+    },
+    {
+      "id": "buff_mega_speed",
+      "name": "ความเร็วสุดๆ",
+      "nameEn": "Mega Speed",
+      "category": "buffs",
+      "commandLine": "speed_boost 20"
+    },
+    {
+      "id": "buff_mega_jumps",
+      "name": "กระโดดสูง",
+      "nameEn": "Mega Jumps",
+      "category": "buffs",
+      "commandLine": "jump_power 20 2.5"
+    },
+    {
+      "id": "buff_low_gravity",
+      "name": "แรงโน้มถ่วงต่ำ",
+      "nameEn": "Low Gravity",
+      "category": "buffs",
+      "commandLine": "change_gravity 30 -3"
+    },
+    {
+      "id": "effect_emote_random",
+      "name": "อิโมจิสุ่ม",
+      "nameEn": "Random Emote",
+      "category": "effects",
+      "commandLine": "play_emote random"
+    },
+    {
+      "id": "effect_emote_dance",
+      "name": "เต้น",
+      "nameEn": "Dance",
+      "category": "effects",
+      "commandLine": "play_emote VictoryDance"
+    },
+    {
+      "id": "effect_head_scale_up",
+      "name": "หัวโต",
+      "nameEn": "Big Head",
+      "category": "effects",
+      "commandLine": "head_scale_up 15 1 12"
+    },
+    {
+      "id": "effect_shuffle_players",
+      "name": "สลับตำแหน่งผู้เล่น",
+      "nameEn": "Shuffle Players",
+      "category": "effects",
+      "commandLine": "teleport_shuffle_players"
+    },
+    {
+      "id": "give_random_item",
+      "name": "สุ่มไอเทม",
+      "nameEn": "Give Random Item",
+      "category": "items",
+      "commandLine": "give_item random"
+    },
+    {
+      "id": "give_item_coffee",
+      "name": "ให้กาแฟ",
+      "nameEn": "Give Coffee",
+      "category": "items",
+      "commandLine": "give_item Coffee 2"
+    },
+    {
+      "id": "give_item_boots",
+      "name": "ให้รองเท้าสปริง",
+      "nameEn": "Give Boots",
+      "category": "items",
+      "commandLine": "give_item SpringBoots"
+    },
+    {
+      "id": "give_item_airhorn",
+      "name": "ให้แตร",
+      "nameEn": "Give Airhorn",
+      "category": "items",
+      "commandLine": "give_item Airhorn"
+    },
+    {
+      "id": "give_item_landmine",
+      "name": "ให้ระเบิด",
+      "nameEn": "Give Landmine",
+      "category": "items",
+      "commandLine": "give_item Landmine 3"
+    },
+    {
+      "id": "give_item_pistol",
+      "name": "ให้ปืนพก",
+      "nameEn": "Give Pistol",
+      "category": "items",
+      "commandLine": "give_item DuelingPistol"
+    },
+    {
+      "id": "give_item_shotgun",
+      "name": "ให้ช็อตกัน",
+      "nameEn": "Give Shotgun",
+      "category": "items",
+      "commandLine": "give_item ElephantGun 2"
+    },
+    {
+      "id": "give_item_laser",
+      "name": "ให้เลเซอร์ออร์บิทัล",
+      "nameEn": "Give Orbital Laser",
+      "category": "items",
+      "commandLine": "give_item OrbitalLaser"
+    },
+    {
+      "id": "give_item_magnet",
+      "name": "ให้แม่เหล็ก",
+      "nameEn": "Give Magnet",
+      "category": "items",
+      "commandLine": "give_item Electromagnet"
+    },
+    {
+      "id": "give_item_golfcart",
+      "name": "ให้รถกอล์ฟ",
+      "nameEn": "Give Golf Cart",
+      "category": "items",
+      "commandLine": "give_item GolfCart"
+    },
+    {
+      "id": "give_item_rocket",
+      "name": "ให้จรวด",
+      "nameEn": "ให้จรวด",
+      "category": "items",
+      "commandLine": "give_item RocketLauncher"
+    },
+    {
+      "id": "give_item_driver",
+      "name": "ให้ไม้กอล์ฟจรวด",
+      "nameEn": "Give Rocket Driver",
+      "category": "items",
+      "commandLine": "give_item RocketDriver"
+    },
+    {
+      "id": "give_item_freeze",
+      "name": "ให้ระเบิดแช่แข็ง",
+      "nameEn": "Give Freeze Bomb",
+      "category": "items",
+      "commandLine": "give_item FreezeBomb"
+    },
+    {
+      "id": "cut_buff_mega_jump",
+      "name": "กระโดดพิเศษ",
+      "nameEn": "กระโดดพิเศษ",
+      "category": "buffs",
+      "commandLine": "jump_power 15 4"
+    },
+    {
+      "id": "cut_debuff_drop_hands_item",
+      "name": "ทิ้งของในมือ",
+      "nameEn": "ทิ้งของในมือ",
+      "category": "debuffs",
+      "commandLine": "drop_item"
+    },
+    {
+      "id": "cut_effect_head_scale_down",
+      "name": "หัวเล็กลง",
+      "nameEn": "หัวเล็กลง",
+      "category": "effects",
+      "commandLine": "head_scale_down 15 0.25"
+    },
+    {
+      "id": "cut_effect_emote_wave_emote",
+      "name": "โบกมือ",
+      "nameEn": "โบกมือ",
+      "category": "effects",
+      "commandLine": "play_emote Wave"
+    },
+    {
+      "id": "cut_effect_tp_to_random_player",
+      "name": "วาร์ปหาผู้เล่นสุ่ม",
+      "nameEn": "วาร์ปหาผู้เล่นสุ่ม",
+      "category": "effects",
+      "commandLine": "teleport_to_random_player"
+    }
+  ]
+}

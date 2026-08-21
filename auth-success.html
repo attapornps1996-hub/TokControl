@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8">
+    <title>TokControl Login</title>
+    <style>
+        body { margin: 0; background: #090614; color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 24px; box-sizing: border-box; }
+        .box { max-width: 360px; }
+        h2 { color: #bc13fe; margin-bottom: 8px; }
+        p { color: #aaa; line-height: 1.5; }
+        .err { color: #ff4757; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <img src="assets/tokcontrol-logo.png" alt="TokControl" style="width:120px;height:auto;margin:0 auto 16px;display:block;object-fit:contain;">
+        <h2 id="title">กำลังเข้าสู่ระบบ...</h2>
+        <p id="msg">กรุณารอสักครู่</p>
+    </div>
+    <script>
+        const params = new URLSearchParams(location.search);
+        const hashParams = new URLSearchParams(String(location.hash || '').replace(/^#/, ''));
+        const token = hashParams.get('token') || params.get('token');
+        const error = params.get('error');
+        const title = document.getElementById('title');
+        const msg = document.getElementById('msg');
+        const allowed = new Set([
+            location.origin,
+            'http://127.0.0.1:3000',
+            'http://localhost:3000',
+            'https://tokcontrol.com',
+            'https://www.tokcontrol.com'
+        ]);
+
+        function postToken(value) {
+            allowed.forEach((origin) => {
+                try {
+                    if (window.opener) window.opener.postMessage({ type: 'pandy-oauth', token: value }, origin);
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({ type: 'pandy-oauth', token: value }, origin);
+                    }
+                } catch (e) { /* ignore */ }
+            });
+        }
+
+        if (error) {
+            title.textContent = 'เข้าสู่ระบบไม่สำเร็จ';
+            title.className = 'err';
+            msg.textContent = decodeURIComponent(error);
+        } else if (token) {
+            title.textContent = 'เข้าสู่ระบบสำเร็จ!';
+            msg.textContent = 'กำลังกลับไปที่ TokControl...';
+            postToken(token);
+            try { history.replaceState({}, '', location.pathname); } catch (e) { /* ignore */ }
+            setTimeout(() => window.close(), 900);
+        } else {
+            title.textContent = 'ข้อมูลไม่ครบ';
+            msg.textContent = 'ไม่พบ token — กรุณาลองใหม่อีกครั้ง';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "actions": [
+    { "id": "build", "cmd": "fc_build", "emoji": "⚓", "label": "รีสร้างท่าเรือ", "type": "setup" },
+    { "id": "increase_fish", "cmd": "fc_increase_fish", "emoji": "📈", "label": "+เป้าหมายปลา", "type": "troll" },
+    { "id": "decrease_fish", "cmd": "fc_decrease_fish", "emoji": "📉", "label": "-เป้าหมายปลา", "type": "help" },
+    { "id": "plus_win", "cmd": "fc_plus_win", "emoji": "🏆", "label": "บวกวิน", "type": "help" },
+    { "id": "minus_win", "cmd": "fc_minus_win", "emoji": "💀", "label": "ลบวิน", "type": "troll" },
+    { "id": "auto_fish", "cmd": "fc_auto_fish", "emoji": "⚡", "label": "ช่วยตก 10วิ", "type": "help" },
+    { "id": "multi_fish", "cmd": "fc_multi_fish", "emoji": "🐟", "label": "อัพเกรดตก +1/ครั้ง", "type": "help" },
+    { "id": "demulti_fish", "cmd": "fc_demulti_fish", "emoji": "🪝", "label": "อัพเกรดตก -1/ครั้ง", "type": "troll" },
+    { "id": "villager_help", "cmd": "fc_villager_help", "emoji": "👨‍🌾", "label": "ชาวบ้านช่วยตก -1", "type": "help" },
+    { "id": "spawn_zombie", "cmd": "fc_spawn_zombie", "emoji": "🧟", "label": "เสกซอมบี้", "type": "troll" },
+    { "id": "spawn_golem", "cmd": "fc_spawn_golem", "emoji": "🤖", "label": "เสกโกเลม", "type": "help" },
+    { "id": "clear_golem", "cmd": "fc_clear_golem", "emoji": "🧹", "label": "เคลียร์โกเลม", "type": "help" },
+    { "id": "fishing_wall", "cmd": "fc_wall", "emoji": "🧱", "label": "กำแพงท่าเรือ 15วิ", "type": "troll" }
+  ],
+  "default_triggers": [
+    { "giftName": "Rose", "giftId": "5655", "action": "fc_increase_fish" },
+    { "giftName": "Finger Heart", "giftId": "", "action": "fc_decrease_fish" },
+    { "giftName": "GG", "giftId": "", "action": "fc_auto_fish" },
+    { "giftName": "Ice Cream Cone", "giftId": "", "action": "fc_villager_help" },
+    { "giftName": "Mini Heart", "giftId": "", "action": "fc_spawn_zombie" },
+    { "giftName": "Donut", "giftId": "", "action": "fc_spawn_golem" },
+    { "giftName": "Cap", "giftId": "", "action": "fc_wall" }
+  ]
+}

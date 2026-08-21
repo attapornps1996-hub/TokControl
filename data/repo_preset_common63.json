@@ -1,0 +1,171 @@
+{
+  "RandomEventsCategories": {
+    "spawn_creatures": {
+      "IsEnabled": false,
+      "TargetEventID": null,
+      "TargetEventsCategoryID": "spawn_creatures",
+      "Sources": [],
+      "IsCategoryEvent": true
+    },
+    "solo_effects": {
+      "IsEnabled": false,
+      "TargetEventID": null,
+      "TargetEventsCategoryID": "solo_effects",
+      "Sources": [],
+      "IsCategoryEvent": true
+    },
+    "spawn_loot": {
+      "IsEnabled": false,
+      "TargetEventID": null,
+      "TargetEventsCategoryID": "spawn_loot",
+      "Sources": [],
+      "IsCategoryEvent": true
+    },
+    "spawn_items": {
+      "IsEnabled": false,
+      "TargetEventID": null,
+      "TargetEventsCategoryID": "spawn_items",
+      "Sources": [],
+      "IsCategoryEvent": true
+    },
+    "mass_effects": {
+      "IsEnabled": false,
+      "TargetEventID": null,
+      "TargetEventsCategoryID": "mass_effects",
+      "Sources": [],
+      "IsCategoryEvent": true
+    }
+  },
+  "CustomEvents": [
+    {
+      "IsEnabled": true,
+      "TargetEventID": "loot_rand_beta_small",
+      "TargetEventsCategoryID": null,
+      "Sources": [
+        {
+          "giftID": null,
+          "type": "like",
+          "thresholdTriggerByCount": 100
+        }
+      ],
+      "IsCategoryEvent": false
+    },
+    {
+      "IsEnabled": true,
+      "TargetEventID": "active_nade_stun",
+      "TargetEventsCategoryID": null,
+      "Sources": [
+        {
+          "giftID": null,
+          "type": "follow",
+          "thresholdTriggerByCount": 1
+        }
+      ],
+      "IsCategoryEvent": false
+    },
+    {
+      "IsEnabled": true,
+      "TargetEventID": "all_debuff_hurt",
+      "TargetEventsCategoryID": null,
+      "Sources": [
+        {
+          "giftID": "5655",
+          "type": "gift",
+          "thresholdTriggerByCount": 1
+        }
+      ],
+      "IsCategoryEvent": false
+    },
+    {
+      "IsEnabled": true,
+      "TargetEventID": "spawn_duck",
+      "TargetEventsCategoryID": null,
+      "Sources": [
+        {
+          "giftID": "5487",
+          "type": "gift",
+          "thresholdTriggerByCount": 1
+        }
+      ],
+      "IsCategoryEvent": false
+    },
+    {
+      "IsEnabled": true,
+      "TargetEventID": "spawn_spewer",
+      "TargetEventsCategoryID": null,
+      "Sources": [
+        {
+          "giftID": "8913",
+          "type": "gift",
+          "thresholdTriggerByCount": 1
+        }
+      ],
+      "IsCategoryEvent": false
+    },
+    {
+      "IsEnabled": true,
+      "TargetEventID": "spawn_dogo",
+      "TargetEventsCategoryID": null,
+      "Sources": [
+        {
+          "giftID": "5658",
+          "type": "gift",
+          "thresholdTriggerByCount": 1
+        }
+      ],
+      "IsCategoryEvent": false
+    },
+    {
+      "IsEnabled": true,
+      "TargetEventID": "spawn_bella",
+      "TargetEventsCategoryID": null,
+      "Sources": [
+        {
+          "giftID": "5879",
+          "type": "gift",
+          "thresholdTriggerByCount": 1
+        }
+      ],
+      "IsCategoryEvent": false
+    },
+    {
+      "IsEnabled": true,
+      "TargetEventID": "spawn_huntsman",
+      "TargetEventsCategoryID": null,
+      "Sources": [
+        {
+          "giftID": "6104",
+          "type": "gift",
+          "thresholdTriggerByCount": 1
+        }
+      ],
+      "IsCategoryEvent": false
+    },
+    {
+      "IsEnabled": true,
+      "TargetEventID": "all_buff_resurrect_all",
+      "TargetEventsCategoryID": null,
+      "Sources": [
+        {
+          "giftID": "5660",
+          "type": "gift",
+          "thresholdTriggerByCount": 1
+        }
+      ],
+      "IsCategoryEvent": false
+    },
+    {
+      "IsEnabled": true,
+      "TargetEventID": "solo_debuff_kill",
+      "TargetEventsCategoryID": null,
+      "Sources": [
+        {
+          "giftID": "7168",
+          "type": "gift",
+          "thresholdTriggerByCount": 1
+        }
+      ],
+      "IsCategoryEvent": false
+    }
+  ]
+}

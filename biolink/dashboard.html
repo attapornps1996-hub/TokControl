@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <script>
+    (function () {
+        // ซิงก์ session จาก TokControl (Electron) → Bio Link
+        try {
+            var params = new URLSearchParams(location.search);
+            var u = params.get('u') || params.get('user') || '';
+            var token = params.get('token') || localStorage.getItem('pandy_token') || '';
+            if (!u && window.opener && window.opener.currentUser) {
+                u = window.opener.currentUser.name || window.opener.currentUser.username || '';
+            }
+            if (!u) {
+                try {
+                    var cu = JSON.parse(localStorage.getItem('pandy_user') || 'null');
+                    if (cu && (cu.username || cu.name)) u = cu.username || cu.name;
+                } catch (e) {}
+            }
+            if (!u) u = 'demo';
+            u = String(u).replace(/_/g, '-').toLowerCase();
+            localStorage.setItem('biolink_session', JSON.stringify({
+                username: u,
+                token: token || null,
+                source: 'tokcontrol'
+            }));
+        } catch (e) {
+            localStorage.setItem('biolink_session', JSON.stringify({ username: 'demo' }));
+        }
+    })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokBio — ตกแต่งโปรไฟล์</title>
+    <link rel="icon" type="image/png" href="/assets/tokcontrol-icon.png">
+    
+    <!-- External Font CDN & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheet (absolute under /biolink) -->
+    <link rel="stylesheet" href="/biolink/css/dashboard.css?v=tokbio-1">
+    <link rel="stylesheet" href="/biolink/css/effects.css">
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/biolink/js/database.js?v=tokbio-2"></script>
+    <script>
+    (function () {
+        // สร้าง user/profile จาก session TokControl ก่อน dashboard โหลด
+        // (กันเคสมี session แต่ไม่มีโปรไฟล์ → เด้งไป login.html)
+        try {
+            var s = JSON.parse(localStorage.getItem('biolink_session') || 'null');
+            if (s && s.username && window.DB && typeof window.DB.ensureTokControlUser === 'function') {
+                window.DB.ensureTokControlUser(s.username, {
+                    email: s.email,
+                    token: s.token,
+                    source: s.source || 'tokcontrol'
+                });
+            }
+        } catch (e) {}
+    })();
+    </script>
+    <script src="/biolink/js/mediadb.js"></script>
+    <script src="/biolink/js/dashboard.js?v=tokbio-2"></script>
+</head>
+
+<body>
+    <div class="fusions-layout">
+        
+        <!-- Fusions Sidebar Navigation -->
+        <nav class="fusions-sidebar">
+            <div class="brand-section">
+                <div class="brand-title">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> รูปลักษณ์ & เอฟเฟกต์
+                    <span>Super Bio PRO</span>
+                </div>
+            </div>
+
+            <div class="sidebar-menu-label">แดชบอร์ด</div>
+            <li class="sidebar-nav-item" onclick="switchTab('stats')"><i class="fa-solid fa-chart-pie"></i> ภาพรวม</li>
+
+            <div class="sidebar-menu-label" style="margin-top: 15px;">จัดการ</div>
+            <div class="sidebar-nav-item active" onclick="switchTab('profile')">
+                <i class="fa-regular fa-user"></i> โปรไฟล์
+            </div>
+            <div class="sidebar-nav-item" onclick="switchTab('appearance')">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> รูปลักษณ์ & เอฟเฟกต์
+            </div>
+            <div class="sidebar-nav-item" onclick="switchTab('blocks')">
+                <i class="fa-solid fa-link"></i> สร้างลิงก์
+            </div>
+            <div class="sidebar-nav-item sidebar-tab" data-tab="widgets" onclick="switchTab('widgets')">
+                <i class="fa-solid fa-puzzle-piece"></i> วิดเจ็ต
+            </div>
+
+            <div class="sidebar-nav-item" onclick="switchTab('appearance')">
+                <i class="fa-solid fa-gear"></i> ตั้งค่าระบบ
+            </div>
+            <a href="#" class="sidebar-nav-item" style="color: var(--danger);">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> กลับหน้าหลัก
+            </a>
+
+            <div class="sidebar-footer">
+                <div style="display:flex; align-items:center; justify-content:space-between; width: 100%;">
+                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-muted);">Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="dark-mode-toggle" onchange="toggleDashboardTheme()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; margin-top: 10px; cursor: pointer;">
+                    <div id="mini-avatar" style="width:32px; height:32px; border-radius:50%; background:var(--primary); color:white; display:flex; align-items:center; justify-content:center; font-weight:bold;">U</div>
+                    <div>
+                        <div id="mini-username" style="font-size:0.85rem; font-weight:600;">@username</div>
+                        <div style="font-size:0.7rem; color:var(--primary); font-weight:600;"><i class="fa-solid fa-crown"></i> PRO</div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Main Area -->
+        <main class="fusions-main">
+            <!-- Top Tabs Navigation -->
+            <nav class="fusions-top-nav">
+                <div class="top-tabs">
+                    <div class="top-tab" onclick="switchTab('stats')" data-tab-header="stats">ภาพรวม</div>
+                    <div class="top-tab active" onclick="switchTab('profile')" data-tab-header="profile">โปรไฟล์</div>
+                    <div class="top-tab" onclick="switchTab('appearance')" data-tab-header="appearance">รูปลักษณ์ & เอฟเฟกต์</div>
+                    <div class="top-tab" onclick="switchTab('blocks')" data-tab-header="blocks">ลิงก์งก์</div>
+                    <div class="top-tab" onclick="switchTab('widgets')" data-tab-header="widgets">วิดเจ็ต</div>
+                </div>
+
+                <div class="header-controls">
+                    <button class="btn-primary" style="background:var(--bg-card); color:var(--text); border:1px solid var(--border-color);" onclick="saveProfileConfiguration()">
+                        <i class="fa-solid fa-save"></i> บันทึก
+                    </button>
+                    <button onclick="copyBioLink()" class="btn-primary" style="background: rgba(162, 155, 254, 0.15); color: #a29bfe; border: 1px solid rgba(162, 155, 254, 0.3);">
+                        <i class="fa-regular fa-copy"></i> คัดลอกลิงก์งก์
+                    </button>
+                    <button onclick="openPublicProfile()" class="btn-primary" style="background: var(--primary);">
+                        <i class="fa-solid fa-eye"></i> ดูพรีวิวหน้าจริง
+                    </button>
+                    <button onclick="openCreateLinkModal()" class="btn-primary" style="background: linear-gradient(135deg, #FF3366, #ff7f50); color: white; border: none; box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3);">
+                        <i class="fa-solid fa-link"></i> สร้างลิงก์
+                    </button>
+                </div>
+            </nav>
+            
+            <div class="fusions-workspace">
+                
+                <!-- Editor Panel -->
+                <section class="edit-panel">
+                    
+
+                    <!-- TAB: PROFILE -->
+                    <div class="tab-panel active" id="panel-profile">
+                        <div class="panel-header" style="margin-bottom: 25px;">
+                            <h2 style="font-size: 1.8em; background: linear-gradient(135deg, #FF3366, #ff7f50); -webkit-background-clip: text; color: transparent; font-weight: 800;"><i class="fa-solid fa-id-badge" style="color: #FF3366;"></i> PRO PROFILE</h2>
+                            <p style="color: var(--text-secondary);">จัดการตัวตนของคุณให้โดดเด่นไม่ซ้ำใคร</p>
+                        </div>
+                        <div class="pro-glass-card bio-link-share-card" style="margin-bottom: 25px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 250px;">
+                                <h4 style="margin: 0 0 6px 0; color: var(--text); display: flex; align-items: center; gap: 8px; font-size: 1.1rem;">
+                                    <i class="fa-solid fa-share-nodes" style="color: var(--primary);"></i> ลิงก์งก์เพื่อแชร์โปรไฟล์ของคุณ
+                                </h4>
+                                <p style="margin: 0; font-size: 0.85rem; color: var(--text-secondary);">คัดลอกลิงก์งก์นี้ไปใส่ในโปรไฟล์ TikTok, Instagram, Facebook หรือ LINE ของคุณเพื่อเริ่มแชร์</p>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center; width: 100%; max-width: 500px; flex-wrap: nowrap;">
+                                <input type="text" id="bio-share-url-input" readonly style="flex: 1; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); color: var(--text); border-radius: 8px; padding: 10px 14px; font-size: 0.9rem; outline: none; font-family: monospace;" value="Loading...">
+                                <button onclick="copyBioLink()" class="pro-btn-glow" style="padding: 10px 18px; white-space: nowrap; display: flex; align-items: center; gap: 8px; font-weight: 500;">
+                                    <i class="fa-regular fa-copy"></i> คัดลอกลิงก์งก์
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-editor-container pro-glass-card">
+                            
+                            <!-- Section 1: Avatar & Shapes -->
+                            <div class="pro-section">
+                                <div class="pro-avatar-area">
+                                    <div class="pro-avatar-preview-wrap" id="prof-avatar-preview-wrap">
+                                        <div id="prof-avatar-img" class="pro-avatar-img"></div>
+                                        <div id="prof-avatar-decor" class="pro-avatar-decor"></div>
+                                        
+                                        <!-- Floating Camera Button -->
+                                        <button class="pro-upload-btn" onclick="document.getElementById('prof-upload').click()" title="เปลี่ยนรูปโปรไฟล์">
+                                            <i class="fa-solid fa-camera"></i>
+                                        </button>
+                                        <input type="file" id="prof-upload" style="display:none;" accept="image/*" onchange="uploadProfileAvatar(this)">
+                                        
+                                        <!-- Remove Avatar Button -->
+                                        <button class="pro-remove-avatar-btn" onclick="removeProfileAvatar()" title="ลบรูป">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="pro-avatar-controls" style="margin-top: 15px;">
+                                        <button class="pro-btn-glow" onclick="openDecorationModal()">
+                                            <i class="fa-solid fa-wand-magic-sparkles"></i> รูปลักษณ์ & เอฟเฟกต์
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="pro-shape-selector">
+                                    <h4>รูปทรง Avatar</h4>
+                                    <div class="pro-pill-group">
+                                        <div class="pro-pill-opt active" data-shape="square" onclick="selectProfShape('square')"><i class="fa-solid fa-square"></i> สี่เหลี่ยม</div>
+                                        <div class="pro-pill-opt" data-shape="rounded" onclick="selectProfShape('rounded')"><i class="fa-solid fa-square" style="border-radius:6px;"></i> มนละมุน</div>
+                                        <div class="pro-pill-opt" data-shape="squircle" onclick="selectProfShape('squircle')"><i class="fa-solid fa-circle" style="clip-path: circle(50%);"></i> ขอบมน</div>
+                                        <div class="pro-pill-opt" data-shape="circle" onclick="selectProfShape('circle')"><i class="fa-solid fa-circle"></i> วงกลม</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Section 2: Layout -->
+                            <div class="pro-section">
+                                <h4><i class="fa-solid fa-layer-group"></i> เค้าโครง (Layout)</h4>
+                                <div class="pro-layout-grid">
+                                    <div class="pro-layout-card active" data-layout="floating" onclick="selectProfLayout('floating')">
+                                        <div class="pro-layout-wireframe center">
+                                            <div class="wf-avatar"></div>
+                                            <div class="wf-line"></div>
+                                            <div class="wf-line short"></div>
+                                        </div>
+                                        <span>Floating</span>
+                                    </div>
+                                    <div class="pro-layout-card" data-layout="stacked" onclick="selectProfLayout('stacked')">
+                                        <div class="pro-layout-wireframe left">
+                                            <div class="wf-avatar"></div>
+                                            <div class="wf-line"></div>
+                                            <div class="wf-line short"></div>
+                                        </div>
+                                        <span>Stacked</span>
+                                    </div>
+                                    <div class="pro-layout-card" data-layout="compact" onclick="selectProfLayout('compact')">
+                                        <div class="pro-layout-wireframe row">
+                                            <div class="wf-avatar"></div>
+                                            <div class="wf-lines">
+                                                <div class="wf-line"></div>
+                                                <div class="wf-line short"></div>
+                                            </div>
+                                        </div>
+                                        <span>Compact</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Section 3: Basic Info & Details -->
+                            <div class="pro-section">
+                                <h4><i class="fa-solid fa-pen-to-square"></i> ข้ขอบมนูล & รายละเอียด</h4>
+                                
+                                <div class="pro-input-group">
+                                    <input type="text" id="prof-displayname" class="pro-input" placeholder=" " oninput="updateProfileInfo()">
+                                    <label class="pro-floating-label"><i class="fa-solid fa-user"></i> ชื่อที่แสดง</label>
+                                </div>
+                                
+                                <div class="pro-input-group">
+                                    <textarea id="prof-bio" class="pro-input" rows="2" placeholder=" " oninput="updateProfileInfo()"></textarea>
+                                    <label class="pro-floating-label"><i class="fa-solid fa-quote-left"></i> คำอธิบาย (Bio)</label>
+                                </div>
+                                
+                                <div class="pro-grid-2">
+                                    <div class="pro-input-group">
+                                        <input type="text" id="prof-occupation" class="pro-input" placeholder=" " oninput="updateProfileInfo()">
+                                        <label class="pro-floating-label"><i class="fa-solid fa-briefcase"></i> อาชีพ</label>
+                                    </div>
+                                    <div class="pro-input-group">
+                                        <input type="text" id="prof-location" class="pro-input" placeholder=" " oninput="updateProfileInfo()">
+                                        <label class="pro-floating-label"><i class="fa-solid fa-location-dot"></i> ที่อยู่</label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Section 4: Tags -->
+                            <div class="pro-section">
+                                <h4><i class="fa-solid fa-hashtag"></i> แท็กส่วนตัว</h4>
+                                <div style="display:flex; gap:10px; margin-bottom: 15px;">
+                                    <div class="pro-input-group" style="flex:1; margin-bottom:0;">
+                                        <input type="text" id="prof-tag-input" class="pro-input" placeholder=" " onkeypress="if(event.key==='Enter') addProfileTag()">
+                                        <label class="pro-floating-label">พิมพ์แท็ก (เช่น GAMES)</label>
+                                    </div>
+                                    <button class="pro-btn-add" onclick="addProfileTag()"><i class="fa-solid fa-plus"></i></button>
+                                </div>
+                                <div id="prof-tags-container" class="pro-tags-wrap">
+                                    <!-- Tags render here -->
+                                </div>
+                            </div>
+
+                            <!-- Section 5: Enter Screen -->
+                            <div class="pro-section" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div>
+                                        <h4><i class="fa-solid fa-door-open"></i> หน้าต้อนรับ (Enter Screen)</h4>
+                                        <span style="font-size:0.85em; color:var(--text-secondary);">เปปิดเมื่อต้องการให้มีหน้าคลิงก์กก่อนเข้าโปรไฟล์</span>
+                                    </div>
+                                    <label class="switch">
+                                        <input type="checkbox" id="prof-enterscreen-toggle" onchange="updateProfileInfo()">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                                <div id="prof-enterscreen-message-container" style="display:none; margin-top: 15px;">
+                                    <div class="pro-input-group">
+                                        <input type="text" id="prof-enterscreen-message" class="pro-input" placeholder=" " oninput="updateProfileInfo()">
+                                        <label class="pro-floating-label">ข้อความต้อนรับ</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                    <!-- TAB 1: MANAGING BLOCKS -->
+                    <div class="tab-panel" id="panel-blocks">
+                        <div class="add-block-grid">
+                            <button class="add-block-btn" onclick="addNewBlock('profile')">
+                                <i class="fa-solid fa-user"></i> <span>โปรไฟล์ผู้ใช้</span>
+                            </button>
+                            <button class="add-block-btn" onclick="addNewBlock('link')">
+                                <i class="fa-solid fa-link"></i> <span>ปุ่มลิงก์มาตรฐาน</span>
+                            </button>
+                            <button class="add-block-btn" onclick="addNewBlock('linkgrid')" style="border: 1px solid rgba(162, 155, 254, 0.4); background: rgba(162, 155, 254, 0.05);">
+                                <i class="fa-solid fa-table-cells-large" style="color: #a29bfe;"></i> <span>บล็อกกลุ่มลิงก์งก์</span>
+                            </button>
+
+                            <button class="add-block-btn" onclick="addNewBlock('image')">
+                                <i class="fa-solid fa-image"></i> <span>บล็อกรูปเดี่ยว/คู่</span>
+                            </button>
+                            <button class="add-block-btn" onclick="addNewBlock('youtube')">
+                                <i class="fa-brands fa-youtube"></i> <span>ฝังคลิงก์ป YouTube</span>
+                            </button>
+                            <button class="add-block-btn" onclick="addNewBlock('social')">
+                                <i class="fa-solid fa-share-nodes"></i> <span>โซเชียลมีเดีย</span>
+                            </button>
+                            <button class="add-block-btn" onclick="addNewBlock('music')">
+                                <i class="fa-solid fa-music"></i> <span>เครื่องเล่นเพลง</span>
+                            </button>
+                            <button class="add-block-btn" onclick="addNewBlock('album')">
+                                <i class="fa-solid fa-compact-disc"></i> <span>อัลบั้มเพลง</span>
+                            </button>
+                            <button class="add-block-btn" onclick="addNewBlock('text')">
+                                <i class="fa-solid fa-align-left"></i> <span>ข้อความ</span>
+                            </button>
+                            
+                        </div>
+
+                        <div class="block-list-header">ลำดับข้อมูลบล็อกของคุณ</div>
+                        <div id="blocks-list-container">
+                            <!-- Rendered dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: BACKGROUND CUSTOMIZER -->
+                    
+                    <!-- ========================================== -->
+                    <!-- APPEARANCE PANEL (NEW UNIFIED) -->
+                    <!-- ========================================== -->
+                                        <div class="tab-panel" id="panel-appearance">
+
+                        <div class="panel-header" style="margin-bottom: 25px;">
+
+                            <h2 style="font-size: 1.8em; background: linear-gradient(135deg, #9b59b6, #8e44ad); -webkit-background-clip: text; color: transparent; font-weight: 800;"><i class="fa-solid fa-wand-magic-sparkles" style="color: #9b59b6;"></i> APPEARANCE & EFFECTS</h2>
+
+                            <p style="color: var(--text-secondary);">จัดการตัวตนของคุณให้โดดเด่นไม่ซ้ำใคร</p>
+
+                        </div>
+
+
+
+                        <div class="profile-editor-container pro-glass-card">
+
+                            
+
+                            <!-- BACKGROUND & BANNER -->
+
+                            <div class="pro-section">
+
+                                <i class="fa-solid fa-image"></i> <span>บล็อกรูปเดี่ยว/คู่</span>
+
+                                
+
+                                <div class="pro-field-label">สีพื้นหลังทึบ (Solid Color)</div>
+
+                                <div style="display:flex; align-items:center; gap:15px; margin-bottom: 15px;">
+
+                                    <input type="color" id="bg-color-input" onchange="handleBgColorInput(this.value)" style="width: 50px; height: 50px; border: none; border-radius: 12px; cursor: pointer; background: transparent;">
+
+                                    <input type="text" id="bg-color-hex" class="pro-input" style="flex-grow: 1; font-family: monospace;" placeholder="#HEX" onchange="handleBgColorHex(this.value)">
+
+                                </div>
+
+                                
+
+                                <div class="bg-presets" style="margin-bottom:20px; display:flex; gap:10px;">
+
+                                    <div class="preset-color" style="background:#000000; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 1px solid var(--border-color);" onclick="handleBgColorHex('#000000')"></div>
+
+                                    <div class="preset-color" style="background:#1a1a2e; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 1px solid var(--border-color);" onclick="handleBgColorHex('#1a1a2e')"></div>
+
+                                    <div class="preset-color" style="background:#2d1b69; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 1px solid var(--border-color);" onclick="handleBgColorHex('#2d1b69')"></div>
+
+                                    <div class="preset-color" style="background:#16213e; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 1px solid var(--border-color);" onclick="handleBgColorHex('#16213e')"></div>
+
+                                    <div class="preset-color" style="background:#0f3460; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 1px solid var(--border-color);" onclick="handleBgColorHex('#0f3460')"></div>
+
+                                </div>
+
+                                
+
+                                <button class="pro-btn-glow" style="width: 100%; margin-bottom: 25px;" onclick="document.getElementById('bg-media-upload').click()">
+
+                                    <i class="fa-solid fa-upload"></i> คลิกเพื่ออัปโหลดรูป/วิดีโอพื้นหลัง
+
+                                </button>
+
+                                <input type="file" id="bg-media-upload" style="display:none;" accept="image/*,video/*" onchange="handleBgMediaUpload(this)">
+
+                                
+
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+
+                                    <div class="pro-field-label" style="margin:0;">แบนเนอร์ด้านบนสุด</div>
+
+                                    <button class="btn-text-danger" style="font-size:0.8rem; background: none; border: none; cursor: pointer;" onclick="removeBanner()"><i class="fa-solid fa-trash"></i> ลบ</button>
+
+                                </div>
+
+                                <div class="banner-preview-wrap" onclick="document.getElementById('banner-upload').click()" id="banner-preview-wrap" style="border-radius:12px; overflow:hidden; border:2px dashed var(--border-color); background: var(--bg-hover); padding: 30px; text-align: center; cursor: pointer; transition: 0.2s;">
+
+                                    <div class="banner-placeholder" style="color: var(--text-muted);">
+
+                                        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2em; margin-bottom: 10px;"></i>
+
+                                        <p>คลิกเพื่ออัปโหลดแบนเนอร์</p>
+
+                                    </div>
+
+                                </div>
+
+                                <input type="file" id="banner-upload" style="display:none;" accept="image/*" onchange="handleBannerUpload(this)">
+
+                                <p style="font-size:0.75em; color:var(--text-muted); margin-top:10px; text-align:center;">ขนาดแนะนำ 1920x1080 - สูงสุด 8MB</p>
+
+                            </div>
+
+                            
+
+                            <!-- BACKGROUND MUSIC -->
+
+                            <div class="pro-section">
+
+                                <i class="fa-solid fa-music"></i> <span>เครื่องเล่นเพลง</span>
+
+                                
+
+                                <div class="bgm-player-card" style="margin:0; padding: 20px; border-radius: 16px; border:1px solid var(--border-color); background:var(--bg-card);">
+
+                                    <div class="bgm-player-header" style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+
+                                        <div class="bgm-icon" style="background:var(--primary-light); color:var(--primary); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2em;"><i class="fa-solid fa-music"></i></div>
+
+                                        <div class="bgm-info" style="flex-grow: 1;">
+
+                                            <div class="bgm-title" id="bgm-title" style="color:var(--text-main); font-weight: bold;">ยังไม่มีเพลง</div>
+
+                                            <div class="bgm-subtitle" style="color:var(--text-muted); font-size: 0.85em;">เล่นเมื่อมีคนเข้าชมโปรไฟล์</div>
+
+                                        </div>
+
+                                        <button class="bgm-play-btn" id="bgm-play-btn" onclick="toggleBgmPlay()" style="background:var(--primary); color:#fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer;"><i class="fa-solid fa-play"></i></button>
+
+                                    </div>
+
+                                    <div class="bgm-progress" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-size: 0.8em; color: var(--text-muted);">
+
+                                        <span class="bgm-time">0:00</span>
+
+                                        <div class="bgm-progress-bar" style="flex-grow: 1; height: 6px; background:var(--bg-main); border-radius: 3px; overflow: hidden;"><div class="bgm-progress-fill" style="background:var(--primary); width:0%; height: 100%;"></div></div>
+
+                                        <span class="bgm-time">0:00</span>
+
+                                    </div>
+
+                                    <div class="bgm-controls" style="display: flex; align-items: center; gap: 10px; color: var(--text-muted);">
+
+                                        <i class="fa-solid fa-volume-low"></i>
+
+                                        <input type="range" class="bgm-volume-slider pro-slider" min="0" max="100" value="50" style="flex-grow: 1;">
+
+                                        <span class="bgm-volume-text" style="font-size: 0.85em;">50%</span>
+
+                                    </div>
+
+                                    <div class="bgm-actions" style="margin-top:20px; display: flex; gap: 10px;">
+
+                                        <button class="pro-btn-glow" style="flex:1;" onclick="document.getElementById('bgm-upload').click()">
+
+                                            <i class="fa-solid fa-upload"></i> เลือกเพลง
+
+                                        </button>
+
+                                        <button class="pro-btn" style="padding:10px 15px; background:var(--danger-light); color: var(--danger); border-radius:12px;" onclick="removeBgm()"><i class="fa-solid fa-trash"></i></button>
+
+                                        <input type="file" id="bgm-upload" style="display:none;" accept="audio/*" onchange="handleBgmUpload(this)">
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            
+
+                            <!-- PROFILE CARD -->
+
+                            <div class="pro-section">
+
+                                <h4 style="margin-bottom: 15px; color: var(--text-main);"><i class="fa-solid fa-address-card"></i> การ์ดลิงก์ (Link Cards)</h4>
+
+                                
+
+                                <div class="pro-field-label">สไตล์การ์ด</div>
+
+                                <div class="card-style-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 15px; margin-bottom: 25px;">
+
+                                    <div class="card-style-opt" data-style="classic" onclick="selectCardStyle('classic')">
+
+                                        <div class="style-preview classic"><div class="fake-icons"><i class="fa-brands fa-youtube"></i></div></div>
+
+                                        <span>Classic</span>
+
+                                    </div>
+
+                                    <div class="card-style-opt" data-style="frosted-square" onclick="selectCardStyle('frosted-square')">
+
+                                        <div class="style-preview frosted-square"><div class="fake-icons"><i class="fa-brands fa-youtube"></i></div></div>
+
+                                        <span>Frosted Sq</span>
+
+                                    </div>
+
+                                    <div class="card-style-opt" data-style="frosted-soft" onclick="selectCardStyle('frosted-soft')">
+
+                                        <div class="style-preview frosted-soft"><div class="fake-icons"><i class="fa-brands fa-youtube"></i></div></div>
+
+                                        <span>Frosted Soft</span>
+
+                                    </div>
+
+                                    <div class="card-style-opt" data-style="outlined" onclick="selectCardStyle('outlined')">
+
+                                        <div class="style-preview outlined"><div class="fake-icons"><i class="fa-brands fa-youtube"></i></div></div>
+
+                                        <span>Outlined</span>
+
+                                    </div>
+
+                                    <div class="card-style-opt active" data-style="aurora" onclick="selectCardStyle('aurora')">
+
+                                        <div class="style-preview aurora"><div class="fake-icons"><i class="fa-brands fa-youtube"></i></div></div>
+
+                                        <div class="active-badge"><i class="fa-solid fa-check"></i></div>
+
+                                        <span>Aurora</span>
+
+                                    </div>
+
+                                    <div class="card-style-opt" data-style="transparent" onclick="selectCardStyle('transparent')">
+
+                                        <div class="style-preview transparent"><div class="fake-icons"><i class="fa-brands fa-youtube"></i></div></div>
+
+                                        <span>Transparent</span>
+
+                                    </div>
+
+                                </div>
+
+                                
+
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+
+                                    <div class="pro-field-label" style="margin:0;">ปรับแต่งสีการ์ดเอง</div>
+
+                                    <label class="pro-switch"><input type="checkbox" id="custom-card-color-toggle" onchange="toggleCustomCardColor()"><span class="pro-slider-round"></span></label>
+
+                                </div>
+
+                                
+
+                                <div style="display:flex; align-items:center; gap:15px; margin-bottom: 15px;">
+
+                                    <input type="color" id="card-color-input" value="#1D0049" onchange="updateCardColor()" style="width: 50px; height: 50px; border: none; border-radius: 12px; cursor: pointer; background: transparent;">
+
+                                    <input type="text" id="card-color-hex" class="pro-input" value="#1D0049" style="flex-grow: 1; font-family: monospace;" readonly>
+
+                                </div>
+
+                                
+
+                                <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+
+                                    <strong style="font-size:0.85rem; color: var(--text-main);">ความเข้ม (Opacity)</strong>
+
+                                    <span class="opacity-val" id="card-opacity-val" style="font-size:0.85rem; color: var(--text-muted);">40%</span>
+
+                                </div>
+
+                                <input type="range" id="card-opacity-slider" class="pro-slider" style="margin-bottom: 25px;" min="0" max="100" value="40" oninput="updateCardOpacity()">
+
+                                
+
+                                <div style="display:flex; align-items:center; gap:15px; margin-bottom: 25px;">
+
+                                    <input type="color" id="card-border-input" value="#FFFFFF" onchange="updateCardBorder()" style="width: 50px; height: 50px; border: none; border-radius: 12px; cursor: pointer; background: transparent;">
+
+                                    <div style="flex-grow: 1;">
+
+                                        <div class="pro-field-label" style="margin-bottom: 5px;">สีขอบการ์ด</div>
+
+                                        <input type="text" id="card-border-hex" class="pro-input" value="#FFFFFF" style="font-family: monospace;" readonly>
+
+                                    </div>
+
+                                    <button class="pro-btn" style="height: 50px; width: 50px; background:var(--danger-light); color: var(--danger); border-radius:12px; margin-top: 25px;" onclick="removeCardBorder()"><i class="fa-solid fa-trash"></i></button>
+
+                                </div>
+
+                                
+
+                                <div class="pro-field-label">ความโค้งมน</div>
+
+                                <div class="radius-btn-group" style="background: var(--bg-main); padding: 5px; border-radius: 12px; display: flex; gap: 5px;">
+
+                                    <div class="radius-btn" data-radius="0" onclick="setCardRadius('0')"><div class="shape-square"></div></div>
+
+                                    <div class="radius-btn" data-radius="1" onclick="setCardRadius('1')"><div class="shape-rounded-sm"></div></div>
+
+                                    <div class="radius-btn" data-radius="2" onclick="setCardRadius('2')"><div class="shape-rounded-md"></div></div>
+
+                                    <div class="radius-btn active" data-radius="3" onclick="setCardRadius('3')"><div class="shape-rounded-lg"></div></div>
+
+                                    <div class="radius-btn" data-radius="4" onclick="setCardRadius('4')"><div class="shape-circle"></div></div>
+
+                                </div>
+
+                            </div>
+
+                            
+
+                            <!-- COLOR & FONT -->
+
+                            <div class="pro-section">
+
+                                <h4 style="margin-bottom: 15px; color: var(--text-main);"><i class="fa-solid fa-palette"></i> สีข้อความ & ฟอนต์</h4>
+
+                                
+
+                                <div style="display:flex; align-items:center; gap:15px; margin-bottom: 15px;">
+
+                                    <input type="color" id="name-color-input" value="#7604D1" onchange="updateTextColors()" style="width: 50px; height: 50px; border: none; border-radius: 12px; cursor: pointer; background: transparent;">
+
+                                    <div style="flex-grow: 1;">
+
+                                        <div class="pro-field-label" style="margin-bottom: 5px;">สีชื่อโปรไฟล์</div>
+
+                                        <input type="text" id="name-color-hex" class="pro-input" value="#7604D1" style="font-family: monospace;" readonly>
+
+                                    </div>
+
+                                </div>
+
+                                
+
+                                <div style="display:flex; align-items:center; gap:15px; margin-bottom: 25px;">
+
+                                    <input type="color" id="bio-color-input" value="#FFFFFF" onchange="updateTextColors()" style="width: 50px; height: 50px; border: none; border-radius: 12px; cursor: pointer; background: transparent;">
+
+                                    <div style="flex-grow: 1;">
+
+                                        <div class="pro-field-label" style="margin-bottom: 5px;">สีคำอธิบาย (Bio)</div>
+
+                                        <input type="text" id="bio-color-hex" class="pro-input" value="#FFFFFF" style="font-family: monospace;" readonly>
+
+                                    </div>
+
+                                </div>
+
+                                
+
+                                <div class="pro-field-label">ภาษาอังกฤษ</div>
+
+                                <select id="font-eng" class="pro-input" style="margin-bottom: 15px;" onchange="updateFonts()">
+
+                                    <option value="Poppins">Poppins</option>
+
+                                    <option value="Inter">Inter</option>
+
+                                    <option value="Outfit">Outfit</option>
+
+                                    <option value="Roboto">Roboto</option>
+
+                                </select>
+
+                                
+
+                                <div class="pro-field-label">ภาษาไทย</div>
+
+                                <select id="font-thai" class="pro-input" onchange="updateFonts()">
+
+                                    <option value="PK Maehongson">PK Maehongson</option>
+
+                                    <option value="Prompt">Prompt</option>
+
+                                    <option value="Sarabun">Sarabun</option>
+
+                                    <option value="Kanit">Kanit</option>
+
+                                </select>
+
+                            </div>
+
+                            
+
+                            <!-- EFFECTS -->
+
+                            <div class="pro-section">
+
+                                <h4 style="margin-bottom: 15px; color: var(--text-main);"><i class="fa-solid fa-bolt"></i> เอฟเฟกต์ (Effects)</h4>
+
+                                
+
+                                <div class="pro-field-label">เอฟเฟกต์โต้ตอบ</div>
+
+                                <div class="effects-grid" style="gap:10px; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); margin-bottom: 25px;">
+
+                                    <div class="effect-card" data-effect="mouse-trail" onclick="toggleInteractiveEffect('mouse-trail')">
+
+                                        <div class="eff-icon"><i class="fa-solid fa-arrow-pointer"></i></div>
+
+                                        <strong>รอยเมาส์</strong>
+
+                                    </div>
+
+                                    <div class="effect-card" data-effect="mouse-decor" onclick="toggleInteractiveEffect('mouse-decor')">
+
+                                        <div class="eff-icon"><i class="fa-solid fa-wand-magic"></i></div>
+
+                                        <strong>ตกแต่งเมาส์</strong>
+
+                                    </div>
+
+                                    <div class="effect-card" data-effect="neko" onclick="toggleInteractiveEffect('neko')">
+
+                                        <div class="eff-icon"><i class="fa-solid fa-cat" style="color:orange;"></i></div>
+
+                                        <strong>แมว Neko</strong>
+
+                                    </div>
+
+                                    <div class="effect-card" data-effect="duck" onclick="toggleInteractiveEffect('duck')">
+
+                                        <div class="eff-icon"><i class="fa-solid fa-kiwi-bird" style="color:yellowgreen;"></i></div>
+
+                                        <strong>เป็ดเดินเล่น</strong>
+
+                                    </div>
+
+                                    <div class="effect-card active" data-effect="name-rainbow" onclick="toggleInteractiveEffect('name-rainbow')">
+
+                                        <div class="active-dot"><i class="fa-solid fa-check"></i></div>
+
+                                        <div class="eff-icon"><i class="fa-solid fa-wand-magic-sparkles" style="color:#6c5ce7;"></i></div>
+
+                                        <strong>เอฟเฟกต์ชื่อ</strong>
+
+                                    </div>
+
+                                    <div class="effect-card active" data-effect="icon-border" onclick="toggleInteractiveEffect('icon-border')">
+
+                                        <div class="active-dot"><i class="fa-solid fa-check"></i></div>
+
+                                        <div class="eff-icon"><i class="fa-solid fa-star" style="color:#6c5ce7;"></i></div>
+
+                                        <strong>ขอบนีออน</strong>
+
+                                    </div>
+
+                                </div>
+
+                                
+
+                                <div class="pro-field-label">พฤติกรรมและการตอบสนอง</div>
+
+                                
+
+                                <div class="pro-flex-between" style="padding: 15px; border-radius: 12px; background: var(--bg-hover); margin-bottom: 10px;">
+
+                                    <div>
+
+                                        <i class="fa-solid fa-eye"></i> ดูพรีวิวหน้าจริง
+
+                                        <span style="font-size: 0.85em; color: var(--text-muted);">ตัวเลข view เคลื่อนไหว</span>
+
+                                    </div>
+
+                                    <label class="pro-switch"><input type="checkbox" id="beh-animate-view" onchange="updateBehaviors()" checked><span class="pro-slider-round"></span></label>
+
+                                </div>
+
+                                
+
+                                <div class="pro-flex-between" style="padding: 15px; border-radius: 12px; background: var(--bg-hover); margin-bottom: 10px;">
+
+                                    <div>
+
+                                        <strong style="color: var(--text-main); display: block; margin-bottom: 3px;"><i class="fa-solid fa-location-arrow" style="margin-right: 8px;"></i> การ์ดเอียงตามเมาส์ (Tilt)</strong>
+
+                                        <span style="font-size: 0.85em; color: var(--text-muted);">เอียงการ์ดแบบ 3D</span>
+
+                                    </div>
+
+                                    <label class="pro-switch"><input type="checkbox" id="beh-tilt" onchange="updateBehaviors()" checked><span class="pro-slider-round"></span></label>
+
+                                </div>
+
+                                
+
+                                <div class="pro-flex-between" style="padding: 15px; border-radius: 12px; background: var(--bg-hover); margin-bottom: 25px;">
+
+                                    <div>
+
+                                        <strong style="color: var(--text-main); display: block; margin-bottom: 3px;"><i class="fa-solid fa-tv" style="margin-right: 8px;"></i> วิชวลไลเซอร์เสียง</strong>
+
+                                        <span style="font-size: 0.85em; color: var(--text-muted);">คลื่นเสียงสำหรับเพลง</span>
+
+                                    </div>
+
+                                    <label class="pro-switch"><input type="checkbox" id="beh-visualizer" onchange="updateBehaviors()" checked><span class="pro-slider-round"></span></label>
+
+                                </div>
+
+                                
+
+                                <div class="pro-flex-between" style="padding: 15px; border-radius: 12px; border: 1px solid var(--danger); background: var(--danger-light);">
+
+                                    <div>
+
+                                        <i class="fa-solid fa-eye"></i> ดูพรีวิวหน้าจริง
+
+                                        <span style="font-size: 0.85em; color: var(--danger);">เฉพาะบัญชีระดับ PRO เท่านั้น</span>
+
+                                    </div>
+
+                                    <label class="pro-switch danger"><input type="checkbox" id="hide-watermark" onchange="toggleWatermark()"><span class="pro-slider-round"></span></label>
+
+                                </div>
+
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+
+
+                
+                    <!-- ========================================== -->
+                    <!-- WIDGETS PANEL -->
+                    <!-- ========================================== -->
+                    <div class="tab-panel" id="panel-widgets">
+                        <div class="pro-glass-card" style="margin-bottom: 25px;">
+                            <div class="pro-section" style="border:none; margin-bottom:0; padding-bottom:0;">
+                                <h2 style="font-size: 1.6em; background: linear-gradient(135deg, #a29bfe, #6c5ce7); -webkit-background-clip: text; color: transparent; font-weight: 800; display:flex; align-items:center; gap:10px; margin-top:0;">
+                                    <i class="fa-solid fa-puzzle-piece" style="color: #6c5ce7;"></i> วิดเจ็ต (Widgets)
+                                </h2>
+                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;">เชื่อมต่อและแสดงผลสดของคอนเทนต์ แบบเรียลไทม์</p>
+                                
+
+
+                                <div style="margin-bottom: 20px;">
+                                    <h4 style="margin: 0 0 12px 0; color: var(--text); font-size: 0.95rem;">คลิกแพลตฟอร์มเพื่อเพิ่มวิดเจ็ต:</h4>
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                                        <button class="btn-primary" style="background:#ff0000; border:none; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="addNewWidget('youtube')">
+                                            <i class="fa-brands fa-youtube"></i> YouTube
+                                        </button>
+                                        <button class="btn-primary" style="background:#5865F2; border:none; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="addNewWidget('discord')">
+                                            <i class="fa-brands fa-discord"></i> Discord
+                                        </button>
+                                        <button class="btn-primary" style="background:#1DB954; border:none; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="addNewWidget('spotify')">
+                                            <i class="fa-brands fa-spotify"></i> Spotify
+                                        </button>
+                                        <button class="btn-primary" style="background:#E1306C; border:none; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="addNewWidget('instagram')">
+                                            <i class="fa-brands fa-instagram"></i> Instagram
+                                        </button>
+                                        <button class="btn-primary" style="background:#000000; border:none; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="addNewWidget('tiktok')">
+                                            <i class="fa-brands fa-tiktok"></i> TikTok
+                                        </button>
+                                        <button class="btn-primary" style="background:#24292e; border:none; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="addNewWidget('github')">
+                                            <i class="fa-brands fa-github"></i> GitHub
+                                        </button>
+                                        <button class="btn-primary" style="background:#9146FF; border:none; padding:10px; border-radius:10px; font-weight:bold; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="addNewWidget('twitch')">
+                                            <i class="fa-brands fa-twitch"></i> Twitch
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="block-list-header" style="margin-top:20px; font-weight:bold; font-size:1.1rem; color:var(--text);">รายการวิดเจ็ตของคุณ</div>
+                        <div id="widgets-list-container"></div>
+                    </div>
+
+                    <!-- ========================================== -->
+                    <!-- STATS PANEL -->
+                    <!-- ========================================== -->
+                    <div class="tab-panel" id="panel-stats">
+                        <div class="pro-glass-card" style="margin-bottom: 25px; padding: 25px;">
+                            <h2 style="font-size: 1.6em; background: linear-gradient(135deg, #a29bfe, #6c5ce7); -webkit-background-clip: text; color: transparent; font-weight: 800; display:flex; align-items:center; gap:10px; margin-top:0;">
+                                <i class="fa-solid fa-chart-line" style="color: #6c5ce7;"></i> สถิติและการวิเคราะห์ (Analytics)
+                            </h2>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 25px;">วิเคราะห์ประสิทธิภาพและการเข้าชมโปรไฟล์ของคุณแบบเรียลไทม์</p>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px;">
+                                <!-- Views Card -->
+                                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; text-align: center; backdrop-filter: blur(10px);">
+                                    <div style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">ยอดผู้เข้าชมรวม</div>
+                                    <div id="total-views" style="font-size: 2.2rem; font-weight: 900; color: var(--text); margin-top: 5px;">0</div>
+                                </div>
+                                <!-- Clicks Card -->
+                                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; text-align: center; backdrop-filter: blur(10px);">
+                                    <div style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">ยอดการคลิกรวม</div>
+                                    <div id="total-clicks" style="font-size: 2.2rem; font-weight: 900; color: var(--text); margin-top: 5px;">0</div>
+                                </div>
+                                <!-- CTR Card -->
+                                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; text-align: center; backdrop-filter: blur(10px);">
+                                    <div style="color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">อัตราการคลิก (CTR)</div>
+                                    <div id="total-ctr" style="font-size: 2.2rem; font-weight: 900; color: var(--primary); margin-top: 5px;">0.0%</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Views Daily Chart Canvas -->
+                            <div style="position: relative; height: 220px; width: 100%; margin-top: 15px;">
+                                <canvas id="viewsDailyChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="block-list-header" style="font-weight:bold; font-size:1.1rem; color:var(--text); margin-bottom:15px;">การวิเคราะห์คลิกรายบล็อก</div>
+                        <div id="stats-blocks-container"></div>
+                    </div>
+
+                </section>
+                <!-- Preview Panel -->
+                <section class="preview-pane">
+                    <div class="preview-header">
+                        <div class="preview-title-indicator">
+                            <span style="display:inline-block; width:8px; height:8px; background:var(--danger); border-radius:50%; box-shadow:0 0 8px var(--danger);"></span>
+                            พรีวิวสด
+                        </div>
+                        <div style="display:flex; background:var(--bg-card); border:1px solid var(--border-color); border-radius:20px; padding:3px;">
+                            <button id="btn-view-mobile" onclick="setPreviewDevice('mobile')" style="padding:6px 12px; border-radius:15px; border:none; background:var(--primary); color:white; font-size:0.8rem; cursor:pointer;">
+                                <i class="fa-solid fa-mobile-screen-button"></i>
+                            </button>
+                            <button id="btn-view-pc" onclick="setPreviewDevice('pc')" style="padding:6px 12px; border-radius:15px; border:none; background:transparent; color:var(--text-muted); font-size:0.8rem; cursor:pointer;">
+                                <i class="fa-solid fa-desktop"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="preview-viewport-wrapper" id="viewport-wrapper">
+                        <div class="viewport-mobile" id="preview-viewport">
+                            <iframe id="preview-frame" class="preview-iframe" src="index.html?mode=preview"></iframe>
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- Floating Auto-Decorate Button (Magic Randomizer) -->
+    <button onclick="triggerMagicRandomizer()" class="magic-float-btn">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> รูปลักษณ์ & เอฟเฟกต์
+        <span>สุ่มตกแต่ง 🎲</span>
+    </button>
+
+    <!-- Toast Success Notification -->
+    <div class="alert-toast" id="toast-bar">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-bar-text">บันทึกข้ขอบมนูลเรียบร้อยแล้ว!</span>
+    </div>
+
+    <script>
+        function toggleDashboardTheme() {
+            const toggle = document.getElementById('dark-mode-toggle').checked;
+            if (toggle) {
+                document.body.classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+            }
+        }
+        
+        // Initial setup
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply default Fusions light mode
+            document.body.classList.remove('dark-mode');
+            document.getElementById('dark-mode-toggle').checked = false;
+        });
+
+        // Tab selection logic override to sync sub tabs header
+        const originalSwitchTab = window.switchTab;
+        window.switchTab = function(tabName) {
+            if (originalSwitchTab) {
+                // Remove active from all sidebar and top tabs
+                document.querySelectorAll('.sidebar-nav-item').forEach(el => el.classList.remove('active'));
+                document.querySelectorAll('.top-tab').forEach(el => el.classList.remove('active'));
+                
+                // Add active to top tabs
+                const topTab = document.querySelector(`.top-tab[data-tab-header="${tabName}"]`);
+                if (topTab) topTab.classList.add('active');
+
+                // Add active to matching sidebar item
+                document.querySelectorAll('.sidebar-nav-item').forEach(el => {
+                    const onclickAttr = el.getAttribute('onclick');
+                    if (onclickAttr && onclickAttr.includes(`'${tabName}'`)) {
+                        el.classList.add('active');
+                    }
+                });
+
+                // Call original panel switcher logic
+                originalSwitchTab(tabName);
+                
+                // If switching to widgets tab, render widgets
+                if (tabName === 'widgets' && typeof renderWidgets === 'function') {
+                    renderWidgets();
+                }
+            }
+        };
+    </script>
+
+
+                <!-- Decoration Modal (Cyber Glassmorphism) -->
+    <div id="decoration-modal" class="cyber-modal-overlay" style="display:none;">
+        <div class="cyber-modal-container">
+            <!-- Header -->
+            <div class="cyber-modal-header">
+                <h3><i class="fa-solid fa-wand-magic-sparkles"></i> รูปลักษณ์ & เอฟเฟกต์</h3>
+                <button class="btn-close-cyber" onclick="closeDecorationModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <!-- Body: Two Columns -->
+            <div class="cyber-modal-body">
+                <!-- Left: Grid -->
+                <div class="cyber-panel-left">
+                    <div id="decoration-grid" class="cyber-grid">
+                        <!-- JS will inject options here -->
+                    </div>
+                </div>
+                
+                <!-- Right: Preview & Slider -->
+                <div class="cyber-panel-right">
+                    <h4>Preview</h4>
+                    <div class="cyber-preview-box">
+                        <div class="scanner-line"></div>
+                        <div class="pro-avatar-preview-wrap">
+                            <div id="decor-preview-img" class="pro-avatar-img"></div>
+                            <div id="decor-preview-overlay" class="pro-avatar-decor"></div>
+                        </div>
+                    </div>
+                    
+                    <h4>Hue Core</h4>
+                    <input type="range" id="decor-hue-slider" min="0" max="360" value="0" class="cyber-hue-slider" oninput="updateDecorationPreview()">
+                    <div class="cyber-hue-labels">
+                        <span>0°</span>
+                        <span>360°</span>
+                    </div>
+                    <p class="cyber-hint">Adjust the core frequency to change aura color.</p>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="cyber-modal-footer">
+                <button class="btn-cyber-outline" onclick="clearDecoration()">Clear Aura</button>
+                <button class="btn-cyber-glow" onclick="confirmDecoration()">Initialize</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- EFFECTS MODALS -->
+    
+    <!-- 1. Mouse Trail Modal -->
+    <div id="mouse-trail-modal" class="cyber-modal-overlay" style="display:none; z-index: 9999;">
+        <div class="cyber-modal-container" style="max-width: 500px; background: white; color: #333; border-radius: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding: 20px; border-bottom: 1px solid #eee;">
+                <h3 style="margin:0; font-size: 1.2rem;">เลือกสไตล์รอยเมาส์</h3>
+                <button onclick="document.getElementById('mouse-trail-modal').style.display='none'" style="background:none; border:none; font-size:1.5rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div style="padding: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" id="mouse-trail-options">
+                    <!-- Options injected by JS -->
+                </div>
+            </div>
+            <div style="padding: 20px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: #666; cursor:pointer;" onclick="setMouseTrail('none')">ปปิดเอฟเฟกต์</span>
+                <button class="btn-primary" style="background: #5a4bda; padding: 10px 25px; border-radius: 12px; font-weight:bold;" onclick="document.getElementById('mouse-trail-modal').style.display='none'">เสร็จ็จ</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 2. Mouse Decor Modal -->
+    <div id="mouse-decor-modal" class="cyber-modal-overlay" style="display:none; z-index: 9999;">
+        <div class="cyber-modal-container" style="max-width: 450px; background: white; color: #333; border-radius: 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding: 20px;">
+                <div>
+                    <h3 style="margin:0; font-size: 1.2rem;">ตกแต่งเมาส์ด้วยรูป</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #666;">ใช้รูปของคุณแทนเคอร์เซอร์ - ทำงานร่วมกับเอฟเฟกต์รอยเมาส์ได้</p>
+                </div>
+                <button onclick="document.getElementById('mouse-decor-modal').style.display='none'" style="background:none; border:none; font-size:1.5rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div style="padding: 20px;">
+                <div style="border: 2px solid #ff0066; border-radius: 15px; padding: 20px;">
+                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 25px;">
+                        <div id="mouse-decor-preview" style="width: 100px; height: 100px; border: 1px solid #ccc; border-radius: 15px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                            <img src="" style="max-width:100%; max-height:100%; display:none;">
+                        </div>
+                        <div style="flex-grow: 1; text-align: center;">
+                            <button class="btn-primary" style="background: #d6005c; width: 100%; margin-bottom: 10px; border-radius: 10px;" onclick="document.getElementById('mouse-decor-file').click()"><i class="fa-solid fa-upload"></i> อัปโหลดรูป</button>
+                            <input type="file" id="mouse-decor-file" style="display:none;" accept="image/*" onchange="uploadMouseDecor(this)">
+                            <span style="color: #d6005c; font-weight: bold; cursor: pointer; font-size: 0.9rem;" onclick="removeMouseDecor()">ลบรูป</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom: 10px;">
+                            <strong style="font-size:0.9rem;">ขนขนาด: <span id="mouse-decor-size-val">30px</span></strong>
+                        </div>
+                        <input type="range" id="mouse-decor-size" class="pro-slider" style="accent-color: #d6005c;" min="10" max="100" value="30" oninput="updateMouseDecorSize(this.value)">
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div>
+                            <strong style="font-size:0.95rem;">เปิดทิศทาง</strong>
+                            <div style="font-size:0.8rem; color:#666;">แสดงรูปแทนเคอร์เซอร์บนโปรไฟล์</div>
+                        </div>
+                        <label class="switch"><input type="checkbox" id="mouse-decor-enable" onchange="toggleMouseDecorEnable()"><span class="slider"></span></label>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #888; text-align: center;"><i class="fa-regular fa-lightbulb" style="color: #f1c40f;"></i> แนะนำรูปสี่เหลี่ยมโปร่งใส (PNG/SVG) ขนาด 64-128px เพื่อความคมชัด</div>
+                </div>
+            </div>
+            
+            <div style="padding: 10px 20px 20px 20px; text-align: right;">
+                <button class="btn-primary" style="background: #d6005c; padding: 10px 30px; border-radius: 12px; font-weight:bold;" onclick="document.getElementById('mouse-decor-modal').style.display='none'">เสร็จ็จ</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 3. Name Effect Modal -->
+    <div id="name-effect-mo    <!-- 4. Create Link & Suffix Edit Modal -->
+    <div id="create-link-modal" class="cyber-modal-overlay" style="display:none; z-index: 9999;">
+        <div class="cyber-modal-container" style="max-width: 500px; background: #0e0a24; color: #fff; border-radius: 20px; border: 1px solid rgba(108, 92, 231, 0.3); box-shadow: 0 10px 40px rgba(0,0,0,0.8);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <h3 style="margin:0; font-size: 1.25rem; display:flex; align-items:center; gap:10px;">
+                    <i class="fa-solid fa-link" style="color: var(--primary-light);"></i> สร้างและแชร์ลิงก์งก์ของคุณ
+                </h3>
+                <button onclick="closeCreateLinkModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:#fff;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div style="padding: 20px;">
+                <p style="margin: 0 0 15px 0; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;">
+                    คุณสามารถกำหนดชื่อต่อท้ายลิงก์ (Username) ใหม่ได้ตามต้องการ เพื่อเพิ่มความสวยงามและจดจำง่ายสำหรับการนำไปใส่ในโปรไฟล์ช่องทางต่างๆ
+                </p>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display:block; font-size:0.8rem; color:var(--text-muted); margin-bottom: 8px; font-weight:600; text-transform:uppercase;">ตั้งชื่อท้ายลิงก์งก์</label>
+                    <div style="display:flex; align-items:center; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; overflow:hidden;">
+                        <span id="create-link-prefix" style="background: rgba(255,255,255,0.05); color: var(--text-secondary); padding: 12px 14px; font-size: 0.9rem; border-right: 1px solid var(--border-color); white-space: nowrap; user-select:none; font-family: monospace;">http://localhost/index.html?u=</span>
+                        <input type="text" id="create-link-suffix-input" style="flex:1; background:none; border:none; padding:12px; color:#fff; font-size:0.95rem; outline:none; font-weight:bold; font-family: monospace;" oninput="updateCreateLinkPreview()">
+                    </div>
+                    <div id="create-link-availability-status" style="font-size:0.8rem; margin-top: 6px; display:none;"></div>
+                </div>
+
+                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 15px; margin-bottom: 10px;">
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom: 6px; font-weight:600; text-transform:uppercase;">ตัวอย่างลิงก์งก์ที่จะได้รับ</div>
+                    <div id="create-link-preview-url" style="font-size:0.95rem; color:var(--primary-light); font-weight:bold; font-family: monospace; word-break: break-all;">http://localhost/index.html?u=demo</div>
+                </div>
+            </div>
+            
+            <div style="padding: 15px 20px; border-top: 1px solid rgba(255,255,255,0.08); text-align: right; display:flex; justify-content:flex-end; gap: 10px;">
+                <button class="btn-primary" style="background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.15);" onclick="closeCreateLinkModal()">ยกเลิงก์ก</button>
+                <button class="btn-primary" style="background: linear-gradient(135deg, #FF3366, #ff7f50); color:white; border:none;" onclick="saveAndCopyBioLink()">
+                    <i class="fa-solid fa-copy"></i> บันทึก & คัดลอกลิงก์งก์
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    window.addEventListener('DOMContentLoaded', () => {
+        console.log("Triggering switchTab('blocks') via automation script");
+        if (typeof switchTab === 'function') {
+            switchTab('blocks');
+        } else {
+            console.error("switchTab is not a function!");
+        }
+    });
+    </script>
+    </body>
+</html>

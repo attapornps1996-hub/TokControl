@@ -11,5 +11,28 @@ TokControl-win32-x64/
 
 # Local data & logs
 database.db
+data/team_members_cache.json
+data/emotes_cache.json
+data/local-admin-pin.txt
+data/local-jwt-secret.txt
+data/mc-bridge-token.txt
+data/mc-rcon-password.txt
 *.sqlite
 *.log
+*.zip
+uploads/
+.env
+resources/app.env
+scratch/cloud-run-secrets.local.txt
+scratch/.cloud-env-tmp.yaml
+.freebuff/
+overlay_settings_cache.json
+renderer_errors.txt
+chat_gift_debug.log
+scratch/
+
+# R.E.P.O. mod build artifacts (source lives in mods/TokControlREPOBridge/)
+mods/TokControlREPOBridge/bin/
+mods/TokControlREPOBridge/obj/
+mods/TokControlREPOBridge/dist/
+mods/TokControlREPOBridge/plugins/

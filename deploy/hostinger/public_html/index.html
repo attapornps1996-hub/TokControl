@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokControl — เครื่องมือคุมไลฟ์สำหรับสตรีมเมอร์ TikTok</title>
+    <meta name="description" content="TokControl รวมระบบสุ่มกาชา วงล้อ Reaction เอฟเฟกต์ของขวัญ และ Widget สำหรับ OBS ไว้ในโปรแกรมเดียว — ดาวน์โหลดฟรีสำหรับ Windows">
+
+    <meta property="og:title" content="TokControl — เครื่องมือคุมไลฟ์สำหรับสตรีมเมอร์ TikTok">
+    <meta property="og:description" content="ระบบสุ่ม เอฟเฟกต์ของขวัญ และ Widget สำหรับ OBS ในโปรแกรมเดียว">
+    <meta property="og:image" content="/assets/tokcontrol-icon.png">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/tokcontrol-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/tokcontrol-icon.png">
+    <link rel="apple-touch-icon" href="/assets/tokcontrol-icon.png">
+    <link rel="shortcut icon" href="/assets/tokcontrol-icon.png">
+    <meta name="theme-color" content="#07060b">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/download.css?v=dl-pro-1">
+</head>
+<body class="dl-protect">
+
+    <div class="dl-bg" aria-hidden="true">
+        <div class="dl-aurora"></div>
+        <div class="dl-nebula n1"></div>
+        <div class="dl-nebula n2"></div>
+        <div class="dl-nebula n3"></div>
+        <div class="dl-grid"></div>
+        <div class="dl-scanlines"></div>
+    </div>
+    <div class="dl-stars" id="dlStars" aria-hidden="true"></div>
+    <div class="dl-meteors" id="dlMeteors" aria-hidden="true"></div>
+    <div class="dl-particles" id="dlParticles" aria-hidden="true"></div>
+    <div class="dl-cursor-glow" id="dlCursorGlow" aria-hidden="true"></div>
+
+    <div class="dl-scroll-flow" id="dlScrollFlow" aria-hidden="true">
+        <div class="dl-scroll-flow-track">
+            <span class="dl-flow-wave"></span>
+            <div class="dl-flow-node" data-i="0"><i class="dl-flow-dot"></i></div>
+            <span class="dl-flow-line" data-i="0"></span>
+            <div class="dl-flow-node" data-i="1"><i class="dl-flow-dot"></i></div>
+            <span class="dl-flow-line" data-i="1"></span>
+            <div class="dl-flow-node" data-i="2"><i class="dl-flow-dot"></i></div>
+            <span class="dl-flow-line" data-i="2"></span>
+            <div class="dl-flow-node" data-i="3"><i class="dl-flow-dot"></i></div>
+        </div>
+    </div>
+
+    <!-- ============ Navbar ============ -->
+    <nav class="dl-nav" id="dlNav">
+        <a class="dl-nav-brand" href="#top">
+            <span class="dl-nav-logo-ring">
+                <img src="/assets/tokcontrol-icon.png" alt="TokControl">
+            </span>
+            <div>
+                <b>TokControl</b>
+                <span id="dlNavVersion">v2.0.1</span>
+            </div>
+        </a>
+        <div class="dl-nav-links">
+            <a href="#preview">ตัวอย่างโปรแกรม</a>
+            <a href="#features">ฟีเจอร์</a>
+            <a href="#download">ดาวน์โหลด</a>
+            <a class="dl-nav-cta" href="#download" id="dlNavCta">⬇ ดาวน์โหลด</a>
+        </div>
+    </nav>
+
+    <!-- ============ Hero ============ -->
+    <header class="dl-section dl-hero" id="top">
+        <div class="dl-hero-copy">
+            <span class="dl-eyebrow dl-in" id="dlHeroEyebrow" style="--d:0s">FREE · WINDOWS</span>
+            <h1 class="dl-in" style="--d:.08s">คุมไลฟ์ให้สนุกขึ้น<br><span class="dl-gradient-text">ด้วย TokControl</span></h1>
+            <p class="dl-hero-lead dl-in" style="--d:.16s">
+                รวมระบบสุ่มกาชา วงล้อเสี่ยงโชค เอฟเฟกต์ของขวัญ Reaction อัตโนมัติ
+                และ Widget สำหรับ OBS ไว้ในโปรแกรมเดียว ติดตั้งง่าย เชื่อมต่อ TikTok Live ได้ทันที
+            </p>
+
+            <div class="dl-hero-actions dl-in" style="--d:.24s">
+                <button type="button" class="dl-btn dl-btn-primary" id="dlHeroDownload" data-burst>
+                    <span class="dl-btn-icon">⬇</span>
+                    <span id="dlHeroDownloadLabel">ดาวน์โหลด TokControl</span>
+                </button>
+                <a class="dl-btn dl-btn-ghost" href="#preview">
+                    <span class="dl-btn-icon">▶</span> ดูตัวอย่างโปรแกรม
+                </a>
+            </div>
+
+            <div class="dl-hero-meta dl-in" style="--d:.3s">
+                <span>🪟 Windows 10 / 11 (64-bit)</span>
+                <span>💾 ขนาดราว 475 MB</span>
+                <span>✨ ใช้งานฟรี ไม่มีโฆษณา</span>
+            </div>
+
+            <div class="dl-hero-stats dl-in" style="--d:.36s">
+                <div class="dl-stat"><b class="dl-count" data-count="20">0</b><small>โอเวอร์เลย์พร้อมใช้</small></div>
+                <div class="dl-stat"><b>Real-time</b><small>เชื่อม TikTok Live</small></div>
+                <div class="dl-stat"><b>OBS Ready</b><small>Browser Source</small></div>
+            </div>
+        </div>
+
+        <div class="dl-hero-art dl-in" style="--d:.2s" data-tilt>
+            <div class="dl-mascot-glow"></div>
+            <div class="dl-orbit-ring r1"></div>
+            <div class="dl-orbit-ring r2"></div>
+            <div class="dl-orbit-ring r3"></div>
+            <div class="dl-logo-halo"></div>
+            <div class="dl-logo-sparks" id="dlLogoSparks" aria-hidden="true"></div>
+            <div class="dl-logo-wrap">
+                <img class="dl-mascot" src="/assets/tokcontrol-icon.png" alt="โลโก้ TokControl">
+                <span class="dl-logo-scan"></span>
+            </div>
+            <span class="dl-float-chip c1">🎁 Gift Firework</span>
+            <span class="dl-float-chip c2">🎰 วงล้อสุ่ม</span>
+            <span class="dl-float-chip c3">🏆 Leaderboard</span>
+            <span class="dl-float-chip c4">🕺 Dance Club</span>
+        </div>
+    </header>
+
+    <!-- Marquee -->
+    <div class="dl-marquee" aria-hidden="true">
+        <div class="dl-marquee-track">
+            <span>GACHA</span><span>WHEEL SPIN</span><span>GIFT FIREWORK</span><span>DANCE CLUB 3D</span>
+            <span>LEADERBOARD</span><span>OBS OVERLAY</span><span>SOUND ALERTS</span><span>AUTO REACTION</span>
+            <span>GACHA</span><span>WHEEL SPIN</span><span>GIFT FIREWORK</span><span>DANCE CLUB 3D</span>
+            <span>LEADERBOARD</span><span>OBS OVERLAY</span><span>SOUND ALERTS</span><span>AUTO REACTION</span>
+        </div>
+    </div>
+
+    <!-- ============ Mockup / Preview ============ -->
+    <section class="dl-section" id="preview">
+        <div class="dl-section-head dl-reveal">
+            <span class="dl-eyebrow">Preview</span>
+            <h2>หน้าตาโปรแกรมที่ใช้งานจริง</h2>
+            <p>แดชบอร์ดเดียวคุมได้ทุกอย่าง — ตั้งค่าโอเวอร์เลย์ ดูสถิติของขวัญ และคุมเอฟเฟกต์บนไลฟ์แบบเรียลไทม์</p>
+        </div>
+
+        <div class="dl-mockup-frame dl-reveal" data-tilt>
+            <div class="dl-mockup-glow"></div>
+            <div class="dl-mockup-bar">
+                <span class="dl-mockup-dot red"></span>
+                <span class="dl-mockup-dot yellow"></span>
+                <span class="dl-mockup-dot green"></span>
+                <span class="dl-mockup-title">TokControl — แดชบอร์ดสตรีมเมอร์</span>
+                <span class="dl-mockup-live">LIVE</span>
+            </div>
+
+            <div class="dl-mockup-body">
+                <aside class="dl-mockup-side">
+                    <div class="dl-mockup-side-item active">🎯 <span>Goal Overlays</span></div>
+                    <div class="dl-mockup-side-item">🎰 <span>วงล้อสุ่ม</span></div>
+                    <div class="dl-mockup-side-item">🎛️ <span>กาชา</span></div>
+                    <div class="dl-mockup-side-item">🔊 <span>Sound Alerts</span></div>
+                    <div class="dl-mockup-side-item">🖼️ <span>Avatar</span></div>
+                </aside>
+
+                <div class="dl-mockup-stage">
+                    <div class="dl-mockup-cards">
+                        <div class="dl-mock-card">
+                            <div class="dl-mock-emoji">❤️</div>
+                            <b>12.4K</b>
+                            <small>ยอดไลค์</small>
+                        </div>
+                        <div class="dl-mock-card">
+                            <div class="dl-mock-emoji">🪙</div>
+                            <b>5,280</b>
+                            <small>เหรียญวันนี้</small>
+                        </div>
+                        <div class="dl-mock-card">
+                            <div class="dl-mock-emoji">👀</div>
+                            <b>836</b>
+                            <small>ผู้ชมตอนนี้</small>
+                        </div>
+                    </div>
+
+                    <div class="dl-mock-goal">
+                        <div class="dl-mock-goal-top">
+                            <span>🎯 COIN GOAL</span>
+                            <span>5,280 / 8,000</span>
+                        </div>
+                        <div class="dl-mock-goal-bar"><div class="dl-mock-goal-fill"></div></div>
+                    </div>
+
+                    <div class="dl-mock-feed">
+                        <div class="dl-mock-feed-row"><span>🌹</span><b>RoseFan</b><span class="dl-mock-coins">×15</span></div>
+                        <div class="dl-mock-feed-row"><span>🦁</span><b>LionKing</b><span class="dl-mock-coins">×299</span></div>
+                        <div class="dl-mock-feed-row"><span>💎</span><b>DiamondPro</b><span class="dl-mock-coins">×1000</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ Features ============ -->
+    <section class="dl-section" id="features">
+        <div class="dl-section-head dl-reveal">
+            <span class="dl-eyebrow">Features</span>
+            <h2>ทุกอย่างที่สตรีมเมอร์ต้องใช้</h2>
+            <p>ออกแบบมาเพื่อไลฟ์ TikTok โดยเฉพาะ — ติดตั้งครั้งเดียวใช้ได้ครบทุกระบบ</p>
+        </div>
+
+        <div class="dl-features">
+            <article class="dl-feature-card dl-reveal" style="--dl-card-accent:#bc13fe;--i:0">
+                <div class="dl-feature-icon">🎰</div>
+                <h3>ระบบสุ่มและกาชา</h3>
+                <p>วงล้อเสี่ยงโชคและตู้กาชาพร้อมอนิเมชันเปิดการ์ด ตั้งรางวัลและอัตราออกเองได้ หมุนอัตโนมัติเมื่อได้รับของขวัญตามที่กำหนด</p>
+            </article>
+
+            <article class="dl-feature-card dl-reveal" style="--dl-card-accent:#ff0050;--i:1">
+                <div class="dl-feature-icon">🎁</div>
+                <h3>เอฟเฟกต์ Reaction</h3>
+                <p>Gift Firework, Gift Cannon, น้ำพุหัวใจ และกำแพงอีโมจิ ตอบสนองทันทีที่ผู้ชมส่งของขวัญหรือกดไลค์ พร้อมเสียงประกอบ</p>
+            </article>
+
+            <article class="dl-feature-card dl-reveal" style="--dl-card-accent:#00d2ff;--i:2">
+                <div class="dl-feature-icon">🖼️</div>
+                <h3>Widget สำหรับ OBS</h3>
+                <p>คัดลอกลิงก์ไปวางใน Browser Source ของ OBS หรือ TikTok Studio ได้ทันที รองรับทั้งจอแนวนอน 16:9 และแนวตั้ง 9:16</p>
+            </article>
+
+            <article class="dl-feature-card dl-reveal" style="--dl-card-accent:#ff7a3d;--i:3">
+                <div class="dl-feature-icon">📊</div>
+                <h3>สถิติและอันดับสด</h3>
+                <p>Leaderboard ผู้ให้ของขวัญ แถบเป้าหมายไลค์และเหรียญ พร้อมระบบแต้มช่องจำลองสำหรับแลกรางวัลกับผู้ชม</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- ============ PRO Plans ============ -->
+    <section class="dl-section" id="pro">
+        <div class="dl-section-head dl-reveal">
+            <span class="dl-eyebrow">TokControl PRO</span>
+            <h2>เติมโปรเพื่อปลดล็อกทุกฟีเจอร์</h2>
+            <p>สมาชิกฟรีใช้งานพื้นฐานได้ — อัปเกรด PRO เพื่อเข้าถึงระบบเต็มรูปแบบ</p>
+        </div>
+        <div class="dl-pro-grid dl-reveal">
+            <article class="dl-pro-card free">
+                <span class="dl-pro-tier">FREE</span>
+                <h3>สมาชิกฟรี</h3>
+                <ul>
+                    <li>แกลเลอรีโอเวอร์เลย์ — เลย์เอาต์ Default / คลาสสิก</li>
+                    <li>ตัวนับ Win &amp; นาฬิกา — สไตล์ Classic</li>
+                    <li>Sound Alerts สูงสุด 5 รายการ</li>
+                    <li>Actions &amp; Events สูงสุดอย่างละ 5</li>
+                    <li>วงล้อสุ่ม 1 ชุด</li>
+                    <li>Channel Points สูงสุด 250 คน</li>
+                </ul>
+            </article>
+            <article class="dl-pro-card pro">
+                <span class="dl-pro-tier">PRO 👑</span>
+                <h3>สมาชิก PRO</h3>
+                <ul>
+                    <li>โอเวอร์เลย์ทุกเลย์เอาต์ + เอฟเฟกต์พิเศษ</li>
+                    <li>Win / Timer สไตล์ครบทุกแบบ</li>
+                    <li>กาชา · Game Center · Stream Credits</li>
+                    <li>โหวต · Airdrop · Gift Throw</li>
+                    <li>ไม่จำกัด Sound Alerts / Actions &amp; Events / วงล้อ / แต้ม</li>
+                </ul>
+                <p class="dl-pro-note">สมัคร PRO ได้ในโปรแกรมหลังติดตั้ง — รองรับ PromptPay</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- ============ CTA Band ============ -->
+    <section class="dl-section" id="download">
+            <div class="dl-cta-band dl-reveal">
+            <div class="dl-cta-orb"></div>
+            <img class="dl-cta-logo" src="/assets/tokcontrol-icon.png" alt="">
+            <span class="dl-eyebrow" id="dlCtaEyebrow">Download</span>
+            <h2 id="dlCtaTitle">ดาวน์โหลด TokControl ฟรี</h2>
+            <p id="dlCtaDesc">ติดตั้งบน Windows 10 / 11 แล้วเชื่อมต่อ TikTok Live ได้ทันที — อัปเดตเวอร์ชันใหม่ผ่าน Auto Update ในโปรแกรม</p>
+            <p class="dl-cta-note">ถ้าเบราว์เซอร์ขึ้นว่าไฟล์ไม่ปลอดภัย ให้กด Keep / เก็บไว้ — ตัวติดตั้งมาจากเว็บไซต์ทางการของ TokControl</p>
+            <button type="button" class="dl-btn dl-btn-primary" id="dlMainDownload" data-burst>
+                <span class="dl-btn-icon">⬇</span>
+                <span id="dlMainDownloadLabel">ดาวน์โหลด TokControl</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- ============ Footer ============ -->
+    <footer class="dl-footer">
+        <div class="dl-footer-inner">
+            <div class="dl-footer-brand">
+                <a class="dl-nav-brand" href="#top">
+                    <span class="dl-nav-logo-ring">
+                        <img src="/assets/tokcontrol-icon.png" alt="TokControl">
+                    </span>
+                    <div>
+                        <b>TokControl</b>
+                        <span>STREAMER TOOLKIT</span>
+                    </div>
+                </a>
+                <p>เครื่องมือคุมไลฟ์สำหรับสตรีมเมอร์ TikTok พัฒนาโดยทีมงานคนไทย อัปเดตฟีเจอร์ใหม่อย่างต่อเนื่อง</p>
+            </div>
+
+            <div class="dl-footer-col">
+                <h4>ติดตามเรา</h4>
+                <div class="dl-social-block">
+                    <img class="dl-footer-app-logo" src="/assets/tokcontrol-icon.png" alt="TokControl">
+                    <div class="dl-social-row">
+                        <a class="dl-social-btn" style="--dl-social-color:#5865f2" href="https://discord.gg/pandyapp" target="_blank" rel="noopener"><img src="/assets/discord-mark.svg" alt="" class="dl-social-icon"> Discord</a>
+                        <a class="dl-social-btn" style="--dl-social-color:#00f2ea" href="https://www.tiktok.com/@pandy_puncheroo" target="_blank" rel="noopener"><img src="/assets/tiktok-mark.svg" alt="" class="dl-social-icon"> TikTok</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dl-footer-col">
+                <h4>สถานะการดาวน์โหลด</h4>
+                <div class="dl-status">
+                    <div class="dl-status-row">
+                        <span>เวอร์ชันล่าสุด</span>
+                        <b id="dlStatusVersion">เร็วๆ นี้</b>
+                    </div>
+                    <div class="dl-status-row">
+                        <span>เผยแพร่เมื่อ</span>
+                        <b id="dlStatusDate">รอเปิดดาวน์โหลด</b>
+                    </div>
+                    <div class="dl-status-row">
+                        <span>ขนาดไฟล์</span>
+                        <b id="dlStatusSize">—</b>
+                    </div>
+                    <div class="dl-status-row">
+                        <span>สถานะเซิร์ฟเวอร์</span>
+                        <span class="dl-status-pill soon" id="dlStatusPill">⏳ 01:00:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dl-footer-bottom">
+            © <span id="dlYear">2026</span> TokControl — สงวนลิขสิทธิ์ · ไม่ได้มีส่วนเกี่ยวข้องกับ TikTok อย่างเป็นทางการ
+        </div>
+    </footer>
+
+    <div class="dl-toast" id="dlToast" role="status" aria-live="polite"></div>
+
+    <script src="/js/download-page.js?v=dl-secure-218"></script>
+</body>
+</html>

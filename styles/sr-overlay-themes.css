@@ -1,0 +1,133 @@
+/* Song Request overlay themes — accent via CSS variables + custom colors from settings */
+
+:root {
+    --sr-accent: #1DB954;
+    --sr-accent2: #1ed760;
+    --sr-accent-rgb: 29, 185, 84;
+    --sr-skip: #ff9f43;
+    --sr-skip2: #ff6b35;
+    --sr-req: #f1c40f;
+    --sr-card-bg: rgba(20, 24, 30, 0.96);
+    --sr-card-bg2: rgba(8, 10, 14, 0.98);
+    --sr-card-border: rgba(29, 185, 84, 0.3);
+    --sr-card-radius: 20px;
+    --sr-card-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+    --sr-glow: rgba(29, 185, 84, 0.14);
+}
+
+/* ── Theme: Neon ── */
+html.sr-theme-neon {
+    --sr-accent: #ff2e97;
+    --sr-accent2: #00e5ff;
+    --sr-accent-rgb: 255, 46, 151;
+    --sr-card-border: rgba(255, 46, 151, 0.45);
+    --sr-glow: rgba(0, 229, 255, 0.18);
+    --sr-card-radius: 14px;
+}
+html.sr-theme-neon .sr-ov-card,
+html.sr-theme-neon .sr-h-bar {
+    box-shadow: 0 0 40px rgba(255, 46, 151, 0.25), var(--sr-card-shadow);
+}
+
+/* ── Theme: Minimal ── */
+html.sr-theme-minimal {
+    --sr-accent: #ffffff;
+    --sr-accent2: #cccccc;
+    --sr-accent-rgb: 255, 255, 255;
+    --sr-card-bg: rgba(12, 12, 14, 0.92);
+    --sr-card-bg2: rgba(6, 6, 8, 0.95);
+    --sr-card-border: rgba(255, 255, 255, 0.18);
+    --sr-glow: transparent;
+    --sr-card-radius: 8px;
+    --sr-card-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+html.sr-theme-minimal .sr-ov-glow,
+html.sr-theme-minimal .sr-h-glow { display: none; }
+
+/* ── Theme: Glass ── */
+html.sr-theme-glass {
+    --sr-accent: #7fd7ff;
+    --sr-accent2: #a8e6ff;
+    --sr-accent-rgb: 127, 215, 255;
+    --sr-card-bg: rgba(255, 255, 255, 0.08);
+    --sr-card-bg2: rgba(255, 255, 255, 0.04);
+    --sr-card-border: rgba(127, 215, 255, 0.35);
+    --sr-glow: rgba(127, 215, 255, 0.12);
+    --sr-card-radius: 24px;
+}
+html.sr-theme-glass .sr-ov-card,
+html.sr-theme-glass .sr-h-bar,
+html.sr-theme-glass .sr-skip-ov-widget {
+    backdrop-filter: blur(28px) saturate(1.4);
+}
+
+/* ── Theme: Sunset ── */
+html.sr-theme-sunset {
+    --sr-accent: #ff6b35;
+    --sr-accent2: #ffd23f;
+    --sr-accent-rgb: 255, 107, 53;
+    --sr-skip: #ff4488;
+    --sr-skip2: #ff6b35;
+    --sr-req: #ffe066;
+    --sr-card-bg: rgba(28, 12, 18, 0.94);
+    --sr-card-bg2: rgba(14, 6, 10, 0.97);
+    --sr-card-border: rgba(255, 107, 53, 0.4);
+    --sr-glow: rgba(255, 210, 63, 0.16);
+    --sr-card-radius: 22px;
+}
+
+/* ── Apply variables to vertical card ── */
+.sr-ov-card {
+    border-radius: var(--sr-card-radius) !important;
+    background: linear-gradient(180deg, var(--sr-card-bg) 0%, var(--sr-card-bg2) 100%) !important;
+    border-color: var(--sr-card-border) !important;
+    box-shadow: var(--sr-card-shadow), 0 0 0 1px rgba(255, 255, 255, 0.04) inset !important;
+}
+.sr-ov-glow { background: radial-gradient(ellipse 100% 60% at 50% 0%, var(--sr-glow), transparent 60%) !important; }
+.sr-ov-badge { color: var(--sr-accent) !important; background: rgba(var(--sr-accent-rgb), 0.12) !important; border-color: rgba(var(--sr-accent-rgb), 0.25) !important; }
+.sr-ov-eq span { background: linear-gradient(180deg, var(--sr-accent2), var(--sr-accent)) !important; }
+.sr-ov-art-wrap { border-color: rgba(var(--sr-accent-rgb), 0.28) !important; }
+.sr-ov-now-label { color: var(--sr-accent) !important; }
+.sr-ov-progress-fill { background: linear-gradient(90deg, var(--sr-accent), var(--sr-accent2)) !important; box-shadow: 0 0 10px rgba(var(--sr-accent-rgb), 0.55) !important; }
+.sr-ov-req { color: var(--sr-req) !important; }
+.sr-ov-queue-head { color: rgba(var(--sr-accent-rgb), 0.85) !important; }
+
+/* Vertical layout variants */
+html.sr-theme-neon .sr-ov-card { width: min(340px, 90vw); }
+html.sr-theme-minimal .sr-ov-art-wrap { border-radius: 4px !important; border-width: 1px !important; }
+html.sr-theme-glass .sr-ov-card { border-width: 1.5px !important; }
+html.sr-theme-sunset .sr-ov-card { border-width: 2px !important; }
+
+/* ── Horizontal bar ── */
+.sr-h-bar {
+    border-radius: var(--sr-card-radius) !important;
+    background: linear-gradient(135deg, var(--sr-card-bg) 0%, var(--sr-card-bg2) 100%) !important;
+    border-color: var(--sr-card-border) !important;
+}
+.sr-h-glow { background: radial-gradient(ellipse 42% 140% at 10% 50%, var(--sr-glow), transparent 58%) !important; }
+.sr-h-badge { color: var(--sr-accent) !important; }
+.sr-h-eq span { background: linear-gradient(180deg, var(--sr-accent2), var(--sr-accent)) !important; }
+.sr-h-art-wrap { border-color: rgba(var(--sr-accent-rgb), 0.28) !important; }
+.sr-h-req { color: var(--sr-req) !important; }
+.sr-h-progress-fill { background: linear-gradient(90deg, var(--sr-accent), var(--sr-accent2)) !important; box-shadow: 0 0 8px rgba(var(--sr-accent-rgb), 0.5) !important; }
+.sr-h-queue-head span:first-child { color: var(--sr-req) !important; }
+
+html.sr-theme-neon .sr-h-bar { height: 118px; border-width: 2px; }
+html.sr-theme-minimal .sr-h-bar { height: 88px; border-radius: 6px !important; }
+html.sr-theme-glass .sr-h-bar { height: 104px; backdrop-filter: blur(28px) saturate(1.4); }
+html.sr-theme-sunset #overlaySongRequestH.active { align-items: flex-start; padding-top: 14px; }
+html.sr-theme-sunset .sr-h-bar { border-width: 2px; }
+
+/* ── Skip vote widget ── */
+.sr-skip-ov-widget {
+    border-color: rgba(var(--sr-accent-rgb), 0.38) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55), 0 0 28px rgba(var(--sr-accent-rgb), 0.18) !important;
+}
+.sr-skip-ov-badge { color: var(--sr-skip) !important; }
+.sr-skip-ov-fill { background: linear-gradient(90deg, var(--sr-skip), var(--sr-skip2)) !important; box-shadow: 0 0 14px rgba(var(--sr-accent-rgb), 0.5) !important; }
+.sr-skip-ov-toast { background: linear-gradient(135deg, var(--sr-skip), var(--sr-skip2)) !important; }
+
+html.sr-theme-neon .sr-skip-ov-widget { border-radius: 14px; min-width: 240px; }
+html.sr-theme-minimal .sr-skip-ov-widget { border-radius: 8px; background: rgba(10, 10, 12, 0.94) !important; }
+html.sr-theme-glass .sr-skip-ov-widget { backdrop-filter: blur(24px); border-radius: 20px; }
+html.sr-theme-sunset .sr-skip-ov-widget { top: auto; bottom: 28px; right: 28px; }

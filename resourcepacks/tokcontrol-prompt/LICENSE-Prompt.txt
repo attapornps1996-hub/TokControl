@@ -1,0 +1,3 @@
+Prompt is licensed under the SIL Open Font License, Version 1.1.
+Copyright 2015 Cadson Demak (http://www.cadson.com)
+See https://scripts.sil.org/OFL

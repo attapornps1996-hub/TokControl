@@ -1,23 +1,19 @@
-# ใช้ official Node.js runtime image
-FROM node:20-alpine
+# Debian-based image — better compatibility with sqlite3/sharp native modules
+FROM node:20-slim
 
-# กำหนด working directory ใน container
 WORKDIR /app
 
-# คัดลอก package.json และ package-lock.json เพื่อติดตั้ง deps
+# Build tools for native npm modules (sqlite3, sharp)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 make g++ \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
+RUN npm ci --omit=dev
 
-# ติดตั้ง dependencies สำหรับ production (ข้าม devDependencies อย่าง electron)
-RUN npm ci --only=production
-
-# คัดลอกไฟล์ทั้งหมดของโปรเจกต์
 COPY . .
 
-# กำหนด Port พื้นฐานสำหรับ Google Cloud Run
-EXPOSE 3000
-
-ENV PORT=3000
+EXPOSE 8080
 ENV NODE_ENV=production
 
-# คำสั่งในการรันเซิร์ฟเวอร์คลาวด์
 CMD ["node", "cloud_server.js"]

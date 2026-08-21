@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<script>
+(function () {
+    // TokControl bridge: ถ้ามี slug/user จากแอป → สร้างโปรไฟล์แล้วเข้า dashboard เลย
+    try {
+        var params = new URLSearchParams(location.search);
+        var u = params.get('u') || params.get('user') || '';
+        var token = params.get('token') || localStorage.getItem('pandy_token') || '';
+        if (!u && window.opener && window.opener.currentUser) {
+            u = window.opener.currentUser.name || window.opener.currentUser.username || '';
+        }
+        if (!u) {
+            try {
+                var cu = JSON.parse(localStorage.getItem('pandy_user') || 'null');
+                if (cu && (cu.username || cu.name)) u = cu.username || cu.name;
+            } catch (e) {}
+        }
+        if (!u) {
+            try {
+                var s = JSON.parse(localStorage.getItem('biolink_session') || 'null');
+                if (s && s.username) u = s.username;
+            } catch (e2) {}
+        }
+        if (u) {
+            u = String(u).replace(/_/g, '-').toLowerCase();
+            localStorage.setItem('biolink_session', JSON.stringify({
+                username: u,
+                token: token || null,
+                source: 'tokcontrol',
+                pendingBootstrap: true
+            }));
+            // database.js โหลดด้านล่างแล้วค่อย redirect
+            window.__TOKBIO_AUTO_USER__ = u;
+            window.__TOKBIO_AUTO_TOKEN__ = token || null;
+        }
+    } catch (e) {}
+})();
+</script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ | TokBio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --bg-gradient: linear-gradient(135deg, #0f0c20 0%, #15102a 50%, #060210 100%);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text: #ffffff;
+            --text-muted: #a0a0b0;
+            --input-bg: rgba(0, 0, 0, 0.2);
+            --success: #00b894;
+            --danger: #ff7675;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', 'Inter', sans-serif;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Decorative background elements */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(150px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            background: rgba(108, 92, 231, 0.3);
+            top: 10%;
+            left: 10%;
+        }
+
+        body::after {
+            background: rgba(236, 0, 140, 0.2);
+            bottom: 10%;
+            right: 10%;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            z-index: 1;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-section i {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .logo-section h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, #fff, var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-section p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 35px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: var(--text);
+            border-bottom-color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            background: var(--input-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(108, 92, 231, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .username-prefix {
+            position: absolute;
+            left: 45px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-light);
+            font-weight: 600;
+            font-size: 0.95rem;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .input-wrapper.username-input input {
+            padding-left: 120px;
+        }
+
+        .username-status {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+        }
+
+        .status-available {
+            color: var(--success);
+        }
+
+        .status-taken {
+            color: var(--danger);
+        }
+
+        .error-message {
+            background: rgba(255, 118, 117, 0.1);
+            border: 1px solid rgba(255, 118, 117, 0.2);
+            color: var(--danger);
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary), #8e2de2);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn-loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-top: -10px;
+            margin-left: -10px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .demo-notice {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+        }
+
+        .demo-notice code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--primary-light);
+            font-family: monospace;
+            cursor: pointer;
+        }
+
+        /* Animate in */
+        .card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-section">
+            <i class="fa-solid fa-link"></i>
+            <h1>Bio Link</h1>
+            <p>หน้าเว็บโปรไฟล์แบบกำหนดเองที่สะท้อนตัวตนของคุณ</p>
+        </div>
+
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" id="tab-login">เข้าสู่ระบบ</div>
+                <div class="tab" id="tab-register">สมัครสมาชิก</div>
+            </div>
+
+            <div class="error-message" id="error-box">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                <span id="error-text">ข้อผิดพลาด</span>
+            </div>
+
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                <!-- Username (Register only) -->
+                <div class="form-group" id="group-username" style="display: none;">
+                    <label for="username">USERNAME</label>
+                    <div class="input-wrapper username-input">
+                        <i class="fa-solid fa-at"></i>
+                        <span class="username-prefix">bio.link/</span>
+                        <input type="text" id="username" placeholder="yourname" autocomplete="off">
+                        <span class="username-status" id="username-status"></span>
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">อีเมล</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-envelope"></i>
+                        <input type="email" id="email" placeholder="name@domain.com" required>
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">รหัสผ่าน</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" id="submit-btn">เข้าสู่ระบบ</button>
+            </form>
+
+            <div class="demo-notice" id="demo-notice-box">
+                💡 ต้องการทดสอบด่วน? ใช้บัญชีเดโม่:<br>
+                อีเมล: <code onclick="fillDemo()">demo@example.com</code> / รหัสผ่าน: <code onclick="fillDemo()">password123</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- DB and Auth JS Scripts -->
+    <script src="/biolink/js/database.js?v=tokbio-2"></script>
+    <script>
+    (function () {
+        var u = window.__TOKBIO_AUTO_USER__;
+        if (u && window.DB && typeof window.DB.ensureTokControlUser === 'function') {
+            var r = window.DB.ensureTokControlUser(u, {
+                token: window.__TOKBIO_AUTO_TOKEN__,
+                source: 'tokcontrol'
+            });
+            if (r && r.success) {
+                location.replace('/biolink/dashboard?u=' + encodeURIComponent(r.username || u));
+                return;
+            }
+        }
+        // มี session + โปรไฟล์อยู่แล้ว → เข้า dashboard
+        try {
+            var s = window.DB && window.DB.getCurrentSession && window.DB.getCurrentSession();
+            if (s && s.username && window.DB.getProfile(s.username)) {
+                location.replace('/biolink/dashboard?u=' + encodeURIComponent(s.username));
+                return;
+            }
+        } catch (e) {}
+    })();
+    </script>
+    <script src="/biolink/js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "actions": [
+    { "id": "build", "cmd": "rs_build", "emoji": "☕", "label": "สร้างร้าน Tok Cafe", "type": "setup" },
+    { "id": "customer", "cmd": "rs_customer", "emoji": "🧑", "label": "ลูกค้าสั่งออเดอร์", "type": "event" },
+    { "id": "order", "cmd": "rs_order", "emoji": "🧾", "label": "สุ่มเมนู Farmer's Delight", "type": "event" },
+    { "id": "disaster", "cmd": "rs_disaster", "emoji": "🔥", "label": "ไฟไหม้ครัว", "type": "troll" },
+    { "id": "bonus", "cmd": "rs_bonus", "emoji": "🧺", "label": "วัตถุดิบเข้าตู้", "type": "help" },
+    { "id": "tick", "cmd": "rs_tick", "emoji": "📍", "label": "ชง / เสิร์ฟ / เวลาอดทน", "type": "setup" },
+    { "id": "status", "cmd": "rs_status", "emoji": "📊", "label": "สถานะร้าน", "type": "setup" },
+    { "id": "clear", "cmd": "rs_clear", "emoji": "🧹", "label": "เคลียร์คิว", "type": "setup" }
+  ],
+  "events": [
+    "CUSTOMER_ARRIVE",
+    "ORDER_FOOD",
+    "KITCHEN_DISASTER",
+    "BONUS_REWARD"
+  ],
+  "loop": [
+    "ลูกค้าเข้าคิวพร้อมออเดอร์สุ่มจาก Farmer's Delight",
+    "บอสบาร์แสดงเวลาอดทน",
+    "ยืนบาร์กาแฟหรือเตาย่างถือวัตถุดิบครบ = ได้เมนู",
+    "เสิร์ฟที่เคาน์เตอร์ได้เงิน / หมดเวลาหักเงิน"
+  ]
+}

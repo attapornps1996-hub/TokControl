@@ -1,0 +1,137 @@
+/** Venue presets — full-room theme swap (not floor props). */
+export const VENUES = [
+    {
+        id: 'neon_club',
+        label: 'Neon Club',
+        stageShape: 'classic',
+        background: 'retrowave',
+        palette: 'neon',
+        fog: '#12021f',
+        floor: 0x0b0716,
+        stage: 0x140f24,
+        ambient: 0x3a2a5c,
+        hemiSky: 0x6f4dff,
+        hemiGround: 0x120820,
+        tile: '#110022',
+        wall: '#220044',
+        props: ['truss', 'lasers']
+    },
+    {
+        id: 'rooftop',
+        label: 'Rooftop Sunset',
+        stageShape: 'classic',
+        background: 'city',
+        palette: 'sunset',
+        fog: '#1a0810',
+        floor: 0x120a0c,
+        stage: 0x1a1018,
+        ambient: 0x4a2818,
+        hemiSky: 0xff8844,
+        hemiGround: 0x1a0808,
+        tile: '#221008',
+        wall: '#331408',
+        props: ['skyline', 'stringlights']
+    },
+    {
+        id: 'ice_palace',
+        label: 'Ice Palace',
+        stageShape: 'classic',
+        background: 'nebula',
+        palette: 'ice',
+        fog: '#061018',
+        floor: 0x081018,
+        stage: 0x0c1824,
+        ambient: 0x1a3048,
+        hemiSky: 0x88ccff,
+        hemiGround: 0x061018,
+        tile: '#081828',
+        wall: '#0a2840',
+        props: ['crystals', 'truss']
+    },
+    {
+        id: 'warehouse',
+        label: 'Warehouse Rave',
+        stageShape: 'classic',
+        background: 'tunnel',
+        palette: 'toxic',
+        fog: '#041208',
+        floor: 0x060a06,
+        stage: 0x0a120a,
+        ambient: 0x1a3010,
+        hemiSky: 0x88ff44,
+        hemiGround: 0x040804,
+        tile: '#081008',
+        wall: '#0c1808',
+        props: ['pillars', 'lasers']
+    },
+    {
+        id: 'galaxy_hall',
+        label: 'Galaxy Hall',
+        stageShape: 'classic',
+        background: 'starfield',
+        palette: 'neon',
+        fog: '#04061a',
+        floor: 0x08041a,
+        stage: 0x100828,
+        ambient: 0x281848,
+        hemiSky: 0x8866ff,
+        hemiGround: 0x08041a,
+        tile: '#100828',
+        wall: '#180840',
+        props: ['discoball', 'arches', 'lasers']
+    },
+    {
+        id: 'festival',
+        label: 'Festival Main',
+        stageShape: 'classic',
+        background: 'equalizer',
+        palette: 'sunset',
+        fog: '#140818',
+        floor: 0x100810,
+        stage: 0x180c18,
+        ambient: 0x401028,
+        hemiSky: 0xff4488,
+        hemiGround: 0x180810,
+        tile: '#180818',
+        wall: '#280818',
+        props: ['festival', 'stringlights']
+    },
+    {
+        id: 'concert_arch',
+        label: 'Concert Arch',
+        stageShape: 'concert',
+        background: 'plasma',
+        palette: 'candy',
+        fog: '#0e0816',
+        floor: 0x0f0c18,
+        stage: 0x1a0f24,
+        ambient: 0x3a1050,
+        hemiSky: 0xff66cc,
+        hemiGround: 0x160810,
+        tile: '#1a0828',
+        wall: '#280838',
+        props: ['arches']
+    },
+    {
+        id: 'neon_arch_ice',
+        label: 'Ice Arch',
+        stageShape: 'concert',
+        background: 'nebula',
+        palette: 'ice',
+        fog: '#04101c',
+        floor: 0x081020,
+        stage: 0x0c1830,
+        ambient: 0x103050,
+        hemiSky: 0x66ccff,
+        hemiGround: 0x060e18,
+        tile: '#0a1828',
+        wall: '#0c2040',
+        props: ['arches']
+    }
+];
+
+export const VENUE_IDS = VENUES.map((v) => v.id);
+
+export function getVenue(id) {
+    return VENUES.find((v) => v.id === id) || VENUES[0];
+}

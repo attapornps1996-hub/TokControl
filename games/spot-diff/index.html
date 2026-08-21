@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จับผิดภาพ — TokControl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="spot-diff.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/styles/overlay-brand.css">
+    <script src="/js/overlay-brand.js" defer></script>
+</head>
+<body>
+<script src="/js/overlay-widget-boot.js"></script>
+<div class="sd-bg" aria-hidden="true"></div>
+<div id="sdRoot" class="sd-app">
+    <header class="sd-top">
+        <div class="sd-top-left">
+            <button type="button" class="sd-icon-btn" id="sdBackBtn" title="กลับ">←</button>
+            <div class="sd-brand">
+                <h1>จับผิดภาพ <span>🔍</span></h1>
+                <p>หาความแตกต่างให้ครบ!</p>
+            </div>
+        </div>
+        <div class="sd-stat-row">
+            <div class="sd-stat">
+                <span class="sd-stat-ico">⭐</span>
+                <div><small>คะแนน</small><b id="sdScore">0</b></div>
+            </div>
+            <div class="sd-stat">
+                <span class="sd-stat-ico">🏆</span>
+                <div><small>อันดับ</small><b id="sdRank">—</b></div>
+            </div>
+            <div class="sd-stat">
+                <span class="sd-stat-ico">❤️</span>
+                <div><small>ชีวิต</small><b id="sdLives">5 / 5</b></div>
+            </div>
+            <div class="sd-stat timer" id="sdTimerCard">
+                <span class="sd-stat-ico">⏱</span>
+                <div><small>เวลา</small><b id="sdTimer">01:00</b></div>
+            </div>
+        </div>
+        <div class="sd-top-right">
+            <button type="button" class="sd-icon-btn" id="sdStatsBtn" title="สถิติ">📊</button>
+            <button type="button" class="sd-icon-btn" id="sdSettingsBtn" title="ตั้งค่า">⚙️</button>
+            <button type="button" class="sd-icon-btn" id="sdFsBtn" title="เต็มจอ">⛶</button>
+        </div>
+    </header>
+
+    <main class="sd-main">
+        <div id="sdBoardWrap">
+            <div class="sd-frame" id="sdLeftFrame">
+                <div class="sd-grid" id="sdLeftGrid"></div>
+                <div class="sd-photo-stage" id="sdLeftPhoto">
+                    <div class="sd-photo-fit">
+                        <img id="sdLeftImg" alt="">
+                        <div class="sd-photo-marks" id="sdLeftMarks"></div>
+                        <div class="sd-fx" id="sdLeftFx"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="sd-frame" id="sdRightFrame">
+                <div class="sd-grid" id="sdRightGrid"></div>
+                <div class="sd-photo-stage" id="sdRightPhoto">
+                    <div class="sd-photo-fit">
+                        <img id="sdRightImg" alt="">
+                        <div class="sd-photo-marks" id="sdRightMarks"></div>
+                        <div class="sd-fx" id="sdRightFx"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="sd-toolbar" id="sdPanelControls">
+        <div class="sd-tool-group">
+            <button type="button" class="sd-tool" onclick="sdHintLocal()">
+                💡 เฉลย<span class="sd-badge" id="sdHintBadge">3</span>
+            </button>
+            <button type="button" class="sd-tool" onclick="sdAddTimeLocal()">
+                ⏱ เพิ่มเวลา<span class="sd-badge" id="sdTimeBadge">2</span>
+            </button>
+        </div>
+        <div class="sd-progress">
+            <span>ความคืบหน้า</span>
+            <div class="sd-progress-meta">
+                <b id="sdFound">0 / 0</b>
+                <div class="sd-bar"><i id="sdBarFill"></i></div>
+            </div>
+        </div>
+        <div class="sd-tool-group">
+            <button type="button" class="sd-tool primary" onclick="sdStartGame()">▶ เริ่มเกมใหม่</button>
+        </div>
+    </footer>
+</div>
+
+<div id="sdActionToast"></div>
+<div id="sdOverlayMsg">
+    <h2 id="sdMsgTitle">🎉</h2>
+    <p id="sdMsgBody"></p>
+</div>
+<div id="sdWinOverlay" hidden>
+    <div class="sd-win-stars" id="sdWinStars" aria-hidden="true"></div>
+    <div class="sd-win-card">
+        <div class="sd-win-burst">🎉</div>
+        <h2>ชนะ!</h2>
+        <p id="sdWinBody">หาครบทุกจุดแล้ว</p>
+        <div class="sd-win-actions">
+            <button type="button" class="sd-win-btn" onclick="sdReplayLevel()">เล่นอีกครั้ง</button>
+            <button type="button" class="sd-win-btn primary" onclick="sdNextLevel()">ไปด่านถัดไป</button>
+        </div>
+    </div>
+</div>
+<div id="sdPop" class="sd-pop" hidden>
+    <div class="sd-pop-card" id="sdPopCard"></div>
+</div>
+
+<script src="/js/spot-diff-store.js"></script>
+<script src="spot-diff.js"></script>
+<script>
+(function () {
+    const params = new URLSearchParams(location.search);
+    const isOverlay = params.get('overlay') === '1';
+    const root = document.getElementById('sdRoot');
+    if (isOverlay) root.classList.add('overlay-mode');
+
+    const leftGrid = document.getElementById('sdLeftGrid');
+    const rightGrid = document.getElementById('sdRightGrid');
+    const leftPhoto = document.getElementById('sdLeftPhoto');
+    const rightPhoto = document.getElementById('sdRightPhoto');
+    const leftImg = document.getElementById('sdLeftImg');
+    const rightImg = document.getElementById('sdRightImg');
+    const leftMarks = document.getElementById('sdLeftMarks');
+    const rightMarks = document.getElementById('sdRightMarks');
+    const foundEl = document.getElementById('sdFound');
+    const timerEl = document.getElementById('sdTimer');
+    const timerCard = document.getElementById('sdTimerCard');
+    const toastEl = document.getElementById('sdActionToast');
+    const msgEl = document.getElementById('sdOverlayMsg');
+    const msgTitle = document.getElementById('sdMsgTitle');
+    const msgBody = document.getElementById('sdMsgBody');
+    let socket = null;
+    let streamToken = params.get('token') || '';
+    let broadcastTimer = null;
+    let photoLayoutTimer = null;
+    let winAutoTimer = null;
+    let audioCtx = null;
+
+    function getAudio() {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        if (!audioCtx) audioCtx = new AC();
+        if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+        return audioCtx;
+    }
+
+    function beep(freq, dur, type, gain, at) {
+        const ctx = getAudio();
+        if (!ctx) return;
+        const t0 = ctx.currentTime + (at || 0);
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, t0);
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(gain || 0.08, t0 + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.connect(g);
+        g.connect(ctx.destination);
+        osc.start(t0);
+        osc.stop(t0 + dur + 0.02);
+    }
+
+    function playSfx(kind) {
+        try {
+            if (kind === 'ok') {
+                beep(880, 0.12, 'triangle', 0.07);
+                beep(1320, 0.16, 'sine', 0.045, 0.06);
+            } else if (kind === 'wrong') {
+                beep(180, 0.22, 'square', 0.05);
+            } else if (kind === 'hint') {
+                beep(660, 0.14, 'sine', 0.05);
+                beep(990, 0.18, 'sine', 0.04, 0.1);
+            } else if (kind === 'win') {
+                beep(523, 0.18, 'triangle', 0.07);
+                beep(659, 0.2, 'triangle', 0.07, 0.12);
+                beep(784, 0.22, 'triangle', 0.08, 0.24);
+                beep(1046, 0.35, 'sine', 0.06, 0.38);
+            } else if (kind === 'lose') {
+                beep(320, 0.2, 'sawtooth', 0.04);
+                beep(220, 0.28, 'sawtooth', 0.04, 0.16);
+            }
+        } catch (e) { /* ignore */ }
+    }
+
+    function hideWinOverlay() {
+        const el = document.getElementById('sdWinOverlay');
+        if (el) el.hidden = true;
+        clearTimeout(winAutoTimer);
+    }
+
+    function showWinOverlay(wins) {
+        const el = document.getElementById('sdWinOverlay');
+        const body = document.getElementById('sdWinBody');
+        const stars = document.getElementById('sdWinStars');
+        if (!el) return;
+        if (body) body.textContent = `หาครบทุกจุดแล้ว — รวม ${wins} ครั้ง`;
+        if (stars) {
+            stars.innerHTML = Array.from({ length: 26 }, (_, i) => {
+                const left = 4 + Math.random() * 92;
+                const delay = (Math.random() * 0.7).toFixed(2);
+                const size = 12 + Math.round(Math.random() * 16);
+                return `<span class="sd-win-star" style="left:${left}%;top:${8 + (i % 7) * 6}%;font-size:${size}px;animation-delay:${delay}s">★</span>`;
+            }).join('');
+        }
+        el.hidden = false;
+        playSfx('win');
+        if (isOverlay) {
+            clearTimeout(winAutoTimer);
+            winAutoTimer = setTimeout(() => {
+                hideWinOverlay();
+                if (typeof SpotDiff.nextRound === 'function') SpotDiff.nextRound();
+                else SpotDiff.buildRound(localStorage.getItem('sd_game_mode') || 'normal');
+            }, 4200);
+        }
+    }
+
+    function fmtTime(sec) {
+        const n = Math.max(0, Number(sec) || 0);
+        const m = Math.floor(n / 60);
+        const s = n % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function spawnFx(ok, x, y) {
+        [document.getElementById('sdLeftFx'), document.getElementById('sdRightFx')].forEach((layer) => {
+            if (!layer) return;
+            const ring = document.createElement('span');
+            ring.className = 'sd-ring ' + (ok ? 'ok' : 'bad');
+            ring.style.left = (x * 100) + '%';
+            ring.style.top = (y * 100) + '%';
+            layer.appendChild(ring);
+            setTimeout(() => ring.remove(), 700);
+        });
+        if (!ok) {
+            document.getElementById('sdBoardWrap')?.classList.add('shake');
+            setTimeout(() => document.getElementById('sdBoardWrap')?.classList.remove('shake'), 380);
+        }
+    }
+
+    function layoutPhotoStages() {
+        const geom = window.SpotDiffGeom;
+        if (!geom || typeof geom.fitWrapToImage !== 'function') return;
+        [
+            [leftPhoto, leftImg],
+            [rightPhoto, rightImg]
+        ].forEach(([stage, img]) => {
+            const wrap = stage && stage.querySelector('.sd-photo-fit');
+            if (wrap && img) geom.fitWrapToImage(wrap, img, stage);
+        });
+    }
+
+    function renderPhotoMarks(host, s) {
+        if (!host) return;
+        const wrap = host.parentElement;
+        const box = wrap ? wrap.getBoundingClientRect() : host.getBoundingClientRect();
+        const minSide = Math.min(box.width, box.height) || 1;
+        host.innerHTML = (s.marks || []).map((m, i) => {
+            const found = s.found.includes(i);
+            const hint = s.hintIndex === i;
+            const revealed = s.revealed && !found;
+            if (!found && !hint && !revealed) return '';
+            const size = Math.max(18, Math.round((m.r || 0.05) * minSide * 2));
+            let cls = 'sd-photo-pin';
+            if (found) cls += ' found';
+            if (hint) cls += ' hint';
+            if (revealed) cls += ' revealed';
+            return `<span class="${cls}" style="left:${(m.x * 100).toFixed(2)}%;top:${(m.y * 100).toFixed(2)}%;width:${size}px;height:${size}px;">${found ? '✓' : ''}</span>`;
+        }).join('');
+    }
+
+    function bindGrid(grid, s, clickable) {
+        grid.style.gridTemplateColumns = `repeat(${s.cols}, 1fr)`;
+        grid.innerHTML = '';
+        const icons = grid === leftGrid ? s.left : s.right;
+        icons.forEach((icon, i) => {
+            const el = document.createElement('div');
+            el.className = 'sd-cell';
+            if (s.found.includes(i)) el.classList.add('found');
+            if (s.hintIndex === i) el.classList.add('hint');
+            if (s.revealed && s.diffIndices.includes(i) && !s.found.includes(i)) el.classList.add('revealed');
+            el.textContent = icon;
+            if (clickable && !isOverlay && s.phase === 'playing') {
+                el.addEventListener('click', () => {
+                    if (!SpotDiff.clickCell(i)) {
+                        el.classList.add('wrong-flash');
+                        setTimeout(() => el.classList.remove('wrong-flash'), 400);
+                    }
+                });
+            }
+            grid.appendChild(el);
+        });
+    }
+
+    function render(s) {
+        const photo = !!s.photo;
+        leftGrid.hidden = photo;
+        rightGrid.hidden = photo;
+        leftPhoto.hidden = !photo;
+        rightPhoto.hidden = !photo;
+        root.classList.toggle('is-photo', photo);
+
+        if (photo) {
+            if (leftImg && leftImg.getAttribute('src') !== (s.leftUrl || '')) leftImg.src = s.leftUrl || '';
+            if (rightImg && rightImg.getAttribute('src') !== (s.rightUrl || '')) rightImg.src = s.rightUrl || '';
+            layoutPhotoStages();
+            renderPhotoMarks(leftMarks, s);
+            renderPhotoMarks(rightMarks, s);
+        } else {
+            bindGrid(leftGrid, s, true);
+            bindGrid(rightGrid, s, true);
+        }
+
+        const total = s.totalDiffs || 0;
+        const found = s.foundCount || 0;
+        foundEl.textContent = `${found} / ${total}`;
+        const fill = document.getElementById('sdBarFill');
+        if (fill) fill.style.width = (total ? Math.round((found / total) * 100) : 0) + '%';
+        timerEl.textContent = fmtTime(s.timeLeft);
+        timerCard.classList.toggle('low', s.phase === 'playing' && s.timeLeft <= 10);
+        document.getElementById('sdScore').textContent = Number(s.score || 0).toLocaleString('en-US');
+        document.getElementById('sdRank').textContent = `${s.wins || 0} / ${Math.max(s.rounds || 0, 1)}`;
+        document.getElementById('sdLives').textContent = `${s.lives ?? 5} / ${s.maxLives ?? 5}`;
+        document.getElementById('sdHintBadge').textContent = s.hintLeft ?? 3;
+        const timeBadge = document.getElementById('sdTimeBadge');
+        if (timeBadge) timeBadge.textContent = s.timeBoostLeft ?? 2;
+    }
+
+    function showToast(msg, type) {
+        toastEl.textContent = msg;
+        toastEl.className = type || '';
+        toastEl.classList.add('show');
+        if (type === 'ok' || type === 'wrong' || type === 'hint') playSfx(type);
+        else if (type === 'help') playSfx('ok');
+        setTimeout(() => toastEl.classList.remove('show'), 2200);
+    }
+
+    function showMsg(title, body) {
+        msgTitle.textContent = title;
+        msgBody.textContent = body;
+        msgEl.classList.add('show');
+        setTimeout(() => msgEl.classList.remove('show'), 2400);
+    }
+
+    function broadcastState(s) {
+        if (isOverlay || !socket || !streamToken) return;
+        clearTimeout(broadcastTimer);
+        broadcastTimer = setTimeout(() => {
+            socket.emit('spot_diff_state', { token: streamToken, state: s });
+        }, 40);
+    }
+
+    function onPhotoClick(stage, ev) {
+        const s = SpotDiff.getState();
+        if (!s.photo || s.phase !== 'playing') return;
+        const img = stage.querySelector('img');
+        const geom = window.SpotDiffGeom;
+        let nx;
+        let ny;
+        let boxW;
+        let boxH;
+        if (geom && typeof geom.eventToImageNorm === 'function' && img) {
+            const pt = geom.eventToImageNorm(ev, img, stage);
+            if (!pt) return;
+            nx = pt.x;
+            ny = pt.y;
+            boxW = pt.w;
+            boxH = pt.h;
+        } else {
+            const box = (img || stage).getBoundingClientRect();
+            if (!box.width || !box.height) return;
+            nx = (ev.clientX - box.left) / box.width;
+            ny = (ev.clientY - box.top) / box.height;
+            if (nx < 0 || ny < 0 || nx > 1 || ny > 1) return;
+            boxW = box.width;
+            boxH = box.height;
+        }
+        const res = SpotDiff.clickPhoto(nx, ny, boxW, boxH);
+        spawnFx(!!(res && res.ok), res && res.ok ? res.x : nx, res && res.ok ? res.y : ny);
+    }
+
+    SpotDiff.setOnStateChange((s) => {
+        render(s);
+        broadcastState(s);
+    });
+    SpotDiff.setOnActionToast(showToast);
+    SpotDiff.setOnWin((wins) => {
+        if (socket && streamToken) socket.emit('spot_diff_win', { token: streamToken, wins });
+        setTimeout(() => showWinOverlay(wins), 280);
+    });
+    SpotDiff.setOnLose(() => {
+        playSfx('lose');
+        showMsg('หมดรอบ!', 'กดเริ่มเกมใหม่เพื่อเล่นต่อ');
+        if (socket && streamToken) socket.emit('spot_diff_lose', { token: streamToken });
+    });
+
+    window.sdStartGame = function () {
+        hideWinOverlay();
+        const mode = localStorage.getItem('sd_game_mode') || 'normal';
+        SpotDiff.buildRound(mode);
+    };
+    window.sdReplayLevel = function () {
+        hideWinOverlay();
+        if (typeof SpotDiff.replayRound === 'function') SpotDiff.replayRound();
+        else SpotDiff.buildRound(localStorage.getItem('sd_game_mode') || 'normal');
+    };
+    window.sdNextLevel = function () {
+        hideWinOverlay();
+        if (typeof SpotDiff.nextRound === 'function') SpotDiff.nextRound();
+        else SpotDiff.buildRound(localStorage.getItem('sd_game_mode') || 'normal');
+    };
+    window.sdHintLocal = () => {
+        if (typeof SpotDiff.useHint === 'function') SpotDiff.useHint();
+        else SpotDiff.applyAction('hint', 'สตรีมเมอร์');
+    };
+    window.sdAddTimeLocal = () => {
+        if (typeof SpotDiff.useTimeBoost === 'function') SpotDiff.useTimeBoost();
+        else SpotDiff.applyAction('add_time', 'สตรีมเมอร์', 15);
+    };
+    window.sdRevealLocal = () => SpotDiff.applyAction('reveal', 'สตรีมเมอร์');
+    window.sdResetGame = () => SpotDiff.reset();
+
+    document.getElementById('sdBackBtn')?.addEventListener('click', () => {
+        if (window.opener) window.close();
+        else history.back();
+    });
+    document.getElementById('sdFsBtn')?.addEventListener('click', () => {
+        if (!document.fullscreenElement) root.requestFullscreen?.();
+        else document.exitFullscreen?.();
+    });
+    document.getElementById('sdStatsBtn')?.addEventListener('click', () => {
+        const s = SpotDiff.getState();
+        showMsg('สถิติ', `ชนะ ${s.wins} · รอบ ${s.rounds} · คะแนน ${s.score || 0}`);
+    });
+    document.getElementById('sdSettingsBtn')?.addEventListener('click', () => {
+        showMsg('ตั้งค่า', 'ใช้ปุ่มด้านล่างเพื่อเฉลย / เพิ่มเวลา / เริ่มใหม่');
+    });
+
+    async function initSocket() {
+        if (!streamToken) {
+            try {
+                const res = await fetch('/api/overlay/session');
+                const data = await res.json();
+                if (data.success) streamToken = data.streamToken;
+            } catch (e) {}
+        }
+        socket = io();
+        socket.on('connect', () => {
+            if (streamToken) socket.emit('join_overlay', streamToken);
+        });
+        socket.on('spot_diff_action', (data) => {
+            SpotDiff.applyAction(data.action, data.user, data.amount);
+        });
+        socket.on('spot_diff_sync', (data) => {
+            if (Array.isArray(data.levels)) SpotDiff.setLevels(data.levels);
+            if (data.state) SpotDiff.loadState(data.state);
+            else if (data.mode && !isOverlay) {
+                localStorage.setItem('sd_game_mode', data.mode);
+                if (data.reset) SpotDiff.buildRound(data.mode);
+            }
+        });
+    }
+
+    if (!isOverlay) {
+        leftPhoto.addEventListener('click', (ev) => onPhotoClick(leftPhoto, ev));
+        rightPhoto.addEventListener('click', (ev) => onPhotoClick(rightPhoto, ev));
+        document.addEventListener('pointerdown', () => getAudio(), { once: true });
+    }
+    [leftImg, rightImg].forEach((img) => {
+        img?.addEventListener('load', () => {
+            layoutPhotoStages();
+            const s = SpotDiff.getState();
+            if (s.photo) {
+                renderPhotoMarks(leftMarks, s);
+                renderPhotoMarks(rightMarks, s);
+            }
+        });
+    });
+    window.addEventListener('resize', () => {
+        clearTimeout(photoLayoutTimer);
+        photoLayoutTimer = setTimeout(() => {
+            layoutPhotoStages();
+            const s = SpotDiff.getState();
+            if (s.photo) {
+                renderPhotoMarks(leftMarks, s);
+                renderPhotoMarks(rightMarks, s);
+            }
+        }, 60);
+    });
+
+    initSocket();
+    const boot = (typeof SpotDiff.loadLevelsFromStorage === 'function')
+        ? SpotDiff.loadLevelsFromStorage()
+        : Promise.resolve();
+    Promise.resolve(boot).finally(() => {
+        const savedMode = localStorage.getItem('sd_game_mode');
+        if (savedMode && !isOverlay) SpotDiff.buildRound(savedMode);
+    });
+})();
+</script>
+</body>
+</html>

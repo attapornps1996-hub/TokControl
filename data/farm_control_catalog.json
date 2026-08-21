@@ -1,0 +1,29 @@
+{
+  "actions": [
+    { "id": "expand", "cmd": "fm_expand", "emoji": "⬆", "label": "ขยายฟาร์ม", "type": "help" },
+    { "id": "shrink", "cmd": "fm_shrink", "emoji": "⬇", "label": "ลดขนาดฟาร์ม", "type": "troll" },
+    { "id": "snowman", "cmd": "fm_snowman", "emoji": "☃", "label": "สโนแมนยักษ์ช่วยปลูก", "type": "help" },
+    { "id": "blaze", "cmd": "fm_blaze", "emoji": "🔥", "label": "พ่นไฟยักษ์ (ลบ 3 ช่อง/นัด)", "type": "troll" },
+    { "id": "fire", "cmd": "fm_fire", "emoji": "🔥", "label": "ไฟไหม้นา", "type": "troll" },
+    { "id": "cow", "cmd": "fm_cow", "emoji": "🐄", "label": "วัวกินข้าว", "type": "troll" },
+    { "id": "villager", "cmd": "fm_villager", "emoji": "👨‍🌾", "label": "ชาวบ้านช่วยปลูก", "type": "help" },
+    { "id": "wipe", "cmd": "fm_wipe", "emoji": "🚨", "label": "ล้างนา (Wipe)", "type": "troll" },
+    { "id": "flood", "cmd": "fm_flood", "emoji": "🌊", "label": "น้ำท่วมนา (ดับไฟ)", "type": "help" },
+    { "id": "dragon", "cmd": "fm_dragon", "emoji": "🐉", "label": "มังกรพ่นไฟ", "type": "troll" },
+    { "id": "plant_full", "cmd": "fm_plant_full", "emoji": "🌾", "label": "ปลูกข้าวเต็มทันที", "type": "help" },
+    { "id": "win", "cmd": "fm_win", "emoji": "🎬", "label": "คัทซีนวิน", "type": "fx" },
+    { "id": "lose", "cmd": "fm_lose", "emoji": "🎬", "label": "คัทซีนแพ้", "type": "fx" },
+    { "id": "status", "cmd": "fm_status", "emoji": "📊", "label": "สถานะ", "type": "setup" }
+  ],
+  "default_triggers": [
+    { "giftName": "Rose", "giftId": "5655", "action": "fm_fire" },
+    { "giftName": "Mini Heart", "giftId": "", "action": "fm_cow" },
+    { "giftName": "Ice Cream Cone", "giftId": "", "action": "fm_villager" },
+    { "giftName": "Finger Heart", "giftId": "", "action": "fm_flood" },
+    { "giftName": "Donut", "giftId": "", "action": "fm_expand" },
+    { "giftName": "Perfume", "giftId": "", "action": "fm_blaze" },
+    { "giftName": "GG", "giftId": "", "action": "fm_dragon" },
+    { "giftName": "Cap", "giftId": "", "action": "fm_wipe" },
+    { "giftName": "Love Potion", "giftId": "", "action": "fm_shrink" }
+  ]
+}

@@ -3,31 +3,27 @@ const fs = require('fs');
 const path = require('path');
 
 const buildDir = path.join(__dirname, '..', 'build');
-fs.mkdirSync(buildDir, { recursive: true });
-
-const svg = `<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#ff0050"/>
-      <stop offset="100%" stop-color="#bc13fe"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" rx="96" fill="url(#g)"/>
-  <text x="50%" y="54%" text-anchor="middle" font-family="Arial Black, Arial" font-size="220" font-weight="900" fill="white">T</text>
-</svg>`;
+const rootDir = path.join(__dirname, '..');
+const source = process.argv[2] || path.join(rootDir, 'icon.png');
 
 async function main() {
-  const pngPath = path.join(buildDir, 'icon.png');
-  const icoPath = path.join(buildDir, 'icon.ico');
-  await sharp(Buffer.from(svg)).resize(256, 256).png().toFile(pngPath);
-  await sharp(Buffer.from(svg)).resize(256, 256).toFormat('png').toFile(icoPath.replace('.ico', '-tmp.png'));
-  // electron-builder accepts png and converts; also copy as root icon.png for runtime
-  const rootPng = path.join(__dirname, '..', 'icon.png');
-  fs.copyFileSync(pngPath, rootPng);
-  console.log('Created', pngPath, 'and', rootPng);
+    if (!fs.existsSync(source)) {
+        console.error('Source icon not found:', source);
+        process.exit(1);
+    }
+    fs.mkdirSync(buildDir, { recursive: true });
+    const sizes = [16, 32, 48, 64, 128, 256, 512];
+    for (const size of sizes) {
+        const out = path.join(buildDir, `icon-${size}.png`);
+        await sharp(source).resize(size, size, { fit: 'cover' }).png().toFile(out);
+    }
+    const rootPng = path.join(rootDir, 'icon.png');
+    await sharp(source).resize(512, 512, { fit: 'cover' }).png().toFile(rootPng);
+    fs.copyFileSync(rootPng, path.join(buildDir, 'icon.png'));
+    console.log('Created icon assets from', source);
 }
 
 main().catch((err) => {
-  console.error(err);
-  process.exit(1);
+    console.error(err);
+    process.exit(1);
 });

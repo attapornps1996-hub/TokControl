@@ -1,0 +1,43 @@
+{
+    "group_single_item": {
+        "drop_variants": [
+            {
+                "items": [
+                    "Valuables/03_Medium/Valuable_Radio",
+                ]
+            },
+            {
+                "items": [
+                    "Valuables/03_Medium/Valuable_Vase",
+                ]
+            },
+            {
+                "items": [
+                    "Valuables/03_Medium/Valuable_Clown",
+                ]
+            }
+        ]
+    },
+    "group_duo_items": {
+        "drop_variants": [
+            {
+                "items": [
+                    "Valuables/03_Medium/Valuable_Radio",
+                    "Valuables/03_Medium/Valuable_Fan"
+                ]
+            },
+            {
+                "items": [
+                    "Valuables/03_Medium/Valuable_Vase",
+                    "Valuables/03_Medium/Valuable_Trophy"
+                ]
+            },
+            {
+                "items": [
+                    "Valuables/03_Medium/Valuable_Clown",
+                    "Valuables/02_Small/Valuable_Toy_Monkey"
+                ]
+            }
+        ]
+    }
+}

@@ -39,6 +39,43 @@
         }
     }
 
+    const pendingGiftEvents = new Map();
+    const GIFT_COMBO_DEBOUNCE_MS = 2000;
+
+    function queueGiftEvent(payload) {
+        const key = `${String(payload.uniqueId || '').toLowerCase()}:${String(payload.giftId || payload.giftName || '').toLowerCase()}`;
+        let entry = pendingGiftEvents.get(key);
+        if (!entry) {
+            entry = {
+                payload: {
+                    ...payload,
+                    giftType: 1,
+                    repeatEnd: false
+                },
+                timer: null
+            };
+            pendingGiftEvents.set(key, entry);
+        } else {
+            entry.payload = {
+                ...entry.payload,
+                ...payload,
+                giftType: 1,
+                repeatEnd: false,
+                repeatCount: Math.max(entry.payload.repeatCount || 1, payload.repeatCount || 1)
+            };
+            if (entry.timer) clearTimeout(entry.timer);
+        }
+        entry.timer = setTimeout(() => {
+            const finalPayload = {
+                ...entry.payload,
+                giftType: 1,
+                repeatEnd: true
+            };
+            sendEvent('gift', finalPayload);
+            pendingGiftEvents.delete(key);
+        }, GIFT_COMBO_DEBOUNCE_MS);
+    }
+
     // ฟังก์ชั่นช่วยวิเคราะห์และแยกแยะแชทแบบทนทาน (Robust Chat Parser)
     function parseChatText(text) {
         let lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -72,7 +109,8 @@
         if (cleanLines.length >= 2) {
             const comment = cleanLines[cleanLines.length - 1];
             const nickname = cleanLines[0].replace(/^@/, "");
-            return { nickname, comment };
+            const displayName = cleanLines.length >= 3 ? cleanLines[cleanLines.length - 2].replace(/^@/, "") : nickname;
+            return { nickname, displayName, comment };
         }
         
         return null;
@@ -148,11 +186,27 @@
                             }
 
                             let pseudoGiftId = 0;
-                            for (let i = 0; i < giftName.length; i++) {
-                                pseudoGiftId = (pseudoGiftId << 5) - pseudoGiftId + giftName.charCodeAt(i);
-                                pseudoGiftId |= 0;
+                            const knownIds = {
+                                'rose bouquet': 199, 'ช่อกุหลาบ': 199,
+                                'heart me': 7934, heartme: 7934,
+                                rose: 5655, 'กุหลาบ': 5655, rosa: 5655
+                            };
+                            const nl = giftName.toLowerCase().trim();
+                            if (knownIds[nl] != null) {
+                                pseudoGiftId = knownIds[nl];
+                            } else {
+                                const keys = Object.keys(knownIds).sort((a, b) => b.length - a.length);
+                                for (const k of keys) {
+                                    if (nl.includes(k)) { pseudoGiftId = knownIds[k]; break; }
+                                }
                             }
-                            pseudoGiftId = Math.abs(pseudoGiftId);
+                            if (!pseudoGiftId) {
+                                for (let i = 0; i < giftName.length; i++) {
+                                    pseudoGiftId = (pseudoGiftId << 5) - pseudoGiftId + giftName.charCodeAt(i);
+                                    pseudoGiftId |= 0;
+                                }
+                                pseudoGiftId = Math.abs(pseudoGiftId);
+                            }
                             
                             sendEvent("gift_discovered_from_panel", {
                                 giftId: pseudoGiftId,
@@ -169,6 +223,71 @@
         } catch (e) {
             return false;
         }
+    }
+
+    function detectFanClubInChatNode(node) {
+        if (!node || node.nodeType !== 1) return false;
+        try {
+            const isAvatarImg = (src) => {
+                const s = (src || '').toLowerCase();
+                return s.includes('-avt-') || s.includes('avatar') || s.includes('/avt/') || s.includes('dicebear');
+            };
+
+            for (const img of node.querySelectorAll('img')) {
+                const src = (img.src || '').toLowerCase();
+                const alt = (img.alt || '').toLowerCase();
+                const combined = src + ' ' + alt;
+                if (isAvatarImg(src)) continue;
+                if (/fan|team|subscribe|superfan|fansclub|heart_me|heartme|privilege|member/.test(combined)) return true;
+                if (combined.includes('badge') && !/level|rank|gifter|gift/.test(combined)) return true;
+                const w = img.offsetWidth || img.width || 0;
+                const h = img.offsetHeight || img.height || 0;
+                if (w > 0 && w <= 24 && h > 0 && h <= 24 && !/gift|emoji|sticker/.test(combined)) return true;
+            }
+
+            for (const el of node.querySelectorAll('svg, span, div, i, picture')) {
+                const cls = (el.className && el.className.toString ? el.className.toString() : String(el.className || '')).toLowerCase();
+                const txt = (el.textContent || '').toLowerCase();
+                if (/fan|team|subscribe|vip|superfan|fansclub|heart/.test(cls + txt)) return true;
+                try {
+                    const cs = window.getComputedStyle(el);
+                    const blob = (cs.fill || '') + (cs.color || '') + (cs.backgroundColor || '');
+                    const m = blob.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+                    if (m) {
+                        const r = +m[1], g = +m[2], b = +m[3];
+                        if (r >= 220 && g >= 90 && g <= 190 && b <= 100) return true;
+                    }
+                } catch (e) { /* ignore */ }
+            }
+
+            const html = (node.innerHTML || '').toLowerCase();
+            if (/fansclub|fan_club|teammember|team-member|subscribe|superfan|heart_me|heartme|fanclub/.test(html)) return true;
+        } catch (e) { /* ignore */ }
+        return false;
+    }
+
+    function extractUsernameFromNode(node) {
+        if (!node) return '';
+        try {
+            const links = node.querySelectorAll('a[href*="/@"]');
+            for (const a of links) {
+                const m = (a.getAttribute('href') || '').match(/@([^/?#]+)/);
+                if (m && m[1]) return m[1].replace(/^@/, '');
+            }
+            const atEls = node.querySelectorAll('[class*="username"], [class*="Username"], [data-e2e*="user"]');
+            for (const el of atEls) {
+                const t = (el.textContent || '').trim().replace(/^@/, '');
+                if (t && t.length > 1 && t.length < 40) return t;
+            }
+        } catch (e) { /* ignore */ }
+        return '';
+    }
+
+    function detectFanClubNearNode(node) {
+        for (let n = node, depth = 0; n && depth < 5; n = n.parentElement, depth++) {
+            if (detectFanClubInChatNode(n)) return true;
+        }
+        return false;
     }
 
     // ติดตามแชทและการส่งของขวัญในหน้าเบราว์เซอร์
@@ -188,12 +307,12 @@
                     const singleLineText = text.replace(/\r?\n/g, ' ').trim();
 
                     // วิเคราะห์ของขวัญ
-                    const giftMatch = singleLineText.match(/(.+?)\s+(ส่ง|sent)\s+(.+?)\s*[xX]?\s*(\d+)/i);
+                    const giftMatch = singleLineText.match(/(.+?)\s+(ส่ง|sent)\s+(.+?)(?:\s+แล้ว)?\s*[xX×*]?\s*(\d+)/i);
                     const isGiftMsg = giftMatch && (imgs.length >= 1 || singleLineText.includes("sent") || singleLineText.includes("ส่ง"));
                     
                     if (isGiftMsg) {
                         let uniqueId = giftMatch[1].trim().replace(/^@/, "");
-                        let giftName = giftMatch[3].trim();
+                        let giftName = giftMatch[3].trim().replace(/\s+แล้ว$/u, '').trim();
                         if (giftName.toLowerCase() === 'x' || giftName === '') {
                             giftName = "Gift";
                         }
@@ -233,13 +352,29 @@
                         }
 
                         let pseudoGiftId = 0;
-                        for (let i = 0; i < giftName.length; i++) {
-                            pseudoGiftId = (pseudoGiftId << 5) - pseudoGiftId + giftName.charCodeAt(i);
-                            pseudoGiftId |= 0;
+                        const knownIds = {
+                            'rose bouquet': 199, 'ช่อกุหลาบ': 199,
+                            'heart me': 7934, heartme: 7934,
+                            rose: 5655, 'กุหลาบ': 5655, rosa: 5655
+                        };
+                        const nl = giftName.toLowerCase().trim();
+                        if (knownIds[nl] != null) {
+                            pseudoGiftId = knownIds[nl];
+                        } else {
+                            const keys = Object.keys(knownIds).sort((a, b) => b.length - a.length);
+                            for (const k of keys) {
+                                if (nl.includes(k)) { pseudoGiftId = knownIds[k]; break; }
+                            }
                         }
-                        pseudoGiftId = Math.abs(pseudoGiftId);
+                        if (!pseudoGiftId) {
+                            for (let i = 0; i < giftName.length; i++) {
+                                pseudoGiftId = (pseudoGiftId << 5) - pseudoGiftId + giftName.charCodeAt(i);
+                                pseudoGiftId |= 0;
+                            }
+                            pseudoGiftId = Math.abs(pseudoGiftId);
+                        }
 
-                        sendEvent("gift", {
+                        queueGiftEvent({
                             uniqueId,
                             nickname: uniqueId,
                             giftName,
@@ -295,11 +430,16 @@
 
                         const parsedChat = parseChatText(text);
                         if (parsedChat) {
+                            const isFanClub = detectFanClubNearNode(node);
+                            const handle = extractUsernameFromNode(node) || parsedChat.nickname;
                             sendEvent("chat", { 
-                                uniqueId: parsedChat.nickname, 
-                                nickname: parsedChat.nickname, 
+                                uniqueId: handle, 
+                                nickname: parsedChat.displayName || parsedChat.nickname || handle, 
                                 comment: parsedChat.comment,
-                                profilePictureUrl: userAvatar
+                                profilePictureUrl: userAvatar,
+                                isFanClub: isFanClub,
+                                hasFanClubBadge: isFanClub,
+                                teamMemberLevel: isFanClub ? 1 : 0
                             });
                         }
                     }

@@ -1,0 +1,15 @@
+node_modules
+dist
+out
+build
+release
+.git
+.env
+*.log
+*.zip
+*.jpg
+mods/
+deploy/
+pandy-app-win32-x64/
+TokControl-win32-x64/
+database.db

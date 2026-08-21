@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fish Control HUD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&family=Outfit:wght@700;800;900&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background: transparent;
+        }
+        body { font-family: Outfit, Kanit, sans-serif; }
+        #root {
+            position: absolute; inset: 0;
+            pointer-events: none;
+        }
+        .offline {
+            position: absolute; bottom: 16px; left: 16px;
+            font: 600 12px/1.2 Outfit, sans-serif;
+            color: rgba(255,255,255,.55);
+            text-shadow: 0 1px 2px #000;
+            opacity: 0; transition: opacity .3s;
+        }
+        .offline.is-on { opacity: 1; }
+        .win-banner {
+            position: absolute; left: 50%; top: 16%;
+            transform: translateX(-50%) scale(.92);
+            padding: 12px 32px; border-radius: 16px;
+            background: rgba(8,12,20,.72);
+            color: #ffe566; font: 800 30px/1 Outfit, sans-serif;
+            letter-spacing: .06em; display: none;
+            text-shadow: 0 2px 0 #000;
+            animation: winPulse 1s ease-in-out infinite;
+        }
+        .win-banner.is-on { display: block; }
+        @keyframes winPulse {
+            0%, 100% { transform: translateX(-50%) scale(.96); opacity: .9; }
+            50% { transform: translateX(-50%) scale(1.04); opacity: 1; }
+        }
+        img.px { image-rendering: pixelated; image-rendering: crisp-edges; }
+
+        /* ── 1 CLASSIC — reference capsules ── */
+        .s-classic {
+            position: absolute; top: 28px; right: 28px;
+            display: flex; flex-direction: column; gap: 14px;
+        }
+        .s-classic .pill {
+            display: flex; align-items: center; gap: 14px;
+            min-width: 178px; padding: 10px 24px 10px 12px;
+            border-radius: 22px; border: 3px solid;
+            box-shadow: 0 5px 0 rgba(0,0,0,.28);
+            animation: classicBob 2.8s ease-in-out infinite;
+        }
+        .s-classic .pill--z { animation-delay: .4s; }
+        .s-classic .pill--f { background: #c4a574; border-color: #8b6914; }
+        .s-classic .pill--z { background: #6b7a3a; border-color: #3d4a1f; }
+        .s-classic .ico { width: 48px; height: 48px; }
+        .s-classic .num {
+            font: 900 44px/1 Outfit, sans-serif; color: #fff;
+            font-variant-numeric: tabular-nums;
+        }
+        .s-classic .pill--f .num {
+            text-shadow: -2px -2px 0 #8b6914, 2px -2px 0 #8b6914, -2px 2px 0 #8b6914, 2px 2px 0 #8b6914, 0 3px 0 rgba(0,0,0,.25);
+        }
+        .s-classic .pill--z .num {
+            text-shadow: -2px -2px 0 #3d4a1f, 2px -2px 0 #3d4a1f, -2px 2px 0 #3d4a1f, 2px 2px 0 #3d4a1f, 0 3px 0 rgba(0,0,0,.25);
+        }
+        .s-classic .pill.is-bump { animation: classicBump .4s ease; }
+        @keyframes classicBob {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        @keyframes classicBump {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.1) rotate(-2deg); }
+            100% { transform: scale(1); }
+        }
+
+        /* ── 2 BUOY — floating sea buoy stack ── */
+        .s-buoy {
+            position: absolute; top: 36px; right: 48px;
+            width: 120px; display: flex; flex-direction: column; align-items: center; gap: 18px;
+        }
+        .s-buoy .buoy {
+            position: relative; width: 108px; height: 108px;
+            border-radius: 50%;
+            display: grid; place-items: center;
+            animation: buoyFloat 3.2s ease-in-out infinite;
+        }
+        .s-buoy .buoy--z { animation-delay: .55s; }
+        .s-buoy .buoy--f {
+            background: radial-gradient(circle at 35% 30%, #e8c990, #b8873a 55%, #7a5418);
+            box-shadow: inset -8px -10px 0 rgba(0,0,0,.18), 0 10px 0 #5c3d10;
+        }
+        .s-buoy .buoy--z {
+            background: radial-gradient(circle at 35% 30%, #9cb05a, #5f7030 55%, #334018);
+            box-shadow: inset -8px -10px 0 rgba(0,0,0,.18), 0 10px 0 #243010;
+        }
+        .s-buoy .ring {
+            position: absolute; inset: 8px; border-radius: 50%;
+            border: 3px dashed rgba(255,255,255,.35);
+            animation: buoySpin 12s linear infinite;
+        }
+        .s-buoy .ico { width: 36px; height: 36px; position: absolute; top: 14px; }
+        .s-buoy .num {
+            margin-top: 22px; font: 900 34px/1 Bungee, sans-serif; color: #fff;
+            text-shadow: 0 3px 0 rgba(0,0,0,.35);
+        }
+        .s-buoy .wave {
+            width: 90px; height: 10px; margin-top: -8px;
+            background: radial-gradient(ellipse at center, rgba(80,160,220,.55), transparent 70%);
+            animation: wavePulse 2s ease-in-out infinite;
+        }
+        .s-buoy .buoy.is-bump .num { animation: countPop .45s ease; }
+        @keyframes buoyFloat {
+            0%, 100% { transform: translateY(0) rotate(-3deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+        @keyframes buoySpin { to { transform: rotate(360deg); } }
+        @keyframes wavePulse {
+            0%, 100% { transform: scaleX(.85); opacity: .5; }
+            50% { transform: scaleX(1.15); opacity: .9; }
+        }
+
+        /* ── 3 LCD — retro pixel terminal ── */
+        .s-lcd {
+            position: absolute; top: 24px; right: 24px;
+            width: 220px; padding: 14px 14px 12px;
+            background: #1a2214;
+            border: 4px solid #3d4a2a;
+            box-shadow: inset 0 0 0 2px #0d1208, 0 8px 0 #0a0e06;
+            font-family: "Press Start 2P", monospace;
+        }
+        .s-lcd::before {
+            content: ""; position: absolute; inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.12) 2px, rgba(0,0,0,.12) 4px);
+            pointer-events: none;
+            animation: lcdFlicker 4s steps(2) infinite;
+        }
+        .s-lcd .title {
+            color: #6f8f3a; font-size: 8px; margin-bottom: 10px; letter-spacing: 1px;
+        }
+        .s-lcd .row {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 6px; margin-bottom: 6px;
+            background: #10160c; border: 2px solid #2a3520;
+        }
+        .s-lcd .ico { width: 28px; height: 28px; }
+        .s-lcd .meta { flex: 1; }
+        .s-lcd .label { color: #5a7340; font-size: 7px; margin-bottom: 4px; }
+        .s-lcd .num {
+            color: #b6ef55; font-size: 18px;
+            text-shadow: 0 0 6px rgba(182,239,85,.45);
+            animation: lcdBlink 1.6s steps(1) infinite;
+        }
+        .s-lcd .row.is-bump .num { color: #fff; animation: lcdFlash .5s ease; }
+        @keyframes lcdFlicker {
+            0%, 96%, 100% { opacity: 1; }
+            97% { opacity: .85; }
+            98% { opacity: 1; }
+        }
+        @keyframes lcdBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .82; }
+        }
+        @keyframes lcdFlash {
+            0% { color: #fff; transform: scale(1.2); }
+            100% { color: #b6ef55; transform: scale(1); }
+        }
+
+        /* ── 4 REEL — fishing reel dials ── */
+        .s-reel {
+            position: absolute; top: 20px; right: 20px;
+            display: flex; gap: 16px;
+        }
+        .s-reel .dial {
+            width: 130px; height: 130px; position: relative;
+            display: grid; place-items: center;
+        }
+        .s-reel .rim {
+            position: absolute; inset: 0; border-radius: 50%;
+            border: 8px solid #2c2418;
+            background:
+                conic-gradient(from -90deg, var(--fill) calc(var(--pct) * 1%), #3a3228 0);
+            mask: radial-gradient(farthest-side, transparent calc(100% - 14px), #000 calc(100% - 13px));
+            -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 14px), #000 calc(100% - 13px));
+            transition: background .4s ease;
+            animation: reelIdle 6s linear infinite;
+        }
+        .s-reel .dial--f { --fill: #d4a84a; }
+        .s-reel .dial--z { --fill: #7a9a3a; }
+        .s-reel .face {
+            width: 88px; height: 88px; border-radius: 50%;
+            background: linear-gradient(160deg, #4a3d2c, #2a2218);
+            border: 3px solid #1a140e;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+            box-shadow: inset 0 2px 8px rgba(255,255,255,.08);
+        }
+        .s-reel .ico { width: 28px; height: 28px; }
+        .s-reel .num {
+            font: 800 26px/1 Space Grotesk, sans-serif; color: #f5e6c8;
+            font-variant-numeric: tabular-nums;
+        }
+        .s-reel .dial.is-bump .face { animation: reelKick .5s ease; }
+        @keyframes reelIdle {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.08); }
+            100% { filter: brightness(1); }
+        }
+        @keyframes reelKick {
+            0% { transform: scale(1) rotate(0); }
+            40% { transform: scale(1.08) rotate(8deg); }
+            100% { transform: scale(1) rotate(0); }
+        }
+
+        /* ── 5 TIDE — horizontal tide meters ── */
+        .s-tide {
+            position: absolute; top: 28px; left: 50%;
+            transform: translateX(-50%);
+            display: flex; flex-direction: column; gap: 12px; width: min(520px, 70vw);
+        }
+        .s-tide .bar {
+            position: relative; height: 56px; overflow: hidden;
+            border: 3px solid #1e2a36; background: #0e1620;
+            clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
+        }
+        .s-tide .fill {
+            position: absolute; inset: 0 auto 0 0; width: 0%;
+            transition: width .55s cubic-bezier(.2,.8,.2,1);
+        }
+        .s-tide .bar--f .fill {
+            background: linear-gradient(90deg, #8b6914, #e0b45a 50%, #c4a574);
+            animation: tideShimmer 2.4s linear infinite;
+            background-size: 200% 100%;
+        }
+        .s-tide .bar--z .fill {
+            background: linear-gradient(90deg, #2f3c14, #7a9a3a 50%, #6b7a3a);
+            animation: tideShimmer 2.4s linear infinite reverse;
+            background-size: 200% 100%;
+        }
+        .s-tide .content {
+            position: relative; z-index: 1; height: 100%;
+            display: flex; align-items: center; gap: 12px; padding: 0 28px;
+        }
+        .s-tide .ico { width: 36px; height: 36px; }
+        .s-tide .num {
+            font: 900 30px/1 Outfit, sans-serif; color: #fff;
+            text-shadow: 0 2px 0 rgba(0,0,0,.45);
+            margin-left: auto;
+        }
+        .s-tide .label {
+            font: 700 12px/1 Outfit, sans-serif; color: rgba(255,255,255,.85);
+            letter-spacing: .08em; text-transform: uppercase;
+        }
+        .s-tide .bar.is-bump { animation: tideHit .45s ease; }
+        @keyframes tideShimmer {
+            0% { background-position: 0% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes tideHit {
+            0%, 100% { transform: scaleX(1); }
+            40% { transform: scaleX(1.02); filter: brightness(1.25); }
+        }
+
+        /* ── 6 ARCADE — chunky ticket counters ── */
+        .s-arcade {
+            position: absolute; top: 20px; right: 20px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .s-arcade .cab {
+            width: 200px; padding: 8px;
+            background: #2a1f14;
+            border: 4px solid #5a4024;
+            box-shadow: 0 6px 0 #120d08, inset 0 0 0 2px #3a2a18;
+            transform-origin: right top;
+            animation: arcadeWobble 5s ease-in-out infinite;
+        }
+        .s-arcade .cab--z { animation-delay: .7s; }
+        .s-arcade .marquee {
+            text-align: center; font: 700 10px/1.2 Bungee, sans-serif;
+            color: #f0c060; letter-spacing: .12em; margin-bottom: 6px;
+            animation: marqueeBlink 1.2s steps(2) infinite;
+        }
+        .s-arcade .screen {
+            background: #0a0a12; border: 3px solid #111;
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px;
+        }
+        .s-arcade .ico { width: 40px; height: 40px; }
+        .s-arcade .num {
+            font: 900 40px/1 "Press Start 2P", monospace; color: #ff3b5c;
+            text-shadow: 0 0 8px rgba(255,59,92,.5);
+            font-variant-numeric: tabular-nums;
+        }
+        .s-arcade .cab--z .num { color: #5dff7a; text-shadow: 0 0 8px rgba(93,255,122,.45); }
+        .s-arcade .cab.is-bump { animation: arcadeSlam .4s ease; }
+        @keyframes arcadeWobble {
+            0%, 100% { transform: rotate(0); }
+            50% { transform: rotate(-1.2deg); }
+        }
+        @keyframes marqueeBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .55; }
+        }
+        @keyframes arcadeSlam {
+            0% { transform: scale(1); }
+            35% { transform: scale(1.08) translateY(-4px); }
+            100% { transform: scale(1); }
+        }
+
+        /* ── 7 SPLASH — ink blot organic cards ── */
+        .s-splash {
+            position: absolute; top: 32px; right: 36px;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .s-splash .blot {
+            position: relative; width: 170px; height: 100px;
+            display: flex; align-items: center; gap: 10px; padding: 0 18px 0 14px;
+            animation: splashDrift 3.6s ease-in-out infinite;
+        }
+        .s-splash .blot--z { animation-delay: .5s; }
+        .s-splash .blob {
+            position: absolute; inset: 0;
+            background: #c4a574;
+            border-radius: 42% 58% 48% 52% / 52% 42% 58% 48%;
+            border: 3px solid #8b6914;
+            animation: blobMorph 5s ease-in-out infinite;
+            box-shadow: 0 8px 0 rgba(0,0,0,.2);
+        }
+        .s-splash .blot--z .blob {
+            background: #6b7a3a; border-color: #3d4a1f;
+            animation-delay: -1.5s;
+        }
+        .s-splash .ico, .s-splash .num { position: relative; z-index: 1; }
+        .s-splash .ico { width: 44px; height: 44px; animation: splashIcon 2.2s ease-in-out infinite; }
+        .s-splash .num {
+            font: 900 42px/1 Outfit, sans-serif; color: #fff;
+            text-shadow: 0 3px 0 rgba(0,0,0,.3);
+        }
+        .s-splash .blot.is-bump .blob { animation: blotPop .5s ease; }
+        @keyframes splashDrift {
+            0%, 100% { transform: translate(0,0) rotate(-1deg); }
+            50% { transform: translate(-6px, -8px) rotate(2deg); }
+        }
+        @keyframes blobMorph {
+            0%, 100% { border-radius: 42% 58% 48% 52% / 52% 42% 58% 48%; }
+            33% { border-radius: 58% 42% 55% 45% / 45% 55% 42% 58%; }
+            66% { border-radius: 48% 52% 42% 58% / 58% 48% 52% 42%; }
+        }
+        @keyframes splashIcon {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            50% { transform: translateY(-3px) rotate(-8deg); }
+        }
+        @keyframes blotPop {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.12); }
+            100% { transform: scale(1); }
+        }
+
+        /* ── 8 DOCK — wooden pier signboard ── */
+        .s-dock {
+            position: absolute; top: 18px; left: 24px;
+            width: 240px;
+            transform-origin: top left;
+            animation: dockSway 4.5s ease-in-out infinite;
+        }
+        .s-dock .board {
+            background: linear-gradient(180deg, #8b5a2b, #6b4220);
+            border: 5px solid #3e2410;
+            box-shadow: inset 0 0 0 3px #a06a36, 0 10px 0 #2a1608;
+            padding: 12px 14px 16px;
+            position: relative;
+        }
+        .s-dock .board::before,
+        .s-dock .board::after {
+            content: ""; position: absolute; top: -18px; width: 10px; height: 22px;
+            background: #4a2e14; border: 2px solid #2a1808;
+        }
+        .s-dock .board::before { left: 28px; }
+        .s-dock .board::after { right: 28px; }
+        .s-dock .header {
+            text-align: center; font: 700 11px/1 Bungee, sans-serif;
+            color: #f3d9a4; letter-spacing: .14em; margin-bottom: 10px;
+            text-shadow: 0 2px 0 #3e2410;
+        }
+        .s-dock .row {
+            display: flex; align-items: center; gap: 10px;
+            background: rgba(0,0,0,.22); margin-bottom: 8px;
+            padding: 8px 10px; border: 2px solid rgba(62,36,16,.65);
+        }
+        .s-dock .row:last-child { margin-bottom: 0; }
+        .s-dock .ico { width: 34px; height: 34px; }
+        .s-dock .num {
+            margin-left: auto; font: 900 32px/1 Outfit, sans-serif; color: #fff8e8;
+            text-shadow: 0 2px 0 #2a1608;
+            font-variant-numeric: tabular-nums;
+        }
+        .s-dock .chip {
+            font: 700 10px/1 Outfit, sans-serif; color: #d4b07a;
+            letter-spacing: .06em; text-transform: uppercase;
+        }
+        .s-dock .rope {
+            height: 8px; margin-top: 2px;
+            background: repeating-linear-gradient(90deg, #c4a574 0 8px, #8b6914 8px 16px);
+            opacity: .7; animation: ropeScroll 1.2s linear infinite;
+        }
+        .s-dock .row.is-bump { animation: dockKnock .4s ease; }
+        @keyframes dockSway {
+            0%, 100% { transform: rotate(-1.5deg); }
+            50% { transform: rotate(1.5deg); }
+        }
+        @keyframes ropeScroll {
+            to { background-position: 16px 0; }
+        }
+        @keyframes dockKnock {
+            0%, 100% { transform: translateX(0); }
+            30% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+        }
+
+        @keyframes countPop {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.25); }
+            100% { transform: scale(1); }
+        }
+    </style>
+    <link rel="stylesheet" href="/styles/overlay-brand.css">
+    <script src="/js/overlay-brand.js" defer></script>
+</head>
+<body>
+<script src="/js/overlay-widget-boot.js"></script>
+    <div id="root" aria-live="polite"></div>
+    <div class="win-banner" id="winBanner">WIN 15</div>
+    <div class="offline" id="offline">รอเซิร์ฟ Fish…</div>
+    <script>
+(function () {
+    const FISH_ICO = '/assets/fish-control/pufferfish.png';
+    const ZOMBIE_ICO = '/assets/fish-control/zombie.png';
+
+    const STYLES = [
+        'classic', 'buoy', 'lcd', 'reel', 'tide', 'arcade', 'splash', 'dock'
+    ];
+
+    function resolveStyle() {
+        const q = new URLSearchParams(location.search);
+        if (q.get('style') && STYLES.includes(q.get('style'))) return q.get('style');
+        const path = location.pathname.replace(/\/+$/, '');
+        const m = path.match(/\/overlay\/fish-control(?:\/([^/?#]+))?$/i)
+            || path.match(/fish-control\/overlay\.html/i);
+        if (m && m[1] && STYLES.includes(m[1])) return m[1];
+        // /overlay/fish-control/buoy etc.
+        const parts = path.split('/');
+        const idx = parts.lastIndexOf('fish-control');
+        if (idx >= 0 && parts[idx + 1] && STYLES.includes(parts[idx + 1])) return parts[idx + 1];
+        return 'classic';
+    }
+
+    const style = resolveStyle();
+    const root = document.getElementById('root');
+    const winBanner = document.getElementById('winBanner');
+    const offline = document.getElementById('offline');
+    let lastFish = null;
+    let lastZombie = null;
+    let lastGoal = 35;
+
+    function markup() {
+        switch (style) {
+            case 'buoy':
+                return `<div class="s-buoy">
+                    <div class="buoy buoy--f" data-fish><div class="ring"></div>
+                        <img class="px ico" src="${FISH_ICO}" alt=""><div class="num" data-fish-num>0</div></div>
+                    <div class="wave"></div>
+                    <div class="buoy buoy--z" data-zombie><div class="ring"></div>
+                        <img class="px ico" src="${ZOMBIE_ICO}" alt=""><div class="num" data-zombie-num>0</div></div>
+                    <div class="wave"></div>
+                </div>`;
+            case 'lcd':
+                return `<div class="s-lcd">
+                    <div class="title">FISH CTRL // LIVE</div>
+                    <div class="row" data-fish>
+                        <img class="px ico" src="${FISH_ICO}" alt="">
+                        <div class="meta"><div class="label">REMAIN</div><div class="num" data-fish-num>0</div></div>
+                    </div>
+                    <div class="row" data-zombie>
+                        <img class="px ico" src="${ZOMBIE_ICO}" alt="">
+                        <div class="meta"><div class="label">ZOMBIE</div><div class="num" data-zombie-num>0</div></div>
+                    </div>
+                </div>`;
+            case 'reel':
+                return `<div class="s-reel">
+                    <div class="dial dial--f" data-fish style="--pct:0">
+                        <div class="rim"></div>
+                        <div class="face"><img class="px ico" src="${FISH_ICO}" alt=""><div class="num" data-fish-num>0</div></div>
+                    </div>
+                    <div class="dial dial--z" data-zombie style="--pct:0">
+                        <div class="rim"></div>
+                        <div class="face"><img class="px ico" src="${ZOMBIE_ICO}" alt=""><div class="num" data-zombie-num>0</div></div>
+                    </div>
+                </div>`;
+            case 'tide':
+                return `<div class="s-tide">
+                    <div class="bar bar--f" data-fish>
+                        <div class="fill" data-fish-fill></div>
+                        <div class="content">
+                            <img class="px ico" src="${FISH_ICO}" alt="">
+                            <span class="label">เหลือตก</span>
+                            <span class="num" data-fish-num>0</span>
+                        </div>
+                    </div>
+                    <div class="bar bar--z" data-zombie>
+                        <div class="fill" data-zombie-fill></div>
+                        <div class="content">
+                            <img class="px ico" src="${ZOMBIE_ICO}" alt="">
+                            <span class="label">ซอมบี้</span>
+                            <span class="num" data-zombie-num>0</span>
+                        </div>
+                    </div>
+                </div>`;
+            case 'arcade':
+                return `<div class="s-arcade">
+                    <div class="cab cab--f" data-fish>
+                        <div class="marquee">FISH LEFT</div>
+                        <div class="screen"><img class="px ico" src="${FISH_ICO}" alt=""><div class="num" data-fish-num>0</div></div>
+                    </div>
+                    <div class="cab cab--z" data-zombie>
+                        <div class="marquee">ZOMBIES</div>
+                        <div class="screen"><img class="px ico" src="${ZOMBIE_ICO}" alt=""><div class="num" data-zombie-num>0</div></div>
+                    </div>
+                </div>`;
+            case 'splash':
+                return `<div class="s-splash">
+                    <div class="blot blot--f" data-fish><div class="blob"></div>
+                        <img class="px ico" src="${FISH_ICO}" alt=""><div class="num" data-fish-num>0</div></div>
+                    <div class="blot blot--z" data-zombie><div class="blob"></div>
+                        <img class="px ico" src="${ZOMBIE_ICO}" alt=""><div class="num" data-zombie-num>0</div></div>
+                </div>`;
+            case 'dock':
+                return `<div class="s-dock">
+                    <div class="board">
+                        <div class="header">PIER BOARD</div>
+                        <div class="row" data-fish>
+                            <img class="px ico" src="${FISH_ICO}" alt="">
+                            <span class="chip">เหลือ</span>
+                            <span class="num" data-fish-num>0</span>
+                        </div>
+                        <div class="row" data-zombie>
+                            <img class="px ico" src="${ZOMBIE_ICO}" alt="">
+                            <span class="chip">ซอมบี้</span>
+                            <span class="num" data-zombie-num>0</span>
+                        </div>
+                        <div class="rope"></div>
+                    </div>
+                </div>`;
+            default: // classic
+                return `<div class="s-classic">
+                    <div class="pill pill--f" data-fish>
+                        <img class="px ico" src="${FISH_ICO}" alt=""><span class="num" data-fish-num>0</span>
+                    </div>
+                    <div class="pill pill--z" data-zombie>
+                        <img class="px ico" src="${ZOMBIE_ICO}" alt=""><span class="num" data-zombie-num>0</span>
+                    </div>
+                </div>`;
+        }
+    }
+
+    root.innerHTML = markup();
+    document.title = 'Fish HUD — ' + style;
+
+    function bump(sel) {
+        const el = root.querySelector(sel);
+        if (!el) return;
+        el.classList.remove('is-bump');
+        void el.offsetWidth;
+        el.classList.add('is-bump');
+    }
+
+    function apply(data) {
+        const fish = data && data.fish ? data.fish : data;
+        const previewMode = new URLSearchParams(location.search).get('preview') === '1'
+            || new URLSearchParams(location.search).get('demo') === '1'
+            || new URLSearchParams(location.search).get('card') === '1';
+        if (!fish || fish.ok === false) {
+            if (!previewMode) offline.classList.add('is-on');
+            return;
+        }
+        offline.classList.remove('is-on');
+        const goal = Math.max(1, Number(fish.goal) || lastGoal || 35);
+        lastGoal = goal;
+        const remaining = Math.max(0, Number(fish.remaining != null ? fish.remaining : goal) || 0);
+        const zombies = Math.max(0, Number(fish.zombies) || 0);
+
+        root.querySelectorAll('[data-fish-num]').forEach((n) => { n.textContent = String(remaining); });
+        root.querySelectorAll('[data-zombie-num]').forEach((n) => { n.textContent = String(zombies); });
+
+        if (style === 'reel') {
+            const fishPct = Math.max(0, Math.min(100, (remaining / goal) * 100));
+            const zPct = Math.max(0, Math.min(100, Math.min(zombies, goal) / goal * 100));
+            const fd = root.querySelector('[data-fish]');
+            const zd = root.querySelector('[data-zombie]');
+            if (fd) fd.style.setProperty('--pct', String(fishPct));
+            if (zd) zd.style.setProperty('--pct', String(zPct));
+        }
+        if (style === 'tide') {
+            const fishFill = root.querySelector('[data-fish-fill]');
+            const zFill = root.querySelector('[data-zombie-fill]');
+            if (fishFill) fishFill.style.width = Math.max(8, Math.min(100, (remaining / goal) * 100)) + '%';
+            if (zFill) zFill.style.width = Math.max(zombies ? 8 : 0, Math.min(100, (Math.min(zombies, goal) / goal) * 100)) + '%';
+        }
+
+        if (lastFish !== null && lastFish !== remaining) bump('[data-fish]');
+        if (lastZombie !== null && lastZombie !== zombies) bump('[data-zombie]');
+        lastFish = remaining;
+        lastZombie = zombies;
+
+        if (fish.winActive) {
+            winBanner.textContent = 'WIN ' + Math.max(0, Number(fish.winSeconds) || 0);
+            winBanner.classList.add('is-on');
+        } else {
+            winBanner.classList.remove('is-on');
+        }
+    }
+
+    async function tick() {
+        try {
+            const res = await fetch('/api/minecraft/fish-status', { cache: 'no-store' });
+            const data = await res.json();
+            if (data && data.success && data.fish && data.fish.ok !== false) {
+                apply(data);
+                return;
+            }
+            if (!isPreview) offline.classList.add('is-on');
+        } catch (e) {
+            if (!isPreview) offline.classList.add('is-on');
+        }
+    }
+
+    const q = new URLSearchParams(location.search);
+    const isPreview = q.get('preview') === '1' || q.get('demo') === '1' || q.get('card') === '1';
+
+    tick();
+    setInterval(tick, 700);
+
+    // โหมดแกลเลอรี่ / พรีวิว — ตัวเลขตัวอย่างถ้ายังไม่มีเซิร์ฟ
+    if (isPreview) {
+        apply({
+            success: true,
+            fish: { ok: true, goal: 35, caught: 8, remaining: 27, zombies: 3, winActive: false }
+        });
+        let demoLeft = 27;
+        setInterval(() => {
+            demoLeft = demoLeft <= 20 ? 27 : demoLeft - 1;
+            apply({
+                success: true,
+                fish: { ok: true, goal: 35, caught: 35 - demoLeft, remaining: demoLeft, zombies: (demoLeft % 5), winActive: false }
+            });
+        }, 2200);
+    }
+})();
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+    "isDisableNotify": false,
+    "notifyParameters": [
+        {
+            "isDisable": false,
+            "imageFileName": "notify.png",
+            "type": "notify_good",
+            "messageTemplate": "<b>%name% <color=#3e3e3e>%template_msg%</color> %message%</b>",
+            "showMessageDuration": 5,
+            "showFadeAnimationDuration": 0.1,
+            "hideFadeAnimationDuration": 0.1,
+            "delayAfterNotify": 1,
+            "notifyHorisontalOffset": 0,
+            "notifyVerticalOffset": -0.425,
+            "fontPath": "Arial",
+            "fontSize": 30,
+            "textPadding": {
+                "bottom": 0,
+                "top": 110,
+                "left": 32,
+                "right": 32
+            },
+            "nicknameTextColor": {
+                "r": 188,
+                "g": 19,
+                "b": 254,
+                "a": 255
+            },
+            "messageTextColor": {
+                "r": 188,
+                "g": 19,
+                "b": 254,
+                "a": 255
+            },
+            "events": []
+        }
+    ]
+}

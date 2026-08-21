@@ -1,0 +1,96 @@
+/* Smooth fluid fills — water-like flow for bars, tanks, counters */
+
+:root {
+    --ov-fluid-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --ov-fluid-dur: 1.35s;
+}
+
+.ov-fluid-fill {
+    transition:
+        width var(--ov-fluid-dur) var(--ov-fluid-ease),
+        height var(--ov-fluid-dur) var(--ov-fluid-ease),
+        stroke-dashoffset var(--ov-fluid-dur) var(--ov-fluid-ease),
+        clip-path 1.45s var(--ov-fluid-ease) !important;
+    will-change: width, height, stroke-dashoffset, clip-path;
+}
+
+/* Horizontal bar wave surface */
+.ov-fluid-fill.ov-fluid-h::after,
+.gl-goal-fill.ov-fluid-fill::after,
+.gfill-classic-fill::after,
+.jar-ov-fill-bar.ov-fluid-fill::after,
+.ad-ov-progress-bar.ov-fluid-fill::after,
+.vote-ov-bar-fill.ov-fluid-fill::after,
+.gl-hud-bar-fill.ov-fluid-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        105deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.08) 35%,
+        rgba(255, 255, 255, 0.38) 50%,
+        rgba(255, 255, 255, 0.08) 65%,
+        transparent 100%
+    );
+    background-size: 220% 100%;
+    animation: ovFluidShimmer 2.8s linear infinite;
+    pointer-events: none;
+    mix-blend-mode: soft-light;
+}
+
+/* Vertical liquid wave (tank, capsule, bottle) */
+.gfill-tank-liquid::before,
+.gfill-bottle-liquid::before,
+.gfill-chest-fill::before,
+.gfill-hopper-fill::before,
+.gfill-tube-fill::before,
+.gl-capsule-fill.ov-fluid-fill::before {
+    animation: ovFluidWave 2.4s ease-in-out infinite !important;
+}
+
+.gfill-layout {
+    --gfill-pct: 0%;
+    transition: --gfill-pct var(--ov-fluid-dur) var(--ov-fluid-ease);
+}
+
+@keyframes ovFluidShimmer {
+    0% { background-position: 120% 0; }
+    100% { background-position: -120% 0; }
+}
+
+@keyframes ovFluidWave {
+    0%, 100% { transform: translateX(0) scaleY(1); opacity: 0.85; }
+    50% { transform: translateX(6%) scaleY(1.08); opacity: 1; }
+}
+
+.gl-goal-fill,
+.gl-capsule-fill,
+.gl-hud-bar-fill,
+.gl-ring-fill,
+.gl-arc-fill,
+.gfill-classic-fill,
+.gfill-tank-liquid,
+.gfill-bottle-liquid,
+.gfill-chest-fill,
+.gfill-hopper-fill,
+.gfill-tube-fill,
+.gfill-vortex-core,
+.jar-ov-fill-bar,
+.ad-ov-progress-bar,
+.vote-ov-bar-fill,
+.rk-bar-fill {
+    transition-duration: var(--ov-fluid-dur) !important;
+    transition-timing-function: var(--ov-fluid-ease) !important;
+}
+
+.gl-blocks-cell,
+.gfill-block {
+    transition: background 0.55s var(--ov-fluid-ease), box-shadow 0.55s var(--ov-fluid-ease), transform 0.45s var(--ov-fluid-ease) !important;
+}
+
+.gl-blocks-cell.is-on,
+.gfill-block.on {
+    transform: scaleY(1.02);
+}

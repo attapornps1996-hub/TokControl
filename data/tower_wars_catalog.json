@@ -1,0 +1,28 @@
+{
+  "actions": [
+    { "id": "build", "cmd": "tw_build", "emoji": "🏰", "label": "รีสร้างแมพ + เตรียม", "type": "setup" },
+    { "id": "prep", "cmd": "tw_prep", "emoji": "⏳", "label": "เตรียมตัว 60วิ", "type": "setup" },
+    { "id": "begin", "cmd": "tw_begin", "emoji": "▶", "label": "เริ่มศึก", "type": "setup" },
+    { "id": "status", "cmd": "tw_status", "emoji": "📊", "label": "สถานะ HUD", "type": "setup" },
+    { "id": "red_mix", "cmd": "tw_red_mix", "emoji": "🔴", "label": "ทดสอบแดง", "type": "troll" },
+    { "id": "blue_mix", "cmd": "tw_blue_mix", "emoji": "🔵", "label": "ทดสอบฟ้า", "type": "help" },
+    { "id": "red_fire", "cmd": "tw_red_fire", "emoji": "🔥", "label": "พลเพลิงแดง", "type": "troll" },
+    { "id": "blue_fire", "cmd": "tw_blue_fire", "emoji": "🔥", "label": "พลเพลิงฟ้า", "type": "help" },
+    { "id": "wave_normal", "cmd": "tw_wave_normal", "emoji": "🧟", "label": "ทหารกลาง", "type": "troll" },
+    { "id": "wave_tnt", "cmd": "tw_wave_tnt", "emoji": "💥", "label": "TNT", "type": "troll" },
+    { "id": "wave_boss", "cmd": "tw_wave_boss", "emoji": "☠️", "label": "ทหารใหญ่", "type": "troll" },
+    { "id": "debuff", "cmd": "tw_debuff", "emoji": "😵", "label": "Debuff", "type": "troll" },
+    { "id": "supply", "cmd": "tw_supply", "emoji": "🧱", "label": "เสบียง", "type": "help" },
+    { "id": "defender", "cmd": "tw_defender", "emoji": "🤖", "label": "Golem", "type": "help" },
+    { "id": "buff", "cmd": "tw_buff", "emoji": "💪", "label": "Buff", "type": "help" },
+    { "id": "big", "cmd": "tw_big", "emoji": "🎁", "label": "ของใหญ่", "type": "troll" }
+  ],
+  "default_triggers": [
+    { "giftName": "Rose", "giftId": "5655", "action": "tw_wave_normal" },
+    { "giftName": "Mini Heart", "giftId": "", "action": "tw_wave_tnt" },
+    { "giftName": "Paper Crane", "giftId": "", "action": "tw_debuff" },
+    { "giftName": "Finger Heart", "giftId": "", "action": "tw_supply" },
+    { "giftName": "Donut", "giftId": "", "action": "tw_defender" },
+    { "giftName": "Perfume", "giftId": "", "action": "tw_buff" }
+  ]
+}

@@ -1,0 +1,15 @@
+name: TokControlMinecraftBridge
+version: '${version}'
+main: com.tokcontrol.minecraft.TokControlPlugin
+api-version: '1.20'
+description: TokControl TikTok Live — แมพต่อบล็อกขอบ Bedrock จากของขวัญ
+authors: [TokControl]
+commands:
+  tokcontrol:
+    description: ตั้งค่าสตรีมเมอร์และแมพขอบ Bedrock
+    usage: /tokcontrol <setplayer|goto|rebuild|admin|fly|status>
+    # ไม่บังคับ permission ที่ YAML — ตรวจในโค้ด (RCON/execute as ถึงปลั๊กอินได้)
+permissions:
+  tokcontrol.admin:
+    description: สิทธิ์แอดมิน TokControl (OP / สตรีมเมอร์)
+    default: op

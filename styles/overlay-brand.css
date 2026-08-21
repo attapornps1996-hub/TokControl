@@ -1,0 +1,7 @@
+/* Overlay brand watermark is off. Enable only with ?brand=1 (class --forced). */
+.tc-overlay-brand {
+  display: none !important;
+}
+.tc-overlay-brand--forced {
+  display: none !important;
+}

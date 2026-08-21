@@ -1,0 +1,25 @@
+# TokControl Minecraft Bridge
+http-port: 8081
+# Shared secret กับแอป (X-TokControl-Token) — launcher เขียนทับอัตโนมัติ
+bridge-token: ""
+streamer-name: Puncheroo
+allow-flight: true
+# auto | box | fish | tower — launcher เขียนทับตอนเปิดเซิร์ฟ
+game-mode: auto
+arena:
+  mode: dynamic-bedrock-border
+  # เริ่มที่ 9x9 (Lv.4) แล้วขยายได้ไม่จำกัด
+  expand-level: 4
+  height: 9
+  size: 9
+  layers: 1
+  layer-height: 9
+  floor-y: -1
+  path-block: DIAMOND_BLOCK
+  base-block: LIME_CONCRETE
+  shell-block: BEDROCK
+  wall-block: BEDROCK
+  build-on-start: true
+win:
+  auto-on-fill: true
+  countdown-seconds: 15

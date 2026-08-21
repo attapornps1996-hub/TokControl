@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>TokControl_REPO_Tiktoklive</AssemblyName>
+    <Description>TokControl WebSocket bridge for R.E.P.O. TikTok Live — spawn items and enemies from stream gifts</Description>
+    <Version>1.3.73</Version>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>10.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <!-- Avoid copying build output into a local plugins/ tree (prevents nested duplicates). -->
+    <CopyFilesToPluginOutputDirectoryOnBuild>false</CopyFilesToPluginOutputDirectoryOnBuild>
+    <CopyFilesToPluginOutputDirectoryOnRun>false</CopyFilesToPluginOutputDirectoryOnRun>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="package.bat;README.md;thunderstore\**\*">
+      <CopyToPluginOutputDirectory>Never</CopyToPluginOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Linkoid.Repo.Plugin.Build" Version="*" PrivateAssets="all" />
+    <PackageReference Include="R.E.P.O.GameLibs.Steam" Version="*-*" PrivateAssets="all" Publicize="true" />
+    <PackageReference Include="Zehs.REPOLib" Version="4.*" />
+    <PackageReference Include="HarmonyX" Version="2.7.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <RestoreAdditionalProjectSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+      https://nuget.windows10ce.com/nuget/v3/index.json
+    </RestoreAdditionalProjectSources>
+  </PropertyGroup>
+</Project>

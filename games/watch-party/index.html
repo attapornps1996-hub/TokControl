@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Watch Party Display — TokControl</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple-glow: rgba(188,19,254,0.55);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --dur: 0.58s;
+  }
+  html, body { width: 100%; height: 100%; background: #000; overflow: hidden; }
+  #stage { position: relative; width: 100%; height: 100%; background: #000; overflow: hidden; }
+  #yt-wrap, #cam-wrap {
+    position: absolute; overflow: hidden; background: #000;
+    will-change: top, left, right, bottom, width, height, transform, opacity, border-radius;
+    transition:
+      top var(--dur) var(--ease), left var(--dur) var(--ease),
+      right var(--dur) var(--ease), bottom var(--dur) var(--ease),
+      width var(--dur) var(--ease), height var(--dur) var(--ease),
+      border-radius calc(var(--dur) * 0.85) var(--ease),
+      opacity 0.42s ease, transform calc(var(--dur) * 0.9) var(--ease),
+      box-shadow 0.45s ease, border-color 0.35s ease;
+  }
+  #yt-wrap { z-index: 1; }
+  #cam-wrap {
+    z-index: 2;
+    border: 2px solid var(--purple-glow);
+    box-shadow: 0 0 22px rgba(188,19,254,0.35);
+  }
+  #yt-wrap.is-hidden, #cam-wrap.is-hidden {
+    opacity: 0 !important; pointer-events: none; transform: scale(0.96);
+  }
+  #yt-scaler {
+    position: absolute; inset: -8% -8%;
+    width: 116%; height: 116%;
+    transform: scale(1.08);
+    transform-origin: center center;
+  }
+  #yt-player, #yt-scaler iframe {
+    width: 100%; height: 100%; border: none; display: block;
+  }
+  #yt-cover {
+    position: absolute; inset: 0; z-index: 6;
+    background: #000; opacity: 0; pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+  #yt-cover.visible { opacity: 1; }
+  #yt-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  #cam-video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover; transform: scaleX(-1);
+    display: block; background: #0a0615;
+  }
+  #cam-video.hidden { opacity: 0; pointer-events: none; }
+  #cam-avatar-wrap {
+    position: absolute; inset: 0;
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 6%;
+    pointer-events: none;
+  }
+  #cam-avatar-wrap.hidden { display: none; }
+  #cam-avatar {
+    max-width: 88%; max-height: 92%;
+    object-fit: contain;
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.55));
+    transition: transform 0.2s ease;
+  }
+  #cam-avatar.talking { transform: scale(1.04) translateY(-2px); }
+  #cam-avatar-aura {
+    position: absolute; bottom: 8%; left: 50%;
+    width: 55%; aspect-ratio: 1;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(188,19,254,0.22) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  #cam-off-label {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #555; font: 600 0.8rem 'Segoe UI', sans-serif;
+    pointer-events: none;
+  }
+  html.wp-landscape #stage { aspect-ratio: 16/9; max-height: 100vh; margin: 0 auto; }
+  html.wp-portrait #stage { aspect-ratio: 9/16; max-height: 100vh; margin: 0 auto; max-width: 100vw; }
+</style>
+<link rel="stylesheet" href="/styles/overlay-brand.css">
+<script src="/js/overlay-brand.js" defer></script>
+</head>
+<body>
+<script src="/js/overlay-widget-boot.js"></script>
+<div id="stage">
+  <div id="yt-wrap">
+    <div id="yt-scaler"><div id="yt-player"></div></div>
+    <div id="yt-cover"><img id="yt-cover-img" alt="" src=""></div>
+  </div>
+  <div id="cam-wrap">
+    <video id="cam-video" autoplay muted playsinline></video>
+    <div id="cam-avatar-wrap" class="hidden">
+      <div id="cam-avatar-aura"></div>
+      <img id="cam-avatar" alt="" src="">
+    </div>
+    <div id="cam-off-label">📷</div>
+  </div>
+</div>
+<script>
+const URL_PARAMS = new URLSearchParams(location.search);
+const IS_LANDSCAPE = URL_PARAMS.get('landscape') === '1';
+const IS_PORTRAIT = URL_PARAMS.get('portrait') === '1';
+const IS_PREVIEW = URL_PARAMS.get('embed') === '1' || URL_PARAMS.get('preview') === '1' || URL_PARAMS.get('mute') === '1';
+const WP_BC = 'tokcontrol-watch-party-v1';
+
+if (IS_LANDSCAPE) document.documentElement.classList.add('wp-landscape');
+if (IS_PORTRAIT) document.documentElement.classList.add('wp-portrait');
+
+const state = {
+  queue: [], current: -1, playing: false,
+  layout: IS_PORTRAIT ? 'portrait-stack' : (IS_LANDSCAPE ? 'landscape' : 'pip'),
+  camOn: false, micOn: false, camStream: null,
+  ytReady: false, pendingVideoId: null,
+  camMode: 'webcam', // webcam | avatar | hybrid
+  avatarIdle: '', avatarTalk: '', avatarTalking: false,
+};
+
+const stage = document.getElementById('stage');
+const ytWrap = document.getElementById('yt-wrap');
+const ytCover = document.getElementById('yt-cover');
+const ytCoverImg = document.getElementById('yt-cover-img');
+const camWrap = document.getElementById('cam-wrap');
+const camVideo = document.getElementById('cam-video');
+const camAvatarWrap = document.getElementById('cam-avatar-wrap');
+const camAvatar = document.getElementById('cam-avatar');
+const camOffLabel = document.getElementById('cam-off-label');
+
+const LAYOUT_RECTS = {
+  fullyt: { yt: { t:0,l:0,w:100,h:100,radius:0,hidden:false }, cam: { hidden:true } },
+  fullcam: { yt: { hidden:true }, cam: { t:0,l:0,w:100,h:100,radius:0,hidden:false } },
+  side: {
+    yt: { t:0,l:0,w:50,h:100,radius:0,hidden:false },
+    cam: { t:0,l:50,w:50,h:100,radius:0,hidden:false,border:false }
+  },
+  landscape: {
+    yt: { t:0,l:0,w:68,h:100,radius:0,hidden:false },
+    cam: { t:0,l:68,w:32,h:100,radius:0,hidden:false,border:false }
+  },
+  stack: {
+    yt: { t:0,l:0,w:100,h:58,radius:0,hidden:false },
+    cam: { t:58,l:0,w:100,h:42,radius:0,hidden:false,border:false }
+  },
+  'portrait-stack': {
+    yt: { t:0,l:0,w:100,h:55,radius:0,hidden:false },
+    cam: { t:55,l:0,w:100,h:45,radius:0,hidden:false,border:false }
+  },
+  'portrait-pip': {
+    yt: { t:0,l:0,w:100,h:100,radius:0,hidden:false },
+    cam: { b:20,right:20,w:220,h:293,radius:14,hidden:false,unit:'px' }
+  },
+  pip: {
+    yt: { t:0,l:0,w:100,h:100,radius:0,hidden:false },
+    cam: { b:16,right:16,w:280,h:158,radius:12,hidden:false,unit:'px' }
+  },
+  'pip-lg': {
+    yt: { t:0,l:0,w:100,h:100,radius:0,hidden:false },
+    cam: { b:16,right:16,w:400,h:225,radius:12,hidden:false,unit:'px' }
+  },
+  'cam-main': {
+    yt: { b:16,l:16,w:280,h:158,radius:12,hidden:false,unit:'px' },
+    cam: { t:0,l:0,w:100,h:100,radius:0,hidden:false,border:false }
+  }
+};
+
+function applyRect(el, rect) {
+  if (!rect || rect.hidden) { el.classList.add('is-hidden'); return; }
+  el.classList.remove('is-hidden');
+  el.style.top = el.style.left = el.style.right = el.style.bottom = 'auto';
+  el.style.width = el.style.height = 'auto';
+  const u = rect.unit === 'px' ? 'px' : '%';
+  if (rect.t != null) el.style.top = rect.t + u;
+  if (rect.l != null) el.style.left = rect.l + u;
+  if (rect.right != null) el.style.right = rect.right + 'px';
+  if (rect.b != null) el.style.bottom = rect.b + (rect.unit === 'px' ? 'px' : u);
+  if (rect.w != null) el.style.width = rect.w + u;
+  if (rect.h != null) el.style.height = rect.h + u;
+  el.style.borderRadius = (rect.radius || 0) + 'px';
+  if (rect.border === false) { el.style.border = 'none'; el.style.boxShadow = 'none'; }
+  else if (el === camWrap) {
+    el.style.border = '2px solid rgba(188,19,254,0.55)';
+    el.style.boxShadow = '0 0 22px rgba(188,19,254,0.35)';
+  } else if (el === ytWrap && rect.unit === 'px') {
+    el.style.border = '2px solid rgba(188,19,254,0.45)';
+    el.style.boxShadow = '0 8px 28px rgba(0,0,0,0.65)';
+  } else { el.style.border = 'none'; el.style.boxShadow = 'none'; }
+}
+
+function setLayout(id) {
+  const rects = LAYOUT_RECTS[id];
+  if (!rects) return;
+  applyRect(ytWrap, rects.yt);
+  applyRect(camWrap, rects.cam);
+  state.layout = id;
+  broadcastState();
+}
+
+function thumbUrl(id) {
+  return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+}
+
+function updateYtCover() {
+  const vid = state.current >= 0 ? state.queue[state.current] : null;
+  if (!vid) { ytCover.classList.remove('visible'); return; }
+  ytCoverImg.src = thumbUrl(vid.id);
+  ytCover.classList.toggle('visible', !state.playing);
+}
+
+function extractVideoId(input) {
+  input = (input || '').trim();
+  if (/^[a-zA-Z0-9_-]{11}$/.test(input)) return input;
+  try {
+    const url = new URL(input.includes('://') ? input : 'https://' + input);
+    if (url.hostname.includes('youtu.be')) return url.pathname.slice(1).split('?')[0];
+    return url.searchParams.get('v') || null;
+  } catch (_) { return null; }
+}
+
+let ytPlayer = null;
+let audioCtx = null, analyser = null, micAnalyserRaf = null;
+
+function loadYtApi() {
+  if (window.YT && window.YT.Player) { onYouTubeIframeAPIReady(); return; }
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  document.head.appendChild(tag);
+}
+
+window.onYouTubeIframeAPIReady = function () {
+  ytPlayer = new YT.Player('yt-player', {
+    width: '100%', height: '100%',
+    playerVars: {
+      autoplay: 0, controls: 0, disablekb: 1, modestbranding: 1,
+      rel: 0, iv_load_policy: 3, playsinline: 1, fs: 0, enablejsapi: 1,
+      cc_load_policy: 3, autohide: 1, showinfo: 0,
+      origin: location.origin || 'http://localhost'
+    },
+    events: {
+      onReady() {
+        state.ytReady = true;
+        if (IS_PREVIEW) { try { ytPlayer.mute(); ytPlayer.setVolume(0); } catch (_) {} }
+        else { try { ytPlayer.unMute(); ytPlayer.setVolume(100); } catch (_) {} }
+        if (state.pendingVideoId) {
+          loadVideo(state.pendingVideoId, state.playing);
+          state.pendingVideoId = null;
+        }
+      },
+      onStateChange(e) {
+        if (e.data === YT.PlayerState.PLAYING) { state.playing = true; ytCover.classList.remove('visible'); }
+        if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+          state.playing = false; updateYtCover();
+        }
+        if (e.data === YT.PlayerState.BUFFERING && state.playing) ytCover.classList.remove('visible');
+        broadcastState();
+      }
+    }
+  });
+};
+
+function loadVideo(id, autoplay) {
+  if (!id) return;
+  if (!ytPlayer || !state.ytReady) {
+    state.pendingVideoId = id; state.playing = !!autoplay; return;
+  }
+  ytCoverImg.src = thumbUrl(id);
+  if (autoplay) { ytPlayer.loadVideoById(id); ytCover.classList.remove('visible'); }
+  else { ytPlayer.cueVideoById(id); updateYtCover(); }
+  state.playing = !!autoplay;
+}
+
+function playIndex(idx) {
+  if (idx < 0 || idx >= state.queue.length) return;
+  state.current = idx;
+  loadVideo(state.queue[idx].id, true);
+  broadcastState();
+}
+
+function togglePlayPause() {
+  if (!ytPlayer || !state.ytReady || state.current < 0) return;
+  const st = ytPlayer.getPlayerState();
+  if (st === YT.PlayerState.PLAYING) {
+    ytPlayer.pauseVideo();
+    state.playing = false;
+    updateYtCover();
+  } else {
+    ytCover.classList.remove('visible');
+    ytPlayer.playVideo();
+    state.playing = true;
+  }
+  broadcastState();
+}
+
+function playNext() {
+  if (!state.queue.length) return;
+  playIndex((state.current + 1) % state.queue.length);
+}
+function playPrev() {
+  if (!state.queue.length) return;
+  playIndex((state.current - 1 + state.queue.length) % state.queue.length);
+}
+
+async function addToQueue(raw) {
+  const id = extractVideoId(raw);
+  if (!id || state.queue.find(v => v.id === id)) return;
+  let title = id;
+  try {
+    const r = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`);
+    if (r.ok) { const d = await r.json(); title = d.title || id; }
+  } catch (_) {}
+  state.queue.push({ id, title });
+  if (state.current < 0) playIndex(0);
+  else broadcastState();
+}
+
+function removeFromQueue(idx) {
+  if (state.current === idx) {
+    if (ytPlayer && state.ytReady) ytPlayer.stopVideo();
+    state.playing = false; state.current = -1; updateYtCover();
+  }
+  state.queue.splice(idx, 1);
+  if (state.current > idx) state.current--;
+  if (state.queue.length && state.current < 0) playIndex(0);
+  broadcastState();
+}
+
+/* ─── Avatar / Webcam ─── */
+function defaultAvatar(seed) {
+  return `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed || 'host')}&backgroundColor=bc13fe`;
+}
+
+function applyCamMode() {
+  const mode = state.camMode || 'webcam';
+  const showCam = (mode === 'webcam' || mode === 'hybrid') && state.camOn;
+  const showAvatar = mode === 'avatar' || mode === 'hybrid';
+  camVideo.classList.toggle('hidden', !showCam);
+  const hasAvatar = !!(state.avatarIdle || state.avatarTalk);
+  camAvatarWrap.classList.toggle('hidden', !showAvatar || !hasAvatar);
+  if (showAvatar && hasAvatar) updateAvatarImage(false);
+  const needsCamLabel = mode === 'webcam' && !state.camOn;
+  const needsAvatarLabel = mode === 'avatar' && !hasAvatar;
+  camOffLabel.style.display = (needsCamLabel || needsAvatarLabel) ? 'flex' : 'none';
+  camOffLabel.textContent = needsAvatarLabel ? '🧑' : '📷';
+}
+
+async function ensureAudioForAvatar() {
+  if (state.camMode === 'webcam') return;
+  if (!state.micOn) return;
+  if (state.camStream && state.camStream.getAudioTracks().length) {
+    startMicAnalyser();
+    return;
+  }
+  try {
+    const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    if (state.camOn && state.camStream) {
+      audioStream.getTracks().forEach(t => t.stop());
+      startMicAnalyser();
+      return;
+    }
+    if (state.camStream) state.camStream.getTracks().forEach(t => t.stop());
+    state.camStream = audioStream;
+    startMicAnalyser();
+  } catch (_) {}
+}
+
+function updateAvatarImage(talking) {
+  const idle = state.avatarIdle || defaultAvatar('wp');
+  const talk = state.avatarTalk || idle;
+  camAvatar.src = talking ? talk : idle;
+  camAvatar.classList.toggle('talking', !!talking);
+}
+
+function setAvatarConfig(cfg) {
+  if (cfg.camMode) state.camMode = cfg.camMode;
+  if (cfg.avatarIdle != null) state.avatarIdle = cfg.avatarIdle;
+  if (cfg.avatarTalk != null) state.avatarTalk = cfg.avatarTalk;
+  if (state.camMode === 'avatar' || state.camMode === 'hybrid') {
+    if (!state.micOn && !IS_PREVIEW) state.micOn = true;
+    ensureAudioForAvatar();
+  }
+  applyCamMode();
+}
+
+function toggleCam() { state.camOn ? stopCam() : startCam(); }
+
+function startMicAnalyser() {
+  stopMicAnalyser();
+  if (!state.camStream || state.camMode === 'webcam') return;
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const src = audioCtx.createMediaStreamSource(state.camStream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    src.connect(analyser);
+    const buf = new Uint8Array(analyser.frequencyBinCount);
+    const tick = () => {
+      if (!analyser) return;
+      analyser.getByteFrequencyData(buf);
+      let sum = 0;
+      for (let i = 0; i < buf.length; i++) sum += buf[i];
+      const level = sum / buf.length / 255;
+      const talking = level > 0.06 && state.micOn;
+      if (talking !== state.avatarTalking) {
+        state.avatarTalking = talking;
+        updateAvatarImage(talking);
+      }
+      micAnalyserRaf = requestAnimationFrame(tick);
+    };
+    tick();
+  } catch (_) {}
+}
+
+function stopMicAnalyser() {
+  if (micAnalyserRaf) cancelAnimationFrame(micAnalyserRaf);
+  micAnalyserRaf = null;
+}
+
+async function startCam() {
+  try {
+    state.camStream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
+      audio: !IS_PREVIEW
+    });
+    camVideo.srcObject = state.camStream;
+    await camVideo.play().catch(() => {});
+    state.camOn = true;
+    state.micOn = !IS_PREVIEW;
+    applyCamMode();
+    startMicAnalyser();
+    broadcastState();
+  } catch (e) { console.warn('[WP] cam:', e); }
+}
+
+function stopCam() {
+  stopMicAnalyser();
+  if (state.camStream) state.camStream.getTracks().forEach(t => t.stop());
+  state.camStream = null;
+  camVideo.srcObject = null;
+  state.camOn = false;
+  applyCamMode();
+  broadcastState();
+}
+
+async function toggleMic() {
+  if (state.camMode === 'avatar' && !state.camStream) {
+    state.micOn = !state.micOn;
+    if (state.micOn) await ensureAudioForAvatar();
+    else {
+      stopMicAnalyser();
+      if (state.camStream && !state.camOn) {
+        state.camStream.getTracks().forEach(t => t.stop());
+        state.camStream = null;
+      }
+    }
+    broadcastState();
+    return;
+  }
+  if (!state.camStream) { await startCam(); return; }
+  const tracks = state.camStream.getAudioTracks();
+  if (!tracks.length) return;
+  state.micOn = !state.micOn;
+  tracks.forEach(t => { t.enabled = state.micOn; });
+  if (state.camMode !== 'webcam') startMicAnalyser();
+  broadcastState();
+}
+
+/* ─── Broadcast ─── */
+let wpBc;
+function broadcastState() {
+  try {
+    wpBc?.postMessage({
+      type: 'state', layout: state.layout, queue: state.queue,
+      current: state.current, playing: state.playing,
+      camOn: state.camOn, micOn: state.micOn,
+      camMode: state.camMode, avatarIdle: state.avatarIdle, avatarTalk: state.avatarTalk
+    });
+  } catch (_) {}
+}
+
+try {
+  wpBc = new BroadcastChannel(WP_BC);
+  wpBc.onmessage = (e) => {
+    const msg = e.data || {};
+    if (msg.type === 'set_layout' && msg.layout) setLayout(msg.layout);
+    if (msg.type === 'queue_add' && msg.url) addToQueue(msg.url);
+    if (msg.type === 'queue_remove' && msg.index != null) removeFromQueue(msg.index);
+    if (msg.type === 'play_index' && msg.index != null) playIndex(msg.index);
+    if (msg.type === 'play_pause') togglePlayPause();
+    if (msg.type === 'play_next') playNext();
+    if (msg.type === 'play_prev') playPrev();
+    if (msg.type === 'toggle_cam') toggleCam();
+    if (msg.type === 'toggle_mic') toggleMic();
+    if (msg.type === 'set_avatar') setAvatarConfig(msg);
+    if (msg.type === 'get_state') broadcastState();
+  };
+} catch (_) {}
+
+try {
+  const saved = JSON.parse(localStorage.getItem('tokcontrol_watch_party') || '{}');
+  if (saved.layout) state.layout = saved.layout;
+  if (saved.camMode) state.camMode = saved.camMode;
+  if (saved.avatarIdle) state.avatarIdle = saved.avatarIdle;
+  if (saved.avatarTalk) state.avatarTalk = saved.avatarTalk;
+} catch (_) {}
+
+setLayout(state.layout);
+applyCamMode();
+if (state.camMode !== 'webcam') ensureAudioForAvatar();
+loadYtApi();
+broadcastState();
+</script>
+</body>
+</html>

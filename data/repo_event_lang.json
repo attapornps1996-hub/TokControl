@@ -1,0 +1,1886 @@
+{
+  "repo_active_nade_duck": {
+    "ru": "Бросить уточку",
+    "en": "Activate Rubber Duck",
+    "th": "เปิดใช้เป็ดยาง (เด้ง)",
+    "es": "Lanzar patito",
+    "uk": "Кинути качечку",
+    "de": "Quietscheente werfen",
+    "ko": "Activate Duck",
+    "ja": "Activate Duck"
+  },
+  "repo_active_nade_expl": {
+    "ru": "Бросить гранату",
+    "en": "Activate Explosive Grenade",
+    "th": "เปิดใช้ระเบิดแรง (Explosive)",
+    "es": "Lanzar granada explosiva",
+    "uk": "Кинути гранату",
+    "de": "Explosivgranate werfen",
+    "ko": "Activate Explosive-nade",
+    "ja": "Activate Explosive-nade"
+  },
+  "repo_active_nade_shock": {
+    "ru": "Бросить шоковую гранату",
+    "en": "Activate Shock-nade",
+    "es": "Lanzar granada eléctrica",
+    "uk": "Кинути шокову гранату",
+    "de": "Schockgranate werfen",
+    "ko": "Activate Shock-nade",
+    "ja": "Activate Shock-nade"
+  },
+  "repo_active_nade_stun": {
+    "ru": "Бросить стан гранату",
+    "en": "Activate Stun-nade",
+    "es": "Lanzar granada aturdidora",
+    "uk": "Кинути флеш гранату",
+    "de": "Betäubungsgranate werfen",
+    "ko": "Activate Stun-nade",
+    "ja": "Activate Stun-nade"
+  },
+  "repo_all_buff_full_restore": {
+    "ru": "Полное восстановление",
+    "en": "Full Restore",
+    "es": "Restauración completa",
+    "uk": "Повне відновлення",
+    "de": "Vollständige Wiederherstellung",
+    "ko": "Full Restore",
+    "ja": "Full Restore"
+  },
+  "repo_all_buff_heal": {
+    "ru": "Небольшое лечение",
+    "en": "Minor Heal",
+    "es": "Curación menor",
+    "uk": "Невелике зцілення",
+    "de": "Kleine Heilung",
+    "ko": "Minor Heal",
+    "ja": "Minor Heal"
+  },
+  "repo_all_buff_hp_average": {
+    "ru": "Усреднить ХП игроков",
+    "en": "Average Players HP",
+    "es": "Promediar la vida de jugadores",
+    "uk": "Усереднити ХП гравців",
+    "de": "Spieler-HP mitteln",
+    "ko": "Average Players HP",
+    "ja": "Average Players HP"
+  },
+  "repo_all_buff_resurrect_all": {
+    "ru": "Воскресить всех",
+    "en": "Revive All Players",
+    "es": "Revivir a todos los jugadores",
+    "uk": "Воскресити всіх",
+    "de": "Alle Spieler wiederbeleben",
+    "ko": "Revive All Players",
+    "ja": "Revive All Players"
+  },
+  "repo_all_buff_resurrect_rand": {
+    "ru": "Воскресить случ. игрока",
+    "en": "Revive Random Player",
+    "es": "Revivir jugador aleatorio",
+    "uk": "Воскресити випадк. гравця",
+    "de": "Zufälligen Spieler wiederbeleben",
+    "ko": "Revive Random Player",
+    "ja": "Revive Random Player"
+  },
+  "repo_all_cart_spread": {
+    "ru": "Раскидать лут в тележке",
+    "en": "Scatter Cart Loot",
+    "th": "ระเบิดของในรถเข็นทันที",
+    "es": "Esparcir botín del carro",
+    "uk": "Розкидати лут у візку",
+    "de": "Beute im Wagen verstreuen",
+    "ko": "Scatter Cart Loot",
+    "ja": "Scatter Cart Loot"
+  },
+  "repo_all_cart_teleport_rand": {
+    "ru": "Случайный телепорт тележки",
+    "en": "Random Cart Teleport",
+    "es": "Teletransporte aleatorio del carro",
+    "uk": "Випадковий телепорт візка",
+    "de": "Zufälliger Karre-Teleport",
+    "ko": "Random Cart Teleport",
+    "ja": "Random Cart Teleport"
+  },
+  "repo_all_cart_teleport_start": {
+    "ru": "Телепорт тележки на старт",
+    "en": "Teleport Cart to Start",
+    "es": "Teletransporte del carro al inicio",
+    "uk": "Телепорт візка на старт",
+    "de": "Karre zum Start teleportieren",
+    "ko": "Teleport Cart to Start",
+    "ja": "Teleport Cart to Start"
+  },
+  "repo_all_debuff_hp_shuffle": {
+    "ru": "Перемешать ХП игроков",
+    "en": "Shuffle Players HP",
+    "es": "Mezclar la vida de jugadores",
+    "uk": "Перемішати ХП гравців",
+    "de": "Spieler-HP mischen",
+    "ko": "Shuffle Players HP",
+    "ja": "Shuffle Players HP"
+  },
+  "repo_all_debuff_hurt": {
+    "ru": "Пощечина",
+    "en": "Slap",
+    "es": "Bofetada",
+    "uk": "Ляпас",
+    "de": "Ohrfeige",
+    "ko": "Slap",
+    "ja": "Slap"
+  },
+  "repo_all_debuff_kill_rand": {
+    "ru": "Уничтожить случ. игрока",
+    "en": "Destruct Random Player",
+    "es": "Eliminar jugador aleatorio",
+    "uk": "Знищити випадк. гравця",
+    "de": "Zufälligen Spieler vernichten",
+    "ko": "Destruct Random Player",
+    "ja": "Destruct Random Player"
+  },
+  "repo_all_goal_dec": {
+    "ru": "Уменьшить денежную цель",
+    "en": "Lower Loot Goal",
+    "es": "Reducir objetivo de botín",
+    "uk": "Зменшити грошову мету",
+    "de": "Beuteziel verringern",
+    "ko": "Lower Loot Goal",
+    "ja": "Lower Loot Goal"
+  },
+  "repo_all_goal_inc": {
+    "ru": "Увеличить денежную цель",
+    "en": "Increase Loot Goal",
+    "es": "Aumentar objetivo de botín",
+    "uk": "Збільшити грошову мету",
+    "de": "Beuteziel erhöhen",
+    "ko": "Increase Loot Goal",
+    "ja": "Increase Loot Goal"
+  },
+  "repo_all_stun_enemies": {
+    "ru": "Уронить врагов",
+    "en": "Stun the Enemies",
+    "es": "Derribar a los enemigos",
+    "uk": "Звалити ворогів",
+    "de": "Gegner umwerfen",
+    "ko": "Stun the Enemies",
+    "ja": "Stun the Enemies"
+  },
+  "repo_all_speak_random": {
+    "ru": "Говорят все",
+    "en": "Everyone Speaks",
+    "th": "ทุกคนพูด (Voice Troll)",
+    "es": "Todos hablan",
+    "uk": "Говорять усі",
+    "de": "Alle sprechen",
+    "ko": "Everyone Speaks",
+    "ja": "Everyone Speaks"
+  },
+  "repo_all_nade_burst": {
+    "ru": "Гранаты у всех",
+    "en": "Grenades From All Players",
+    "th": "ระเบิดออกจากตัวทุกคน",
+    "es": "Granadas de todos",
+    "uk": "Гранати від усіх",
+    "de": "Granaten von allen Spielern",
+    "ko": "Grenades From All Players",
+    "ja": "Grenades From All Players"
+  },
+  "repo_all_nade_duck": {
+    "ru": "Утки у всех",
+    "en": "Ducks From All Players",
+    "th": "ระเบิดเป็ดออกจากตัวทุกคน",
+    "es": "Patos de todos",
+    "uk": "Качки від усіх",
+    "de": "Enten von allen Spielern",
+    "ko": "Ducks From All Players",
+    "ja": "Ducks From All Players"
+  },
+  "repo_all_teleport_rand": {
+    "ru": "Случайный телепорт",
+    "en": "Random Teleport",
+    "es": "Teletransporte aleatorio",
+    "uk": "Випадковий телепорт",
+    "de": "Zufälliger Teleport",
+    "ko": "Random Teleport",
+    "ja": "Random Teleport"
+  },
+  "repo_all_teleport_shuffle": {
+    "ru": "Перемешать игроков",
+    "en": "Shuffle Players",
+    "es": "Mezclar jugadores",
+    "uk": "Перемішати гравців",
+    "de": "Spieler mischen",
+    "ko": "Shuffle Players",
+    "ja": "Shuffle Players"
+  },
+  "repo_all_teleport_start": {
+    "ru": "Телепорт на старт",
+    "en": "Teleport to Start",
+    "es": "Teletransporte al inicio",
+    "uk": "Телепорт на старт",
+    "de": "Teleport zum Start",
+    "ko": "Teleport to Start",
+    "ja": "Teleport to Start"
+  },
+  "repo_item_baseball_bat": {
+    "ru": "Бейсбольная бита",
+    "en": "Baseball Bat",
+    "es": "Bate de Béisbol",
+    "uk": "Бейсбольна бита",
+    "de": "Baseballschläger",
+    "ko": "Baseball Bat",
+    "ja": "Baseball Bat"
+  },
+  "repo_item_book_battery": {
+    "ru": "Улучшение: Батарея",
+    "en": "Upgrade: Head Battery",
+    "es": "Mejora: Batería de Cabeza",
+    "uk": "Покращення: Батарея",
+    "de": "Upgrade: Kopf-Batterie",
+    "ko": "Upgrade: Head Battery",
+    "ja": "Upgrade: Head Battery"
+  },
+  "repo_item_book_climb": {
+    "ru": "Улучшение: Карабканье",
+    "en": "Upgrade: Tumble Climb",
+    "es": "Mejora: Escalada en Caída",
+    "uk": "Покращення: Карабкання",
+    "de": "Upgrade: Kletterrolle",
+    "ko": "Upgrade: Tumble Climb",
+    "ja": "Upgrade: Tumble Climb"
+  },
+  "repo_item_book_energy": {
+    "ru": "Улучшение: Энергия",
+    "en": "Upgrade: Energy",
+    "es": "Mejora: Energía",
+    "uk": "Покращення: Енергія",
+    "de": "Verbesserung: Energie",
+    "ko": "Upgrade: Energy",
+    "ja": "Upgrade: Energy"
+  },
+  "repo_item_book_health": {
+    "ru": "Улучшение: Здоровья",
+    "en": "Upgrade: Health",
+    "es": "Mejora: Salud",
+    "uk": "Покращення: Здоров'я",
+    "de": "Verbesserung: Gesundheit",
+    "ko": "Upgrade: Health",
+    "ja": "Upgrade: Health"
+  },
+  "repo_item_book_jump": {
+    "ru": "Улучшение: +1 Прыжок",
+    "en": "Upgrade: +1 Jump",
+    "es": "Mejora: +1 Salto",
+    "uk": "Покращення: +1 Стрибок",
+    "de": "Verbesserung: +1 Sprung",
+    "ko": "Upgrade: +1 Jump",
+    "ja": "Upgrade: +1 Jump"
+  },
+  "repo_item_book_range": {
+    "ru": "Улучшение: Дальности",
+    "en": "Upgrade: Grab Range",
+    "es": "Mejora: Alcance",
+    "uk": "Покращення: Дальність",
+    "de": "Verbesserung: Reichweite",
+    "ko": "Upgrade: Grab Range",
+    "ja": "Upgrade: Grab Range"
+  },
+  "repo_item_book_rest": {
+    "ru": "Улучшение: Отдых",
+    "en": "Upgrade: Rest",
+    "es": "Mejora: Descanso",
+    "uk": "Покращення: Відпочинок",
+    "de": "Verbesserung: Ruhe",
+    "ko": "Upgrade: Rest",
+    "ja": "Upgrade: Rest"
+  },
+  "repo_item_book_roll": {
+    "ru": "Улучшение: Кувырок",
+    "en": "Upgrade: Launch",
+    "es": "Mejora: Voltereta",
+    "uk": "Покращення: Перекид",
+    "de": "Verbesserung: Purzelbaum",
+    "ko": "Upgrade: Launch",
+    "ja": "Upgrade: Launch"
+  },
+  "repo_item_book_speed": {
+    "ru": "Улучшение: Скорость",
+    "en": "Upgrade: Speed",
+    "es": "Mejora: Velocidad",
+    "uk": "Покращення: Швидкість",
+    "de": "Verbesserung: Geschwindigkeit",
+    "ko": "Upgrade: Speed",
+    "ja": "Upgrade: Speed"
+  },
+  "repo_item_book_strength": {
+    "ru": "Улучшение: Силы",
+    "en": "Upgrade: Strength",
+    "es": "Mejora: Fuerza",
+    "uk": "Покращення: Сила",
+    "de": "Verbesserung: Stärke",
+    "ko": "Upgrade: Strength",
+    "ja": "Upgrade: Strength"
+  },
+  "repo_item_book_wings": {
+    "ru": "Улучшение: Крылья",
+    "en": "Upgrade: Wings",
+    "es": "Mejora: Alas",
+    "uk": "Покращення: Крила",
+    "de": "Verbesserung: Flügel",
+    "ko": "Upgrade: Wings",
+    "ja": "Upgrade: Wings"
+  },
+  "repo_item_bridge": {
+    "ru": "Фазовый мост",
+    "en": "Phase Bridge",
+    "es": "Puente de fase",
+    "uk": "Фазовий міст",
+    "de": "Phasenbrücke",
+    "ko": "Phase Bridge",
+    "ja": "Phase Bridge"
+  },
+  "repo_item_cart_cannon": {
+    "ru": "Телега: Пушка",
+    "en": "Cart: Cannon",
+    "es": "Carro: Cañón",
+    "uk": "Візок: Гармата",
+    "de": "Wagen: Kanone",
+    "ko": "Cart: Cannon",
+    "ja": "Cart: Cannon"
+  },
+  "repo_item_cart_laser": {
+    "ru": "Телега: Лазер",
+    "en": "Cart: Laser",
+    "es": "Carro: Láser",
+    "uk": "Візок: Лазер",
+    "de": "Wagen: Laser",
+    "ko": "Cart: Laser",
+    "ja": "Cart: Laser"
+  },
+  "repo_item_cart_medium": {
+    "ru": "Телега: Большая",
+    "en": "Cart: Large",
+    "es": "Carro: Grande",
+    "uk": "Візок: Великий",
+    "de": "Wagen: Groß",
+    "ko": "Cart: Large",
+    "ja": "Cart: Large"
+  },
+  "repo_item_cart_scooter": {
+    "ru": "Телега: Гоночная",
+    "en": "Cart: Semiscooter",
+    "es": "Carro: Semiscooter",
+    "uk": "Візок: Гоночний",
+    "de": "Wagen: Semiscooter",
+    "ko": "Cart: Semiscooter",
+    "ja": "Cart: Semiscooter"
+  },
+  "repo_item_cart_scooter_small": {
+    "ru": "Телега: Скутер",
+    "en": "Cart: Semiscooter Small",
+    "es": "Carro: Semiscooter pequeño",
+    "uk": "Візок: Скутер",
+    "de": "Wagen: Kleiner Semiscooter",
+    "ko": "Cart: Semiscooter Small",
+    "ja": "Cart: Semiscooter Small"
+  },
+  "repo_item_cart_small": {
+    "ru": "Телега: Маленькая",
+    "en": "Cart: Small",
+    "es": "Carro: Pequeño",
+    "uk": "Візок: Маленький",
+    "de": "Wagen: Klein",
+    "ko": "Cart: Small",
+    "ja": "Cart: Small"
+  },
+  "repo_item_crystal": {
+    "ru": "Энергетический Кристалл",
+    "en": "Power Crystal",
+    "es": "Cristal Energético",
+    "uk": "Енергетичний кристал",
+    "de": "Energiekristall",
+    "ko": "Power Crystal",
+    "ja": "Power Crystal"
+  },
+  "repo_item_drone_energy": {
+    "ru": "Дрон: Батарейка",
+    "en": "Drone: Battery",
+    "es": "Dron: Batería",
+    "uk": "Дрон: Батарейка",
+    "de": "Drohne: Batterie",
+    "ko": "Drone: Battery",
+    "ja": "Drone: Battery"
+  },
+  "repo_item_drone_feather": {
+    "ru": "Дрон: Перышко",
+    "en": "Drone: Feather",
+    "es": "Dron: Pluma",
+    "uk": "Дрон: Пір'їнка",
+    "de": "Drohne: Federleicht",
+    "ko": "Drone: Feather",
+    "ja": "Drone: Feather"
+  },
+  "repo_item_drone_gravity": {
+    "ru": "Дрон: 0 Гравитации",
+    "en": "Drone: Zero Gravity",
+    "es": "Dron: Gravedad Cero",
+    "uk": "Дрон: Нульова гравітація",
+    "de": "Drohne: Null Gravitation",
+    "ko": "Drone: Zero Gravity",
+    "ja": "Drone: Zero Gravity"
+  },
+  "repo_item_drone_roll": {
+    "ru": "Дрон: Кувырок",
+    "en": "Drone: Tumble",
+    "es": "Dron: Voltereta",
+    "uk": "Дрон: Перекид",
+    "de": "Drohne: Purzelbaum",
+    "ko": "Drone: Tumble",
+    "ja": "Drone: Tumble"
+  },
+  "repo_item_drone_shield": {
+    "ru": "Дрон: Щит",
+    "en": "Drone: Shield",
+    "es": "Dron: Escudo",
+    "uk": "Дрон: Щит",
+    "de": "Drohne: Schild",
+    "ko": "Drone: Shield",
+    "ja": "Drone: Shield"
+  },
+  "repo_item_duck_bucket": {
+    "ru": "Анти-утка ведро",
+    "en": "Duck Bucket",
+    "es": "Cubo anti-patos",
+    "uk": "Анти-качине відро",
+    "de": "Anti-Enten-Eimer",
+    "ko": "Duck Bucket",
+    "ja": "Duck Bucket"
+  },
+  "repo_item_extraction_tracker": {
+    "ru": "Детектор Пункта Сдачи",
+    "en": "Extraction Tracker",
+    "es": "Detector de Extracción",
+    "uk": "Детектор пункту здачі",
+    "de": "Extraktionsdetektor",
+    "ko": "Extraction Tracker",
+    "ja": "Extraction Tracker"
+  },
+  "repo_item_frying_pan": {
+    "ru": "Сковорода",
+    "en": "Frying Pan",
+    "es": "Sartén",
+    "uk": "Сковорода",
+    "de": "Bratpfanne",
+    "ko": "Frying Pan",
+    "ja": "Frying Pan"
+  },
+  "repo_item_gun_boltzap": {
+    "ru": "Болтзар",
+    "en": "Boltzar",
+    "es": "Boltzar",
+    "uk": "Больтзар",
+    "de": "Boltzar",
+    "ko": "Boltzar",
+    "ja": "Boltzar"
+  },
+  "repo_item_gun_pulse": {
+    "ru": "Импульсный пистолет",
+    "en": "Pulse Pistol",
+    "es": "Pistola de pulsos",
+    "uk": "Імпульсний пістолет",
+    "de": "Impulspistole",
+    "ko": "Pulse Pistol",
+    "ja": "Pulse Pistol"
+  },
+  "repo_item_handgun": {
+    "ru": "Пистолет",
+    "en": "Handgun",
+    "es": "Pistola",
+    "uk": "Пістолет",
+    "de": "Pistole",
+    "ko": "Handgun",
+    "ja": "Handgun"
+  },
+  "repo_item_health_big": {
+    "ru": "Аптечка: Большая",
+    "en": "Health Pack: Large",
+    "es": "Botiquín: Grande",
+    "uk": "Аптечка: Велика",
+    "de": "Medikit: Groß",
+    "ko": "Health Pack: Large",
+    "ja": "Health Pack: Large"
+  },
+  "repo_item_health_med": {
+    "ru": "Аптечка: Средняя",
+    "en": "Health Pack: Medium",
+    "es": "Botiquín: Mediano",
+    "uk": "Аптечка: Середня",
+    "de": "Medikit: Mittel",
+    "ko": "Health Pack: Medium",
+    "ja": "Health Pack: Medium"
+  },
+  "repo_item_health_small": {
+    "ru": "Аптечка: Малая",
+    "en": "Health Pack: Small",
+    "es": "Botiquín: Pequeño",
+    "uk": "Аптечка: Мала",
+    "de": "Medikit: Klein",
+    "ko": "Health Pack: Small",
+    "ja": "Health Pack: Small"
+  },
+  "repo_item_inflatable_hammer": {
+    "ru": "Надувной Молоток",
+    "en": "Inflatable Hammer",
+    "es": "Martillo Inflable",
+    "uk": "Надувний молоток",
+    "de": "Aufblasbarer Hammer",
+    "ko": "Inflatable Hammer",
+    "ja": "Inflatable Hammer"
+  },
+  "repo_item_melee_prodzap": {
+    "ru": "Шок-палка",
+    "en": "Prodzap",
+    "es": "Vara eléctrica",
+    "uk": "Шок-палиця",
+    "de": "Elektrostab",
+    "ko": "Prodzap",
+    "ja": "Prodzap"
+  },
+  "repo_item_mine_expl": {
+    "ru": "Противопехотная мина",
+    "en": "Mine: Explosive",
+    "es": "Mina Explosiva",
+    "uk": "Протипіхотна міна",
+    "de": "Sprengmine",
+    "ko": "Mine: Explosive",
+    "ja": "Mine: Explosive"
+  },
+  "repo_item_mine_shock": {
+    "ru": "Шоковая мина",
+    "en": "Mine: Shockwave",
+    "es": "Mina de Choque",
+    "uk": "Шокова міна",
+    "de": "Schockmine",
+    "ko": "Mine: Shockwave",
+    "ja": "Mine: Shockwave"
+  },
+  "repo_item_mine_stun": {
+    "ru": "Капкан",
+    "en": "Mine: Stun",
+    "es": "Mina Aturdidora",
+    "uk": "Пастка",
+    "de": "Betäubungsmine",
+    "ko": "Mine: Stun",
+    "ja": "Mine: Stun"
+  },
+  "repo_item_nade_duck_f1": {
+    "ru": "Связка гранат",
+    "en": "Grenade: Duct Taped",
+    "th": "ระเบิดพันเทป (ไม่ใช่เป็ด)",
+    "es": "Granadas Atadas",
+    "uk": "Зв'язка гранат",
+    "de": "Granatenbündel",
+    "ko": "Grenade: Duct Taped",
+    "ja": "Grenade: Duct Taped"
+  },
+  "repo_item_nade_expl": {
+    "ru": "Граната",
+    "en": "Grenade: Explosion",
+    "th": "ระเบิดแรง (Explosion)",
+    "es": "Granada Explosiva",
+    "uk": "Граната",
+    "de": "Sprenggranate",
+    "ko": "Grenade: Explosion",
+    "ja": "Grenade: Explosion"
+  },
+  "repo_item_nade_f1": {
+    "ru": "Лимонка",
+    "en": "Grenade: Frag",
+    "es": "Granada de Fragmentación",
+    "uk": "Граната Ф-1",
+    "de": "Splittergranate",
+    "ko": "Grenade: Frag",
+    "ja": "Grenade: Frag"
+  },
+  "repo_item_nade_shock": {
+    "ru": "Шоковая граната",
+    "en": "Grenade: Shockwave",
+    "es": "Granada de Choque",
+    "uk": "Шокова граната",
+    "de": "Schockgranate",
+    "ko": "Grenade: Shockwave",
+    "ja": "Grenade: Shockwave"
+  },
+  "repo_item_nade_stun": {
+    "ru": "Оглушающая граната",
+    "en": "Grenade: Stun",
+    "es": "Granada Aturdidora",
+    "uk": "Світлошумова граната",
+    "de": "Blendgranate",
+    "ko": "Grenade: Stun",
+    "ja": "Grenade: Stun"
+  },
+  "repo_item_photon_blaster": {
+    "ru": "Фотонный бластер",
+    "en": "Photon Blaster",
+    "es": "Bláster de fotones",
+    "uk": "Фотонний бластер",
+    "de": "Photonenblaster",
+    "ko": "Photon Blaster",
+    "ja": "Photon Blaster"
+  },
+  "repo_item_revive": {
+    "ru": "Дефибро",
+    "en": "Defibro",
+    "es": "Defibro",
+    "uk": "Дефібро",
+    "de": "Defibro",
+    "ko": "Defibro",
+    "ja": "Defibro"
+  },
+  "repo_item_rubber_duck": {
+    "ru": "Резиновая утя",
+    "en": "Rubber Duck",
+    "es": "Patito de Goma",
+    "uk": "Гумова качечка",
+    "de": "Gummiente",
+    "ko": "Rubber Duck",
+    "ja": "Rubber Duck"
+  },
+  "repo_item_shotgun": {
+    "ru": "Дробовик",
+    "en": "Shotgun",
+    "es": "Escopeta",
+    "uk": "Дробовик",
+    "de": "Schrotflinte",
+    "ko": "Shotgun",
+    "ja": "Shotgun"
+  },
+  "repo_item_sledge_hammer": {
+    "ru": "Кувалда",
+    "en": "Sledgehammer",
+    "es": "Mazo",
+    "uk": "Кувалда",
+    "de": "Vorschlaghammer",
+    "ko": "Sledgehammer",
+    "ja": "Sledgehammer"
+  },
+  "repo_item_sphere_gravity": {
+    "ru": "Шар: 0 Гравитации",
+    "en": "Orb: Zero Gravity",
+    "es": "Esfera: Gravedad Cero",
+    "uk": "Сфера: Нульова гравітація",
+    "de": "Sphäre: Null Gravitation",
+    "ko": "Orb: Zero Gravity",
+    "ja": "Orb: Zero Gravity"
+  },
+  "repo_item_staff_gravity": {
+    "ru": "Посох: Гравитации",
+    "en": "Staff: Zero Gravity",
+    "es": "Bastón: Gravedad cero",
+    "uk": "Посох: Гравітації",
+    "de": "Stab: Schwerelosigkeit",
+    "ko": "Staff: Zero Gravity",
+    "ja": "Staff: Zero Gravity"
+  },
+  "repo_item_staff_torque": {
+    "ru": "Посох: Закручивания",
+    "en": "Staff: Torque",
+    "es": "Bastón: Torsión",
+    "uk": "Посох: Обертання",
+    "de": "Stab: Drehmoment",
+    "ko": "Staff: Torque",
+    "ja": "Staff: Torque"
+  },
+  "repo_item_staff_void": {
+    "ru": "Посох: Пустоты",
+    "en": "Staff: Void",
+    "es": "Bastón: Vacío",
+    "uk": "Посох: Порожнеча",
+    "de": "Stab: Leere",
+    "ko": "Staff: Void",
+    "ja": "Staff: Void"
+  },
+  "repo_item_sword": {
+    "ru": "Меч",
+    "en": "Sword",
+    "es": "Espada",
+    "uk": "Меч",
+    "de": "Schwert",
+    "ko": "Sword",
+    "ja": "Sword"
+  },
+  "repo_item_tranq": {
+    "ru": "Транкливизатор",
+    "en": "Tranquilizer Gun",
+    "es": "Pistola Tranquilizante",
+    "uk": "Транквілізатор",
+    "de": "Betäubungspistole",
+    "ko": "Tranquilizer Gun",
+    "ja": "Tranquilizer Gun"
+  },
+  "repo_item_valuable_tracker": {
+    "ru": "Детектор Предметов",
+    "en": "Valuable Tracker",
+    "es": "Detector de Objetos",
+    "uk": "Детектор предметів",
+    "de": "Gegenstandsdetektor",
+    "ko": "Valuable Tracker",
+    "ja": "Valuable Tracker"
+  },
+  "repo_item_walkie_talkie": {
+    "ru": "Полубот связи",
+    "en": "Semibot Walkie",
+    "es": "Walkie Semibot",
+    "uk": "Напівбот-Рація",
+    "de": "Semibot-Walkie",
+    "ko": "Semibot Walkie",
+    "ja": "Semibot Walkie"
+  },
+  "repo_loot_ac_blender": {
+    "ru": "Блендер",
+    "en": "Blender",
+    "es": "Licuadora",
+    "uk": "Блендер",
+    "de": "Mixer",
+    "ko": "Blender",
+    "ja": "Blender"
+  },
+  "repo_loot_ac_boombox": {
+    "ru": "Бумбокс",
+    "en": "Boombox",
+    "es": "Radiocasete",
+    "uk": "Бумбокс",
+    "de": "Boombox",
+    "ko": "Boombox",
+    "ja": "Boombox"
+  },
+  "repo_loot_ac_gumball": {
+    "ru": "Жвачкомат",
+    "en": "Gumball",
+    "es": "Máquina de chicles",
+    "uk": "Жуйкомат",
+    "de": "Kaugummiautomat",
+    "ko": "Gumball",
+    "ja": "Gumball"
+  },
+  "repo_loot_ac_trafic_light": {
+    "ru": "Светофор",
+    "en": "Traffic Light",
+    "es": "Semáforo",
+    "uk": "Світлофор",
+    "de": "Ampel",
+    "ko": "Traffic Light",
+    "ja": "Traffic Light"
+  },
+  "repo_loot_animal_crate": {
+    "ru": "Запечатанная коробка",
+    "en": "Sealed Crate",
+    "es": "Caja sellada",
+    "uk": "Запечатана коробка",
+    "de": "Versiegelte Kiste",
+    "ko": "Sealed Crate",
+    "ja": "Sealed Crate"
+  },
+  "repo_loot_baby_head": {
+    "ru": "Голова куклы",
+    "en": "Baby Doll Head",
+    "es": "Cabeza de muñeca",
+    "uk": "Голова ляльки",
+    "de": "Puppenkopf",
+    "ko": "Baby Doll Head",
+    "ja": "Baby Doll Head"
+  },
+  "repo_loot_barrel": {
+    "ru": "Взрывоопасная бочка",
+    "en": "Explosive Barrel",
+    "es": "Barril explosivo",
+    "uk": "Вибухонебезпечна бочка",
+    "de": "Explosives Fass",
+    "ko": "Explosive Barrel",
+    "ja": "Explosive Barrel"
+  },
+  "repo_loot_bottle": {
+    "ru": "Шампанское",
+    "en": "Champagne",
+    "es": "Champán",
+    "uk": "Шампанське",
+    "de": "Champagner",
+    "ko": "Champagne",
+    "ja": "Champagne"
+  },
+  "repo_loot_broom": {
+    "ru": "Волшебная метла",
+    "en": "Magic Broom",
+    "es": "Escoba mágica",
+    "uk": "Чарівна мітла",
+    "de": "Magischer Besen",
+    "ko": "Magic Broom",
+    "ja": "Magic Broom"
+  },
+  "repo_loot_clown": {
+    "ru": "Клоун",
+    "en": "Clown",
+    "es": "Payaso",
+    "uk": "Клоун",
+    "de": "Clown",
+    "ko": "Clown",
+    "ja": "Clown"
+  },
+  "repo_loot_coffin": {
+    "ru": "Гроб",
+    "en": "Coffin",
+    "es": "Ataúd",
+    "uk": "Труна",
+    "de": "Sarg",
+    "ko": "Coffin",
+    "ja": "Coffin"
+  },
+  "repo_loot_creature_leg": {
+    "ru": "Нога чудища",
+    "en": "Creature Leg",
+    "es": "Pata de criatura",
+    "uk": "Нога чудовиська",
+    "de": "Kreaturenbein",
+    "ko": "Creature Leg",
+    "ja": "Creature Leg"
+  },
+  "repo_loot_dinosaur": {
+    "ru": "Динозавр",
+    "en": "Dinosaur",
+    "es": "Dinosaurio",
+    "uk": "Динозавр",
+    "de": "Dinosaurier",
+    "ko": "Dinosaur",
+    "ja": "Dinosaur"
+  },
+  "repo_loot_doll": {
+    "ru": "Одержимая кукла",
+    "en": "Possessed Doll",
+    "es": "Muñeca poseída",
+    "uk": "Одержима лялька",
+    "de": "Besessene Puppe",
+    "ko": "Possessed Doll",
+    "ja": "Possessed Doll"
+  },
+  "repo_loot_dragon_skull": {
+    "ru": "Череп Дракона",
+    "en": "Dragon Skull",
+    "es": "Cráneo de Dragón",
+    "uk": "Череп Дракона",
+    "de": "Drachenschädel",
+    "ko": "Dragon Skull",
+    "ja": "Dragon Skull"
+  },
+  "repo_loot_fan": {
+    "ru": "Вентилятор",
+    "en": "Fan",
+    "es": "Ventilador",
+    "uk": "Вентилятор",
+    "de": "Ventilator",
+    "ko": "Fan",
+    "ja": "Fan"
+  },
+  "repo_loot_flamethrower": {
+    "ru": "Огнемет",
+    "en": "Flamethrower",
+    "es": "Lanzallamas",
+    "uk": "Вогнемет",
+    "de": "Flammenwerfer",
+    "ko": "Flamethrower",
+    "ja": "Flamethrower"
+  },
+  "repo_loot_frog": {
+    "ru": "Лягушка",
+    "en": "Frog",
+    "es": "Rana",
+    "uk": "Жаба",
+    "de": "Frosch",
+    "ko": "Frog",
+    "ja": "Frog"
+  },
+  "repo_loot_gem_burger": {
+    "ru": "Драгоценный бургер",
+    "en": "Gem Burger",
+    "es": "Hamburguesa preciosa",
+    "uk": "Дорогоцінний бургер",
+    "de": "Edelstein-Burger",
+    "ko": "Gem Burger",
+    "ja": "Gem Burger"
+  },
+  "repo_loot_golden_statue": {
+    "ru": "Золотая статуя",
+    "en": "Golden Statue",
+    "es": "Estatua dorada",
+    "uk": "Золота статуя",
+    "de": "Goldene Statue",
+    "ko": "Golden Statue",
+    "ja": "Golden Statue"
+  },
+  "repo_loot_golden_swirl": {
+    "ru": "Золотая куча",
+    "en": "Golden Poop",
+    "es": "Caca dorada",
+    "uk": "Золота купа",
+    "de": "Goldener Haufen",
+    "ko": "Golden Poop",
+    "ja": "Golden Poop"
+  },
+  "repo_loot_gramophone": {
+    "ru": "Граммофон",
+    "en": "Gramophone",
+    "es": "Gramófono",
+    "uk": "Грамофон",
+    "de": "Grammophon",
+    "ko": "Gramophone",
+    "ja": "Gramophone"
+  },
+  "repo_loot_grandfather_clock": {
+    "ru": "Напольные часы",
+    "en": "Grandfather Clock",
+    "es": "Reloj de péndulo",
+    "uk": "Підлоговий годинник",
+    "de": "Standuhr",
+    "ko": "Grandfather Clock",
+    "ja": "Grandfather Clock"
+  },
+  "repo_loot_griffin_statue": {
+    "ru": "Статуя грифона",
+    "en": "Griffin Statue",
+    "es": "Estatua de grifo",
+    "uk": "Статуя грифона",
+    "de": "Greifenstatue",
+    "ko": "Griffin Statue",
+    "ja": "Griffin Statue"
+  },
+  "repo_loot_guitar": {
+    "ru": "Гитара",
+    "en": "Guitar",
+    "es": "Guitarra",
+    "uk": "Гітара",
+    "de": "Gitarre",
+    "ko": "Guitar",
+    "ja": "Guitar"
+  },
+  "repo_loot_harp": {
+    "ru": "Арфа",
+    "en": "Harp",
+    "es": "Arpa",
+    "uk": "Арфа",
+    "de": "Harfe",
+    "ko": "Harp",
+    "ja": "Harp"
+  },
+  "repo_loot_horse": {
+    "ru": "Конь",
+    "en": "Horse",
+    "es": "Caballo",
+    "uk": "Кінь",
+    "de": "Pferd",
+    "ko": "Horse",
+    "ja": "Horse"
+  },
+  "repo_loot_ice_block": {
+    "ru": "Ледяная глыба",
+    "en": "Ice Block",
+    "es": "Bloque de hielo",
+    "uk": "Крижана брила",
+    "de": "Eisblock",
+    "ko": "Ice Block",
+    "ja": "Ice Block"
+  },
+  "repo_loot_jackhammer": {
+    "ru": "Отбойный молоток",
+    "en": "Jackhammer",
+    "es": "Martillo Neumático",
+    "uk": "Відбійний молоток",
+    "de": "Presslufthammer",
+    "ko": "Jackhammer",
+    "ja": "Jackhammer"
+  },
+  "repo_loot_lev_potion": {
+    "ru": "Зелье левитации",
+    "en": "Levitation Potion",
+    "es": "Poción de Levitación",
+    "uk": "Зілля левітації",
+    "de": "Schwebe-Trank",
+    "ko": "Levitation Potion",
+    "ja": "Levitation Potion"
+  },
+  "repo_loot_love_potion": {
+    "ru": "Любовный эликсир",
+    "en": "Love Potion",
+    "es": "Poción de amor",
+    "uk": "Любовне зілля",
+    "de": "Liebestrank",
+    "ko": "Love Potion",
+    "ja": "Love Potion"
+  },
+  "repo_loot_milk": {
+    "ru": "Молоко",
+    "en": "Milk",
+    "es": "Leche",
+    "uk": "Молоко",
+    "de": "Milch",
+    "ko": "Milk",
+    "ja": "Milk"
+  },
+  "repo_loot_money_rain": {
+    "ru": "Пачки денег",
+    "en": "Cash",
+    "es": "Fajos de dinero",
+    "uk": "Пачки грошей",
+    "de": "Geldbündel",
+    "ko": "Cash",
+    "ja": "Cash"
+  },
+  "repo_loot_mug_deluxe": {
+    "ru": "Люкс-чашка",
+    "en": "Mug Deluxe",
+    "es": "Taza Deluxe",
+    "uk": "Люкс-чашка",
+    "de": "Luxus-Tasse",
+    "ko": "Mug Deluxe",
+    "ja": "Mug Deluxe"
+  },
+  "repo_loot_music_box": {
+    "ru": "Музыкальная шкатулка",
+    "en": "Music Box",
+    "es": "Caja musical",
+    "uk": "Музична скринька",
+    "de": "Spieluhr",
+    "ko": "Music Box",
+    "ja": "Music Box"
+  },
+  "repo_loot_painting": {
+    "ru": "Картина",
+    "en": "Painting",
+    "es": "Cuadro",
+    "uk": "Картина",
+    "de": "Gemälde",
+    "ko": "Painting",
+    "ja": "Painting"
+  },
+  "repo_loot_piano": {
+    "ru": "Пианино",
+    "en": "Piano",
+    "es": "Piano",
+    "uk": "Піаніно",
+    "de": "Klavier",
+    "ko": "Piano",
+    "ja": "Piano"
+  },
+  "repo_loot_power_crystal": {
+    "ru": "Кристалл",
+    "en": "Crystal",
+    "es": "Cristal",
+    "uk": "Кристал",
+    "de": "Kristall",
+    "ko": "Crystal",
+    "ja": "Crystal"
+  },
+  "repo_loot_propane_tank": {
+    "ru": "Баллон пропана",
+    "en": "Propane Tank",
+    "es": "Tanque de propano",
+    "uk": "Балон із пропаном",
+    "de": "Propangasflasche",
+    "ko": "Propane Tank",
+    "ja": "Propane Tank"
+  },
+  "repo_loot_rand_beta_med": {
+    "ru": "Средняя безделушка",
+    "en": "Medium Valuables",
+    "es": "Objeto mediano",
+    "uk": "Середня дрібничка",
+    "de": "Mittlere Wertgegenstände",
+    "ko": "Medium Valuables",
+    "ja": "Medium Valuables"
+  },
+  "repo_loot_rand_beta_small": {
+    "ru": "Небольшая безделушка",
+    "en": "Small Valuables",
+    "es": "Objeto pequeño",
+    "uk": "Мала Дрібничка",
+    "de": "Kleine Wertgegenstände",
+    "ko": "Small Valuables",
+    "ja": "Small Valuables"
+  },
+  "repo_loot_rand_big": {
+    "ru": "Большая безделушка",
+    "en": "Large Valuables",
+    "es": "Objeto grande",
+    "uk": "Велика дрібничка",
+    "de": "Große Wertgegenstände",
+    "ko": "Large Valuables",
+    "ja": "Large Valuables"
+  },
+  "repo_loot_rand_enemy": {
+    "ru": "Вражеская сфера",
+    "en": "Enemy Sphere",
+    "es": "Esfera enemiga",
+    "uk": "Ворожа сфера",
+    "de": "Feindliche Sphäre",
+    "ko": "Enemy Sphere",
+    "ja": "Enemy Sphere"
+  },
+  "repo_loot_rand_huge": {
+    "ru": "Огромная безделушка",
+    "en": "Huge Valuables",
+    "es": "Valiosas Gigantes",
+    "uk": "Величезна дрібничка",
+    "de": "Riesige Wertsachen",
+    "ko": "Huge Valuables",
+    "ja": "Huge Valuables"
+  },
+  "repo_loot_rand_med": {
+    "ru": "Средняя безделушка",
+    "en": "Medium Valuables",
+    "es": "Objeto mediano",
+    "uk": "Невеличка дрібничка",
+    "de": "Mittlere Wertgegenstände",
+    "ko": "Medium Valuables",
+    "ja": "Medium Valuables"
+  },
+  "repo_loot_rand_small": {
+    "ru": "Небольшая безделушка",
+    "en": "Small Valuables",
+    "es": "Objeto pequeño",
+    "uk": "Дрібничка",
+    "de": "Kleine Wertgegenstände",
+    "ko": "Small Valuables",
+    "ja": "Small Valuables"
+  },
+  "repo_loot_saw": {
+    "ru": "Циркулярная пила",
+    "en": "Circular Saw",
+    "es": "Sierra circular",
+    "uk": "Циркулярна пилка",
+    "de": "Kreissäge",
+    "ko": "Circular Saw",
+    "ja": "Circular Saw"
+  },
+  "repo_loot_science_station": {
+    "ru": "Научная станция",
+    "en": "Science Station",
+    "es": "Estación científica",
+    "uk": "Наукова станція",
+    "de": "Wissenschaftsstation",
+    "ko": "Science Station",
+    "ja": "Science Station"
+  },
+  "repo_loot_server_rack": {
+    "ru": "Серверная стойка",
+    "en": "Server Rack",
+    "es": "Rack de servidores",
+    "uk": "Серверна стійка",
+    "de": "Server-Rack",
+    "ko": "Server Rack",
+    "ja": "Server Rack"
+  },
+  "repo_loot_staff": {
+    "ru": "Магический посох",
+    "en": "Magic Staff",
+    "es": "Báculo mágico",
+    "uk": "Магічний посох",
+    "de": "Magischer Stab",
+    "ko": "Magic Staff",
+    "ja": "Magic Staff"
+  },
+  "repo_loot_star_wand": {
+    "ru": "Волшебная палочка",
+    "en": "Star Wand",
+    "es": "Varita Estelar",
+    "uk": "Чарівна паличка",
+    "de": "Sternstab",
+    "ko": "Star Wand",
+    "ja": "Star Wand"
+  },
+  "repo_loot_sword": {
+    "ru": "Гигантский меч",
+    "en": "Giant Sword",
+    "es": "Espada gigante",
+    "uk": "Велетенський меч",
+    "de": "Riesenschwert",
+    "ko": "Giant Sword",
+    "ja": "Giant Sword"
+  },
+  "repo_loot_television": {
+    "ru": "Телевизор",
+    "en": "Television",
+    "es": "Televisor",
+    "uk": "Телевізор",
+    "de": "Fernseher",
+    "ko": "Television",
+    "ja": "Television"
+  },
+  "repo_loot_time_glass": {
+    "ru": "Песочные часы",
+    "en": "Time Glass",
+    "es": "Reloj de arena",
+    "uk": "Пісочний годинник",
+    "de": "Sanduhr",
+    "ko": "Time Glass",
+    "ja": "Time Glass"
+  },
+  "repo_loot_tray": {
+    "ru": "Музейный поднос",
+    "en": "Museum Tray",
+    "es": "Bandeja de Museo",
+    "uk": "Музейний піднос",
+    "de": "Museumstablett",
+    "ko": "Museum Tray",
+    "ja": "Museum Tray"
+  },
+  "repo_solo_buff_energy": {
+    "ru": "Восстановить энергию",
+    "en": "Restore Energy",
+    "es": "Restaurar energía",
+    "uk": "Відновити енергію",
+    "de": "Energie wiederherstellen",
+    "ko": "Restore Energy",
+    "ja": "Restore Energy"
+  },
+  "repo_solo_buff_energymode": {
+    "ru": "Бесконечная энергия",
+    "en": "Infinite Energy",
+    "es": "Energía infinita",
+    "uk": "Нескінченна енергія",
+    "de": "Unendliche Energie",
+    "ko": "Infinite Energy",
+    "ja": "Infinite Energy"
+  },
+  "repo_solo_buff_full_restore": {
+    "ru": "Полное восстановление",
+    "en": "Full Restore",
+    "es": "Restauración completa",
+    "uk": "Повне відновлення",
+    "de": "Vollständige Wiederherstellung",
+    "ko": "Full Restore",
+    "ja": "Full Restore"
+  },
+  "repo_solo_buff_godmode": {
+    "ru": "Бессмертие",
+    "en": "Invincibility",
+    "es": "Invencibilidad",
+    "uk": "Безсмертя",
+    "de": "Unverwundbarkeit",
+    "ko": "Invincibility",
+    "ja": "Invincibility"
+  },
+  "repo_solo_buff_gravity": {
+    "ru": "Снизить гравитацию",
+    "en": "Lower Gravity",
+    "es": "Reducir gravedad",
+    "uk": "Зменшити гравітацію",
+    "de": "Schwerkraft verringern",
+    "ko": "Lower Gravity",
+    "ja": "Lower Gravity"
+  },
+  "repo_solo_buff_heal": {
+    "ru": "Небольшое лечение",
+    "en": "Minor Heal",
+    "es": "Curación menor",
+    "uk": "Невелике лікування",
+    "de": "Kleine Heilung",
+    "ko": "Minor Heal",
+    "ja": "Minor Heal"
+  },
+  "repo_solo_buff_jump": {
+    "ru": "Мега прыжки",
+    "en": "Mega Jumps",
+    "es": "Megasaltos",
+    "uk": "Мегастрибки",
+    "de": "Megasprünge",
+    "ko": "Mega Jumps",
+    "ja": "Mega Jumps"
+  },
+  "repo_solo_buff_resurrect": {
+    "ru": "Воскресить",
+    "en": "Revive",
+    "es": "Resucitar",
+    "uk": "Воскресити",
+    "de": "Wiederbeleben",
+    "ko": "Revive",
+    "ja": "Revive"
+  },
+  "repo_solo_buff_speed": {
+    "ru": "Мега скорость",
+    "en": "Mega Speed",
+    "es": "Megavelocidad",
+    "uk": "Мегашвидкість",
+    "de": "Megageschwindigkeit",
+    "ko": "Mega Speed",
+    "ja": "Mega Speed"
+  },
+  "repo_solo_debuff_camera": {
+    "ru": "Блок камеры",
+    "en": "Camera Lock",
+    "es": "Bloqueo de cámara",
+    "uk": "Блокування камери",
+    "de": "Kamera blockieren",
+    "ko": "Camera Lock",
+    "ja": "Camera Lock"
+  },
+  "repo_solo_debuff_crouch": {
+    "ru": "Красться",
+    "en": "Stealth Sneak",
+    "es": "Sigilo",
+    "uk": "Крадькома",
+    "de": "Schleichen",
+    "ko": "Stealth Sneak",
+    "ja": "Stealth Sneak"
+  },
+  "repo_solo_debuff_drop_inv": {
+    "ru": "Выбросить инвентарь",
+    "en": "Drop Inventory",
+    "es": "Soltar inventario",
+    "uk": "Викинути інвентар",
+    "de": "Inventar abwerfen",
+    "ko": "Drop Inventory",
+    "ja": "Drop Inventory"
+  },
+  "repo_solo_debuff_energy": {
+    "ru": "Выкачать энергию",
+    "en": "Drain Energy",
+    "es": "Drenar energía",
+    "uk": "Викачати енергію",
+    "de": "Energie entziehen",
+    "ko": "Drain Energy",
+    "ja": "Drain Energy"
+  },
+  "repo_solo_debuff_freez": {
+    "ru": "Заморозить",
+    "en": "Freeze",
+    "es": "Congelar",
+    "uk": "Заморозити",
+    "de": "Einfrieren",
+    "ko": "Freeze",
+    "ja": "Freeze"
+  },
+  "repo_solo_debuff_grab": {
+    "ru": "Отключить захват",
+    "en": "Disable Grab",
+    "es": "Desactivar agarre",
+    "uk": "Вимкнути хапалку",
+    "de": "Greifen deaktivieren",
+    "ko": "Disable Grab",
+    "ja": "Disable Grab"
+  },
+  "repo_solo_debuff_gravity": {
+    "ru": "Усилить гравитацию",
+    "en": "Increase Gravity",
+    "es": "Aumentar gravedad",
+    "uk": "Підсилити гравітацію",
+    "de": "Schwerkraft erhöhen",
+    "ko": "Increase Gravity",
+    "ja": "Increase Gravity"
+  },
+  "repo_solo_debuff_hurt": {
+    "ru": "Пощечина",
+    "en": "Slap",
+    "es": "Bofetada",
+    "uk": "Ляпас",
+    "de": "Ohrfeige",
+    "ko": "Slap",
+    "ja": "Slap"
+  },
+  "repo_solo_debuff_item_boom": {
+    "ru": "Подрыв предмета",
+    "en": "Detonate Item",
+    "es": "Detonar objeto",
+    "uk": "Підірвати предмет",
+    "de": "Gegenstand sprengen",
+    "ko": "Detonate Item",
+    "ja": "Detonate Item"
+  },
+  "repo_solo_debuff_kill": {
+    "ru": "Самоуничтожение",
+    "en": "Self-Destruct",
+    "es": "Autodestrucción",
+    "uk": "Самознищення",
+    "de": "Selbstzerstörung",
+    "ko": "Self-Destruct",
+    "ja": "Self-Destruct"
+  },
+  "repo_solo_debuff_knockdown": {
+    "ru": "Сбить с ног",
+    "en": "Knockdown",
+    "es": "Derribar",
+    "uk": "Збити з ніг",
+    "de": "Umwerfen",
+    "ko": "Knockdown",
+    "ja": "Knockdown"
+  },
+  "repo_solo_debuff_push_back": {
+    "ru": "Толкнуть назад",
+    "en": "Push Backward",
+    "es": "Empujar hacia atrás",
+    "uk": "Штовхнути назад",
+    "de": "Nach hinten stoßen",
+    "ko": "Push Backward",
+    "ja": "Push Backward"
+  },
+  "repo_solo_debuff_push_front": {
+    "ru": "Толкнуть вперед",
+    "en": "Push Forward",
+    "es": "Empujar hacia adelante",
+    "uk": "Штовхнути вперед",
+    "de": "Nach vorne stoßen",
+    "ko": "Push Forward",
+    "ja": "Push Forward"
+  },
+  "repo_solo_debuff_push_up": {
+    "ru": "Подбросить",
+    "en": "Launch Upwards",
+    "es": "Lanzar hacia arriba",
+    "uk": "Підкинути",
+    "de": "Nach oben schleudern",
+    "ko": "Launch Upwards",
+    "ja": "Launch Upwards"
+  },
+  "repo_solo_debuff_slow": {
+    "ru": "Замедлить",
+    "en": "Slow Speed",
+    "es": "Ralentizar",
+    "uk": "Уповільнити",
+    "de": "Verlangsamen",
+    "ko": "Slow Speed",
+    "ja": "Slow Speed"
+  },
+  "repo_solo_debuff_wasd": {
+    "ru": "Перемешать WASD",
+    "en": "Shuffle WASD",
+    "es": "Mezclar WASD",
+    "uk": "Перемішати WASD",
+    "de": "WASD vertauschen",
+    "ko": "Shuffle WASD",
+    "ja": "Shuffle WASD"
+  },
+  "repo_solo_frogs_around": {
+    "ru": "Окружить жабками",
+    "en": "Frog Encirclement",
+    "es": "Rodear con ranitas",
+    "uk": "Оточити жабками",
+    "de": "Von Fröschen umzingeln",
+    "ko": "Frog Encirclement",
+    "ja": "Frog Encirclement"
+  },
+  "repo_solo_toycars_around": {
+    "ru": "Окружить игрушечными машинками",
+    "en": "Toy Car Encirclement",
+    "es": "Rodear con coches de juguete",
+    "uk": "Оточити іграшковими машинками",
+    "de": "Mit Spielzeugautos umzingeln",
+    "ko": "Toy Car Encirclement",
+    "ja": "Toy Car Encirclement"
+  },
+  "repo_solo_toyplanes_around": {
+    "ru": "Toy Plane Encirclement",
+    "en": "Toy Plane Encirclement",
+    "es": "Toy Plane Encirclement",
+    "uk": "Toy Plane Encirclement",
+    "de": "Toy Plane Encirclement",
+    "ko": "Toy Plane Encirclement",
+    "ja": "Toy Plane Encirclement"
+  },
+  "repo_solo_poop_diamonds": {
+    "ru": "Какать алмазами",
+    "en": "Poop Diamonds",
+    "es": "Cagar diamantes",
+    "uk": "Какати діамантами",
+    "de": "Diamanten kacken",
+    "ko": "Poop Diamonds",
+    "ja": "Poop Diamonds"
+  },
+  "repo_solo_poop_mines": {
+    "ru": "Какать минами",
+    "en": "Poop Mines",
+    "es": "Cagar minas",
+    "uk": "Какати мінами",
+    "de": "Minen kacken",
+    "ko": "Poop Mines",
+    "ja": "Poop Mines"
+  },
+  "repo_solo_poop_shock_mines": {
+    "ru": "Poop Shockwave Mine",
+    "en": "Poop Shockwave Mine",
+    "es": "Poop Shockwave Mine",
+    "uk": "Poop Shockwave Mine",
+    "de": "Poop Shockwave Mine",
+    "ko": "Poop Shockwave Mine",
+    "ja": "Poop Shockwave Mine"
+  },
+  "repo_solo_poop_nades": {
+    "ru": "Какать гранатами",
+    "en": "Poop Grenades",
+    "th": "ถ่ายระเบิด (ต่อเวลาตามจำนวนชิ้น)",
+    "es": "Cagar granadas",
+    "uk": "Какати гранатами",
+    "de": "Granaten kacken",
+    "ko": "Poop Grenades",
+    "ja": "Poop Grenades"
+  },
+  "repo_solo_teleport_rand": {
+    "ru": "Случайный телепорт",
+    "en": "Random Teleport",
+    "es": "Teletransporte aleatorio",
+    "uk": "Випадковий телепорт",
+    "de": "Zufällige Teleportation",
+    "ko": "Random Teleport",
+    "ja": "Random Teleport"
+  },
+  "repo_solo_teleport_start": {
+    "ru": "Телепорт на старт",
+    "en": "Teleport to Start",
+    "es": "Teletransporte al inicio",
+    "uk": "Телепорт на старт",
+    "de": "Zum Start teleportieren",
+    "ko": "Teleport to Start",
+    "ja": "Teleport to Start"
+  },
+  "repo_solo_upgrade_energy": {
+    "ru": "Улучшить энергию",
+    "en": "Upgrade Energy",
+    "es": "Mejorar energía",
+    "uk": "Покращити енергію",
+    "de": "Energie verbessern",
+    "ko": "Upgrade Energy",
+    "ja": "Upgrade Energy"
+  },
+  "repo_solo_upgrade_health": {
+    "ru": "Улучшить здоровье",
+    "en": "Upgrade Health",
+    "es": "Mejorar salud",
+    "uk": "Покращити здоров'я",
+    "de": "Gesundheit verbessern",
+    "ko": "Upgrade Health",
+    "ja": "Upgrade Health"
+  },
+  "repo_solo_upgrade_jump": {
+    "ru": "Дополнительный прыжок",
+    "en": "Extra Jump",
+    "es": "Salto adicional",
+    "uk": "Додатковий стрибок",
+    "de": "Zusätzlicher Sprung",
+    "ko": "Extra Jump",
+    "ja": "Extra Jump"
+  },
+  "repo_solo_upgrade_range": {
+    "ru": "Улучшить дальность",
+    "en": "Upgrade Range",
+    "es": "Mejorar alcance",
+    "uk": "Покращити дальність",
+    "de": "Reichweite verbessern",
+    "ko": "Upgrade Range",
+    "ja": "Upgrade Range"
+  },
+  "repo_solo_upgrade_rest": {
+    "ru": "Улучшить отдых",
+    "en": "Upgrade Rest",
+    "es": "Mejorar descanso",
+    "uk": "Покращити відпочинок",
+    "de": "Ruhe verbessern",
+    "ko": "Upgrade Rest",
+    "ja": "Upgrade Rest"
+  },
+  "repo_solo_upgrade_roll": {
+    "ru": "Улучшить кувырок",
+    "en": "Upgrade Launch",
+    "es": "Mejorar esquiva",
+    "uk": "Покращити перекат",
+    "de": "Ausweichen verbessern",
+    "ko": "Upgrade Launch",
+    "ja": "Upgrade Launch"
+  },
+  "repo_solo_upgrade_speed": {
+    "ru": "Улучшить скорость",
+    "en": "Upgrade Speed",
+    "es": "Mejorar velocidad",
+    "uk": "Покращити швидкість",
+    "de": "Geschwindigkeit verbessern",
+    "ko": "Upgrade Speed",
+    "ja": "Upgrade Speed"
+  },
+  "repo_solo_upgrade_strength": {
+    "ru": "Улучшить силу",
+    "en": "Upgrade Strength",
+    "es": "Mejorar fuerza",
+    "uk": "Покращити силу",
+    "de": "Stärke verbessern",
+    "ko": "Upgrade Strength",
+    "ja": "Upgrade Strength"
+  },
+  "repo_solo_upgrade_wings": {
+    "ru": "Улучшить крылья",
+    "en": "Upgrade Wings",
+    "es": "Mejorar alas",
+    "uk": "Покращити крила",
+    "de": "Flügel verbessern",
+    "ko": "Upgrade Wings",
+    "ja": "Upgrade Wings"
+  },
+  "repo_spawn_bang": {
+    "ru": "Bang",
+    "en": "Bang",
+    "es": "Bang",
+    "uk": "Bang",
+    "de": "Bang",
+    "ko": "Bang",
+    "ja": "Bang",
+    "th": "Bang"
+  },
+  "repo_spawn_ceiling_eye": {
+    "ru": "Ceiling Eye",
+    "en": "Ceiling Eye",
+    "es": "Ceiling Eye",
+    "uk": "Ceiling Eye",
+    "de": "Ceiling Eye",
+    "ko": "Ceiling Eye",
+    "ja": "Ceiling Eye",
+    "th": "Ceiling Eye"
+  },
+  "repo_spawn_gnome": {
+    "ru": "Gnome",
+    "en": "Gnome",
+    "es": "Gnome",
+    "uk": "Gnome",
+    "de": "Gnome",
+    "ko": "Gnome",
+    "ja": "Gnome",
+    "th": "Gnome"
+  },
+  "repo_spawn_alien": {
+    "ru": "Пришелец",
+    "en": "Alien",
+    "es": "Alienígena",
+    "uk": "Прибулець",
+    "de": "Außerirdischer",
+    "ko": "Alien",
+    "ja": "Alien"
+  },
+  "repo_spawn_animal": {
+    "ru": "Животное",
+    "en": "Animal",
+    "es": "Animal",
+    "uk": "Тварина",
+    "de": "Tier",
+    "ko": "Animal",
+    "ja": "Animal"
+  },
+  "repo_spawn_baby": {
+    "ru": "Ох уж эти детки!",
+    "en": "Baby Monster",
+    "es": "¡Esos malditos niños!",
+    "uk": "Невгамовне",
+    "de": "Diese verfluchten Kinder!",
+    "ko": "Baby Monster",
+    "ja": "Baby Monster"
+  },
+  "repo_spawn_bella": {
+    "ru": "Белла",
+    "en": "Bella",
+    "es": "Bella",
+    "uk": "Белла",
+    "de": "Bella",
+    "ko": "Bella",
+    "ja": "Bella"
+  },
+  "repo_spawn_birthday_boy": {
+    "ru": "Именинник",
+    "en": "Birthday Boy",
+    "es": "Cumpleañero",
+    "uk": "Іменинник",
+    "de": "Geburtstagskind",
+    "ko": "Birthday Boy",
+    "ja": "Birthday Boy"
+  },
+  "repo_spawn_bowtie": {
+    "ru": "Крикун",
+    "en": "Bowtie",
+    "es": "Gritón",
+    "uk": "Крикун",
+    "de": "Schreihals",
+    "ko": "Bowtie",
+    "ja": "Bowtie"
+  },
+  "repo_spawn_cleanup_crew": {
+    "ru": "Команда уборки",
+    "en": "Cleanup Crew",
+    "es": "Equipo de limpieza",
+    "uk": "Команда прибирання",
+    "de": "Reinigungsteam",
+    "ko": "Cleanup Crew",
+    "ja": "Cleanup Crew"
+  },
+  "repo_spawn_clown": {
+    "ru": "Клоун",
+    "en": "Clown",
+    "es": "Payaso",
+    "uk": "Клоун",
+    "de": "Clown",
+    "ko": "Clown",
+    "ja": "Clown"
+  },
+  "repo_spawn_dogo": {
+    "ru": "Эльза",
+    "en": "Elsa Dogo",
+    "es": "Elsa Dogo",
+    "uk": "Ельза",
+    "de": "Elsa Dogo",
+    "ko": "Elsa Dogo",
+    "ja": "Elsa Dogo"
+  },
+  "repo_spawn_duck": {
+    "ru": "Утка",
+    "en": "Duck",
+    "es": "Pato",
+    "uk": "Каченя",
+    "de": "Ente",
+    "ko": "Duck",
+    "ja": "Duck"
+  },
+  "repo_spawn_frog": {
+    "ru": "Жаба",
+    "en": "Frog",
+    "es": "Rana",
+    "uk": "Жаба",
+    "de": "Frosch",
+    "ko": "Frog",
+    "ja": "Frog"
+  },
+  "repo_spawn_gambit": {
+    "ru": "Гамбит",
+    "en": "Gambit",
+    "es": "Gambito",
+    "uk": "Гамбіт",
+    "de": "Gambit",
+    "ko": "Gambit",
+    "ja": "Gambit"
+  },
+  "repo_spawn_head": {
+    "ru": "Голова",
+    "en": "Floating Head",
+    "es": "Cabeza Flotante",
+    "uk": "Летюча голова",
+    "de": "Schwebender Kopf",
+    "ko": "Floating Head",
+    "ja": "Floating Head"
+  },
+  "repo_spawn_headgrab": {
+    "ru": "Хедхраб",
+    "en": "Headgrab",
+    "es": "Atracabezas",
+    "uk": "Хедґраб",
+    "de": "Kopfgreifer",
+    "ko": "Headgrab",
+    "ja": "Headgrab"
+  },
+  "repo_spawn_heart_hugger": {
+    "ru": "Обниматель сердец",
+    "en": "Heart Hugger",
+    "es": "Abrazacorazones",
+    "uk": "Обіймач сердець",
+    "de": "Herzumarmung",
+    "ko": "Heart Hugger",
+    "ja": "Heart Hugger"
+  },
+  "repo_spawn_hidden": {
+    "ru": "Невидимка",
+    "en": "Hidden",
+    "es": "Invisible",
+    "uk": "Невидимка",
+    "de": "Unsichtbarer",
+    "ko": "Hidden",
+    "ja": "Hidden"
+  },
+  "repo_spawn_huntsman": {
+    "ru": "Дед охотник",
+    "en": "Huntsman",
+    "es": "Viejo cazador",
+    "uk": "Дід-мисливець",
+    "de": "Alter Jäger",
+    "ko": "Huntsman",
+    "ja": "Huntsman"
+  },
+  "repo_spawn_loom": {
+    "ru": "Ткачиха",
+    "en": "Loom",
+    "es": "Tejedora",
+    "uk": "Ткачиха",
+    "de": "Weberin",
+    "ko": "Loom",
+    "ja": "Loom"
+  },
+  "repo_spawn_oogly": {
+    "ru": "Уродец",
+    "en": "Oogly",
+    "es": "Feúcho",
+    "uk": "Потвора",
+    "de": "Gruselchen",
+    "ko": "Oogly",
+    "ja": "Oogly"
+  },
+  "repo_spawn_reaper": {
+    "ru": "Кукла-Жнец",
+    "en": "Reaper",
+    "es": "Muñeca Segadora",
+    "uk": "Лялька-Жнець",
+    "de": "Sensenpuppe",
+    "ko": "Reaper",
+    "ja": "Reaper"
+  },
+  "repo_spawn_robe": {
+    "ru": "Роба",
+    "en": "Robe",
+    "es": "Túnica",
+    "uk": "Ряса",
+    "de": "Robe",
+    "ko": "Robe",
+    "ja": "Robe"
+  },
+  "repo_spawn_spewer": {
+    "ru": "Блевальщик",
+    "en": "Spewer",
+    "es": "Vomitor",
+    "uk": "Блювальник",
+    "de": "Speier",
+    "ko": "Spewer",
+    "ja": "Spewer"
+  },
+  "repo_spawn_thinman": {
+    "ru": "Ребенок-тень",
+    "en": "Shadow Child",
+    "es": "Niño Sombra",
+    "uk": "Дитина-тінь",
+    "de": "Schattenkind",
+    "ko": "Shadow Child",
+    "ja": "Shadow Child"
+  },
+  "repo_spawn_tick": {
+    "ru": "Клещ",
+    "en": "Tick",
+    "es": "Garrapata",
+    "uk": "Кліщ",
+    "de": "Zecke",
+    "ko": "Tick",
+    "ja": "Tick"
+  },
+  "repo_spawn_trudge": {
+    "ru": "Трудж",
+    "en": "Trudge",
+    "es": "Arrastrado",
+    "uk": "Бредун",
+    "de": "Stampfer",
+    "ko": "Trudge",
+    "ja": "Trudge"
+  },
+  "repo_spawn_upscream": {
+    "ru": "Человекопаук",
+    "en": "Upscream",
+    "es": "Trepa-Gritos",
+    "uk": "Павукокрик",
+    "de": "Schreikletterer",
+    "ko": "Upscream",
+    "ja": "Upscream"
+  }
+}

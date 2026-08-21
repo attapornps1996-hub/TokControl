@@ -1,0 +1,293 @@
+/* Last X Overlay — 8 new layouts (not classic ring reskins) */
+
+.lx-layout {
+    font-family: 'Kanit', sans-serif;
+    color: #fff;
+    --lx-accent: #ff0050;
+}
+
+.lx-layout img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: inherit;
+}
+
+/* ── 1. BANNER (horizontal toast) ── */
+.lx-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: min(420px, 92vw);
+    max-width: 520px;
+    padding: 12px 18px 12px 12px;
+    background: linear-gradient(90deg, rgba(8,8,16,0.94), rgba(12,10,22,0.9));
+    border: 1px solid color-mix(in srgb, var(--lx-accent) 40%, transparent);
+    border-radius: 16px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.45), 0 0 24px color-mix(in srgb, var(--lx-accent) 18%, transparent);
+}
+.lx-banner-av {
+    width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
+    border: 2px solid var(--lx-accent);
+    overflow: hidden; background: #1a1a2e;
+}
+.lx-banner-meta { min-width: 0; flex: 1; }
+.lx-banner-tag {
+    font-size: 0.58rem; font-weight: 900; letter-spacing: 1.5px;
+    color: var(--lx-accent); margin-bottom: 2px;
+}
+.lx-banner-name {
+    font-size: 1.05rem; font-weight: 900; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.lx-banner-action { font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.65); }
+
+/* ── 2. CHIP (compact pill) ── */
+.lx-chip {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 16px 8px 8px;
+    background: rgba(0,0,0,0.82);
+    border: 1px solid color-mix(in srgb, var(--lx-accent) 50%, transparent);
+    border-radius: 999px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.4);
+}
+.lx-chip-av {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2px solid var(--lx-accent); overflow: hidden; flex-shrink: 0;
+}
+.lx-chip-text { font-size: 0.82rem; font-weight: 800; }
+.lx-chip-text b { color: var(--lx-accent); }
+.lx-chip-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--lx-accent);
+    box-shadow: 0 0 10px var(--lx-accent);
+    animation: lx-chip-pulse 1.2s ease infinite;
+}
+@keyframes lx-chip-pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.75); }
+}
+
+/* ── 3. SPOTLIGHT ── */
+.lx-spotlight {
+    text-align: center;
+    width: min(280px, 80vw);
+    position: relative;
+}
+.lx-spotlight-rays {
+    position: absolute; left: 50%; top: 20px;
+    width: 220px; height: 220px; margin-left: -110px;
+    background: conic-gradient(from 0deg, transparent, color-mix(in srgb, var(--lx-accent) 35%, transparent), transparent 28%, color-mix(in srgb, var(--lx-accent) 25%, transparent), transparent 55%);
+    border-radius: 50%;
+    animation: lx-spin 8s linear infinite;
+    filter: blur(1px); opacity: 0.7; pointer-events: none;
+}
+@keyframes lx-spin { to { transform: rotate(360deg); } }
+.lx-spotlight-av {
+    position: relative; z-index: 1;
+    width: 120px; height: 120px; margin: 18px auto 14px;
+    border-radius: 50%;
+    border: 4px solid var(--lx-accent);
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--lx-accent) 18%, transparent), 0 0 40px color-mix(in srgb, var(--lx-accent) 35%, transparent);
+    overflow: hidden; background: #1a1a2e;
+}
+.lx-spotlight-name { position: relative; z-index: 1; font-size: 1.25rem; font-weight: 900; }
+.lx-spotlight-action {
+    position: relative; z-index: 1;
+    margin-top: 4px; font-size: 0.85rem; font-weight: 700;
+    color: var(--lx-accent);
+}
+
+/* ── 4. TICKET ── */
+.lx-ticket {
+    display: flex; align-items: stretch;
+    width: min(380px, 92vw);
+    background: #fff8f0;
+    color: #2a1a12;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.4);
+}
+.lx-ticket-stub {
+    flex: 0 0 72px;
+    background: var(--lx-accent);
+    color: #fff;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 6px; padding: 12px 8px;
+    position: relative;
+}
+.lx-ticket-stub::after {
+    content: '';
+    position: absolute; right: -6px; top: 50%;
+    width: 12px; height: 12px; margin-top: -6px;
+    border-radius: 50%; background: rgba(0,0,0,0.35);
+}
+.lx-ticket-icon { font-size: 1.4rem; }
+.lx-ticket-stub-lbl {
+    font-size: 0.5rem; font-weight: 900; letter-spacing: 1px;
+    writing-mode: vertical-rl; transform: rotate(180deg);
+}
+.lx-ticket-body {
+    flex: 1; padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    background: repeating-linear-gradient(90deg, transparent 0 8px, rgba(0,0,0,0.03) 8px 9px);
+}
+.lx-ticket-av {
+    width: 48px; height: 48px; border-radius: 10px;
+    overflow: hidden; border: 2px solid rgba(0,0,0,0.12); flex-shrink: 0;
+}
+.lx-ticket-name { font-size: 1rem; font-weight: 900; color: #1a100c; }
+.lx-ticket-action { font-size: 0.72rem; font-weight: 700; color: rgba(42,26,18,0.65); margin-top: 2px; }
+
+/* ── 5. NEON CARD ── */
+.lx-neon {
+    width: min(300px, 86vw);
+    padding: 18px 16px;
+    text-align: center;
+    background: rgba(6,6,14,0.92);
+    border: 2px solid var(--lx-accent);
+    border-radius: 18px;
+    box-shadow:
+        0 0 18px color-mix(in srgb, var(--lx-accent) 45%, transparent),
+        inset 0 0 24px color-mix(in srgb, var(--lx-accent) 12%, transparent);
+}
+.lx-neon-av {
+    width: 72px; height: 72px; margin: 0 auto 12px;
+    border-radius: 50%; overflow: hidden;
+    border: 3px solid var(--lx-accent);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--lx-accent) 50%, transparent);
+}
+.lx-neon-tag {
+    font-size: 0.55rem; font-weight: 900; letter-spacing: 2px;
+    color: var(--lx-accent); text-shadow: 0 0 10px color-mix(in srgb, var(--lx-accent) 60%, transparent);
+}
+.lx-neon-name {
+    margin-top: 6px; font-size: 1.15rem; font-weight: 900;
+    text-shadow: 0 0 14px color-mix(in srgb, var(--lx-accent) 40%, transparent);
+}
+.lx-neon-action { margin-top: 4px; font-size: 0.78rem; color: rgba(255,255,255,0.7); font-weight: 700; }
+
+/* ── 6. STACK CARD ── */
+.lx-stack {
+    width: min(280px, 84vw);
+    position: relative;
+    padding-top: 10px;
+}
+.lx-stack-layer {
+    position: absolute; left: 10px; right: 10px; top: 0;
+    height: 100%;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--lx-accent) 25%, #111);
+    opacity: 0.45;
+    transform: scale(0.94) translateY(-8px);
+}
+.lx-stack-layer.l2 {
+    transform: scale(0.97) translateY(-4px);
+    opacity: 0.65;
+    background: color-mix(in srgb, var(--lx-accent) 35%, #0a0a12);
+}
+.lx-stack-card {
+    position: relative; z-index: 1;
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px;
+    background: rgba(10,10,18,0.96);
+    border: 1px solid color-mix(in srgb, var(--lx-accent) 40%, transparent);
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+}
+.lx-stack-av {
+    width: 54px; height: 54px; border-radius: 14px;
+    overflow: hidden; border: 2px solid var(--lx-accent); flex-shrink: 0;
+}
+.lx-stack-name { font-size: 1rem; font-weight: 900; }
+.lx-stack-action { font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.6); margin-top: 2px; }
+
+/* ── 7. MARQUEE (bottom strip) ── */
+.lx-marquee {
+    width: min(720px, 96vw);
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 16px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--lx-accent) 55%, #000), rgba(8,8,16,0.95) 28%);
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--lx-accent) 35%, transparent);
+    box-shadow: 0 10px 32px rgba(0,0,0,0.45);
+}
+.lx-marquee-av {
+    width: 42px; height: 42px; border-radius: 50%;
+    overflow: hidden; border: 2px solid #fff; flex-shrink: 0;
+}
+.lx-marquee-live {
+    font-size: 0.55rem; font-weight: 900; letter-spacing: 1.5px;
+    background: rgba(0,0,0,0.35); padding: 4px 8px; border-radius: 6px;
+    flex-shrink: 0;
+}
+.lx-marquee-text {
+    flex: 1; min-width: 0;
+    font-size: 0.92rem; font-weight: 800;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.lx-marquee-text b { color: #fff; }
+
+/* ── 8. ORBIT ── */
+.lx-orbit {
+    width: min(260px, 80vw);
+    text-align: center;
+    position: relative;
+    padding: 24px 12px 16px;
+}
+.lx-orbit-ring {
+    position: absolute; left: 50%; top: 24px;
+    width: 150px; height: 150px; margin-left: -75px;
+    border: 2px dashed color-mix(in srgb, var(--lx-accent) 45%, transparent);
+    border-radius: 50%;
+    animation: lx-spin 12s linear infinite;
+}
+.lx-orbit-dot {
+    position: absolute; width: 10px; height: 10px; border-radius: 50%;
+    background: var(--lx-accent);
+    box-shadow: 0 0 10px var(--lx-accent);
+    top: -5px; left: 50%; margin-left: -5px;
+}
+.lx-orbit-av {
+    position: relative; z-index: 1;
+    width: 96px; height: 96px; margin: 28px auto 16px;
+    border-radius: 50%; overflow: hidden;
+    border: 3px solid var(--lx-accent);
+    background: #1a1a2e;
+}
+.lx-orbit-name { position: relative; z-index: 1; font-size: 1.1rem; font-weight: 900; }
+.lx-orbit-action {
+    position: relative; z-index: 1;
+    margin-top: 4px; font-size: 0.78rem; font-weight: 700;
+    color: rgba(255,255,255,0.65);
+}
+
+/* Positioning helpers for strip layouts in overlay */
+#overlayGoalLastX.lx-mode-marquee {
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 4vh;
+}
+#overlayGoalLastX.lx-mode-banner,
+#overlayGoalLastX.lx-mode-chip {
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 6vh;
+}
+
+html.ov-card-preview #overlayGoalLastX.lx-mode-marquee,
+html.ov-card-preview #overlayGoalLastX.lx-mode-banner,
+html.ov-card-preview #overlayGoalLastX.lx-mode-chip,
+body.ov-card-preview #overlayGoalLastX.lx-mode-marquee,
+body.ov-card-preview #overlayGoalLastX.lx-mode-banner,
+body.ov-card-preview #overlayGoalLastX.lx-mode-chip {
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+}
+
+body.overlay-portrait-reflow .lx-banner { min-width: 0; width: min(340px, 92vw); }
+body.overlay-portrait-reflow .lx-ticket { width: min(340px, 92vw); }
+body.overlay-portrait-reflow .lx-marquee { width: min(340px, 94vw); flex-wrap: wrap; }

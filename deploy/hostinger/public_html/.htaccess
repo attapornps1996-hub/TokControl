@@ -1,0 +1,27 @@
+DirectoryIndex index.html
+
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # tokcontrol.com บน Hostinger/GitHub Pages เป็น static — ส่ง dynamic app routes ไป Cloud API
+  RewriteRule ^api/download/latest$ https://pandy-backend-302414976454.asia-southeast1.run.app/api/download/latest [R=302,L]
+  RewriteRule ^profile/(.*)$ https://pandy-backend-302414976454.asia-southeast1.run.app/profile/$1 [R=302,L,QSA]
+  RewriteRule ^donate/(.*)$ https://pandy-backend-302414976454.asia-southeast1.run.app/donate/$1 [R=302,L]
+  RewriteRule ^widget/(.*)$ https://pandy-backend-302414976454.asia-southeast1.run.app/widget/$1 [R=302,L,QSA]
+  RewriteRule ^biolink/(.*)$ https://pandy-backend-302414976454.asia-southeast1.run.app/biolink/$1 [R=302,L,QSA]
+  RewriteRule ^b/(.*)$ https://pandy-backend-302414976454.asia-southeast1.run.app/b/$1 [R=302,L]
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>

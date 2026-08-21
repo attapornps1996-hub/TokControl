@@ -1,0 +1,275 @@
+/* Gift Carousel — tighter spacing + multi-row */
+
+.gcar {
+    font-family: 'Kanit', sans-serif;
+    color: #fff;
+    --gcar-accent: #00d2ff;
+    --gcar-speed: 28s;
+    --gcar-gap: 10px;
+    --gcar-icon: 88px;
+    --gcar-font: 18px;
+    width: 100vw;
+    max-width: 100%;
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+}
+
+.gcar-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gcar-gap);
+    width: 100%;
+}
+
+.gcar-track {
+    display: flex;
+    align-items: center;
+    gap: var(--gcar-gap);
+    width: max-content;
+    animation: gcar-scroll var(--gcar-speed) linear infinite;
+    will-change: transform;
+}
+
+.gcar-row:nth-child(even) .gcar-track {
+    animation-direction: reverse;
+    animation-duration: calc(var(--gcar-speed) * 1.12);
+}
+
+@keyframes gcar-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.gcar:hover .gcar-track { animation-play-state: paused; }
+
+.gcar--empty, .gcar.gcar--empty {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100px; padding: 20px;
+}
+.gcar-empty-msg {
+    font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.55);
+    text-align: center; padding: 10px 16px; border-radius: 10px;
+    border: 1px dashed rgba(255,255,255,0.18); background: rgba(255,255,255,0.04);
+}
+
+.gcar-item {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+    text-align: center;
+    width: calc(var(--gcar-icon) + 28px);
+}
+
+.gcar-icon {
+    width: var(--gcar-icon);
+    height: var(--gcar-icon);
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+    user-select: none;
+    pointer-events: none;
+}
+
+.gcar-icon-emoji {
+    font-size: calc(var(--gcar-icon) * 0.72);
+    line-height: 1;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+
+.gcar-label {
+    font-weight: 900;
+    font-size: var(--gcar-font, 18px);
+    line-height: 1.1;
+    max-width: calc(var(--gcar-icon) + 36px);
+    word-break: break-word;
+    text-shadow:
+        -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000,
+        0 0 6px rgba(0,0,0,0.8);
+    margin-top: -12px;
+    position: relative;
+    z-index: 2;
+}
+
+.gcar-sub {
+    font-size: calc(var(--gcar-font, 18px) * 0.78);
+    font-weight: 800;
+    opacity: 0.85;
+    margin-top: 2px;
+    text-shadow: 0 1px 3px #000;
+}
+
+/* ── 1. CLASSIC ── */
+.gcar--classic .gcar-icon { animation: gcar-bob 2.8s ease-in-out infinite; }
+.gcar--classic .gcar-item:nth-child(odd) .gcar-icon { animation-delay: 0.35s; }
+@keyframes gcar-bob {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* ── 2. NEON ── */
+.gcar--neon .gcar-item {
+    width: calc(var(--gcar-icon) + 36px);
+    padding: 8px 6px 10px;
+    border-radius: 12px;
+    background: rgba(6,8,18,0.85);
+    border: 2px solid var(--gcar-accent);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--gcar-accent) 35%, transparent);
+}
+.gcar--neon .gcar-label {
+    margin-top: 4px;
+    text-shadow: 0 0 8px var(--gcar-accent), -1px -1px 0 #000, 1px 1px 0 #000;
+}
+.gcar--neon .gcar-item::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: 12px; pointer-events: none;
+    background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.1), transparent 70%);
+    animation: gcar-shine 3s linear infinite;
+}
+@keyframes gcar-shine {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(100%); }
+}
+
+/* ── 3. GLASS ── */
+.gcar--glass .gcar-item {
+    width: calc(var(--gcar-icon) + 32px);
+    padding: 10px 6px 8px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(8px);
+}
+.gcar--glass .gcar-label { margin-top: 6px; }
+
+/* ── 4. BADGE ── */
+.gcar--badge .gcar-badge-ring {
+    width: calc(var(--gcar-icon) + 8px);
+    height: calc(var(--gcar-icon) + 8px);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.3), color-mix(in srgb, var(--gcar-accent) 50%, #111));
+    border: 3px solid color-mix(in srgb, var(--gcar-accent) 70%, #fff);
+    animation: gcar-spin-slow 10s linear infinite;
+}
+@keyframes gcar-spin-slow { to { transform: rotate(360deg); } }
+.gcar--badge .gcar-badge-ring .gcar-icon,
+.gcar--badge .gcar-badge-ring .gcar-icon-emoji {
+    animation: gcar-spin-slow 10s linear infinite reverse;
+    width: calc(var(--gcar-icon) * 0.72);
+    height: calc(var(--gcar-icon) * 0.72);
+    font-size: calc(var(--gcar-icon) * 0.55);
+    filter: none;
+}
+.gcar--badge .gcar-label { margin-top: 6px; }
+
+/* ── 5. POSTER ── */
+.gcar--poster .gcar-item {
+    width: calc(var(--gcar-icon) + 16px);
+    min-height: calc(var(--gcar-icon) + 56px);
+    height: auto;
+    padding: 6px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--gcar-accent) 35%, #1a1020), #0a0812 70%);
+    border: 1px solid color-mix(in srgb, var(--gcar-accent) 40%, transparent);
+    justify-content: space-between;
+}
+.gcar--poster .gcar-label { margin-top: 0; }
+
+/* ── 6. CHIP ── */
+.gcar--chip .gcar-item {
+    flex-direction: row;
+    gap: 8px;
+    width: auto;
+    min-width: 0;
+    padding: 5px 12px 5px 5px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.7);
+    border: 1.5px solid color-mix(in srgb, var(--gcar-accent) 50%, transparent);
+}
+.gcar--chip .gcar-icon {
+    width: calc(var(--gcar-icon) * 0.48);
+    height: calc(var(--gcar-icon) * 0.48);
+}
+.gcar--chip .gcar-label {
+    margin-top: 0;
+    max-width: 110px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── 7. COMIC ── */
+.gcar--comic .gcar-icon { animation: gcar-wiggle 2.4s ease-in-out infinite; }
+@keyframes gcar-wiggle {
+    0%,100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+}
+.gcar--comic .gcar-label {
+    margin-top: -8px;
+    background: #fff;
+    color: #111;
+    padding: 3px 8px;
+    border: 2.5px solid #111;
+    border-radius: 5px;
+    text-shadow: none;
+    box-shadow: 2px 2px 0 #111;
+}
+
+/* ── 8. HOLOGRAM ── */
+.gcar--holo .gcar-item {
+    width: calc(var(--gcar-icon) + 28px);
+    padding: 8px;
+    border-radius: 6px;
+    background: rgba(0, 40, 60, 0.55);
+    border: 1px solid rgba(0, 255, 255, 0.45);
+    box-shadow: 0 0 14px rgba(0, 210, 255, 0.22);
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+}
+.gcar--holo .gcar-icon { filter: drop-shadow(0 0 6px rgba(0,255,255,0.45)) saturate(1.15); }
+.gcar--holo .gcar-label {
+    margin-top: 4px;
+    color: #7bfffe;
+    text-shadow: 0 0 6px rgba(0,255,255,0.8), 0 0 2px #000;
+}
+.gcar--holo .gcar-item::before {
+    content: '';
+    position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,255,255,0.05) 3px, rgba(0,255,255,0.05) 4px);
+}
+
+/* ── 9. BALD ── */
+.gcar--bald .gcar-item { background: none; border: none; box-shadow: none; padding: 0; }
+.gcar--bald .gcar-icon { filter: none; }
+.gcar--bald .gcar-label {
+    margin-top: 4px;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+}
+
+html.ov-card-preview .gcar,
+body.ov-card-preview .gcar {
+    width: 100%;
+    mask-image: none;
+    -webkit-mask-image: none;
+}
+html.ov-card-preview .gcar-track,
+body.ov-card-preview .gcar-track { animation-duration: 10s; }
+
+#overlayGoalLastX.gcar-mode {
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 0 6vh;
+}
+#overlayGoalLastX.gcar-mode #overlayGoalLastXContent { width: 100%; }
+
+#overlayGoalLastX.gov-mode {
+    align-items: center;
+    justify-content: center;
+    padding: 4vh 2vw;
+}
+#overlayGoalLastX.gov-mode #overlayGoalLastXContent { width: 100%; max-width: 960px; }

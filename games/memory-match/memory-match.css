@@ -1,0 +1,187 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: transparent;
+    font-family: 'Kanit', 'Arial Black', sans-serif;
+    overflow: hidden;
+    user-select: none;
+}
+
+#mmRoot {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 30%, #1a0a2e 0%, #050507 70%);
+    position: relative;
+}
+
+#mmRoot.overlay-mode { background: transparent; }
+
+/* HUD */
+#mmHud {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.mm-hud-pill {
+    background: rgba(0,0,0,0.55);
+    border: 2px solid rgba(188,19,254,0.45);
+    border-radius: 999px;
+    padding: 6px 18px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #fff;
+    font-family: 'Kanit', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mm-hud-pill .mm-val { color: #bc13fe; font-size: 1.1rem; }
+
+.mm-hud-pill.countdown-pill {
+    border-color: #f1c40f;
+    animation: mmCountdownPulse 0.8s ease-in-out infinite alternate;
+}
+.mm-hud-pill.countdown-pill .mm-val { color: #f1c40f; font-size: 1.6rem; }
+
+@keyframes mmCountdownPulse {
+    from { box-shadow: 0 0 12px rgba(241,196,15,0.3); }
+    to   { box-shadow: 0 0 28px rgba(241,196,15,0.7); }
+}
+
+/* Board */
+#mmBoard {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    background: rgba(0,0,0,0.45);
+    border: 2px solid rgba(188,19,254,0.25);
+    border-radius: 18px;
+    box-shadow: 0 0 40px rgba(188,19,254,0.12);
+    max-width: 96vw;
+    max-height: 72vh;
+}
+
+/* Card */
+.mm-card {
+    aspect-ratio: 3/4;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.38s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    min-width: 60px;
+    min-height: 80px;
+}
+
+.mm-card.flipped { transform: rotateY(180deg); }
+.mm-card.matched { opacity: 0.35; pointer-events: none; transform: rotateY(180deg); }
+.mm-card.hint-glow { animation: mmHintGlow 1.2s ease-in-out 3; }
+.mm-card.locked { pointer-events: none; }
+
+@keyframes mmHintGlow {
+    0%,100% { box-shadow: 0 0 0 3px #f1c40f; }
+    50%      { box-shadow: 0 0 0 6px #f1c40f, 0 0 20px #f1c40f; }
+}
+
+.mm-card-face, .mm-card-back {
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backface-visibility: hidden;
+    font-size: clamp(1.4rem, 4vw, 2.4rem);
+}
+
+.mm-card-back {
+    background: linear-gradient(135deg, #2d1b69, #bc13fe);
+    border: 2px solid rgba(188,19,254,0.6);
+    box-shadow: inset 0 0 16px rgba(188,19,254,0.2);
+}
+
+.mm-card-back::after {
+    content: '?';
+    font-size: clamp(1.2rem, 3.5vw, 2rem);
+    color: rgba(255,255,255,0.5);
+    font-weight: 900;
+}
+
+.mm-card-face {
+    background: linear-gradient(160deg, #12121a, #1e1030);
+    border: 2px solid rgba(255,255,255,0.15);
+    transform: rotateY(180deg);
+    font-size: clamp(1.6rem, 5vw, 3rem);
+}
+
+/* Action toast */
+#mmActionToast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: rgba(0,0,0,0.85);
+    border: 2px solid rgba(188,19,254,0.5);
+    border-radius: 14px;
+    padding: 10px 22px;
+    font-family: 'Kanit', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    z-index: 100;
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.35s;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+}
+#mmActionToast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+#mmActionToast.help { border-color: #2ecc71; color: #2ecc71; }
+#mmActionToast.troll { border-color: #ff4757; color: #ff6b81; }
+
+/* Victory overlay */
+#mmVictory {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    gap: 16px;
+}
+#mmVictory.show { display: flex; animation: mmVictoryIn 0.5s ease; }
+#mmVictory h2 { font-size: 3rem; color: #f1c40f; text-shadow: 0 0 30px #f1c40f; font-family: 'Kanit', sans-serif; }
+#mmVictory p { font-size: 1.2rem; color: #fff; font-family: 'Kanit', sans-serif; }
+
+@keyframes mmVictoryIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+/* Panel-only controls (hidden in overlay mode) */
+#mmPanelControls { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; justify-content: center; }
+#mmPanelControls button {
+    padding: 8px 18px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+    color: #ccc;
+    font-family: 'Kanit', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+#mmPanelControls button:hover { background: rgba(188,19,254,0.2); color: #fff; }
+#mmPanelControls button.primary { background: linear-gradient(135deg, #bc13fe, #7b2ff7); border: none; color: #fff; font-weight: 700; }
+
+.overlay-mode #mmPanelControls { display: none; }

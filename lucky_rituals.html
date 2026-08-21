@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TokControl · สุ่มไพ่</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Kanit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg0: #07060c;
+    --ink: #f4f0ff;
+    --muted: #9aa3af;
+    --line: rgba(255,255,255,0.08);
+    --accent: #bc13fe;
+    --cyan: #00d2ff;
+    --gold: #f5c842;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--bg0); color: var(--ink); font-family: Kanit, sans-serif; }
+body.overlay-mode { background: transparent !important; }
+body.overlay-mode .panel { display: none !important; }
+body.overlay-mode .layout { grid-template-columns: 1fr; }
+body.overlay-mode .stage-wrap { inset: 0; background: transparent; }
+
+.layout { display: grid; grid-template-columns: 340px 1fr; height: 100vh; }
+.panel {
+    padding: 18px 16px; overflow: auto; border-right: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(18,12,32,0.98), rgba(8,6,16,0.98));
+}
+.kicker { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: #c084fc; font-weight: 800; }
+h1 { font-family: Cinzel, Kanit, serif; font-size: 1.35rem; margin: 4px 0 6px; }
+.sub { font-size: 0.78rem; color: var(--muted); line-height: 1.45; margin-bottom: 14px; }
+.sys-tabs { display: grid; grid-template-columns: 1fr; gap: 6px; margin-bottom: 14px; max-height: 320px; overflow: auto; padding-right: 2px; }
+.sys-tab {
+    border: 1px solid transparent; border-radius: 12px; padding: 10px 12px; cursor: pointer; text-align: left;
+    background: rgba(255,255,255,0.03); color: #8b949e; font-family: inherit; font-size: 0.82rem; font-weight: 700;
+}
+.sys-tab small { display: block; font-size: 0.68rem; font-weight: 500; color: #6b7280; margin-top: 2px; }
+.sys-tab.active { color: #fff; border-color: rgba(188,19,254,0.5); background: linear-gradient(135deg, rgba(155,92,255,0.35), rgba(126,63,242,0.18)); }
+.block { margin-top: 12px; padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,0.25); }
+.block h3 { font-size: 0.78rem; margin-bottom: 10px; color: #c4b5fd; letter-spacing: 0.04em; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn {
+    border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: #eee;
+    border-radius: 10px; padding: 9px 12px; font-family: inherit; font-weight: 700; font-size: 0.78rem; cursor: pointer;
+}
+.btn.primary { background: linear-gradient(135deg, #9b5cff, #bc13fe); border-color: transparent; color: #fff; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.field { display: grid; gap: 4px; margin-top: 8px; }
+.field label { font-size: 0.68rem; color: #9aa3af; }
+.field input { border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #0d0b14; color: #fff; padding: 8px 10px; font-family: inherit; }
+.url-box { margin-top: 8px; font-size: 0.62rem; color: #7dd3fc; word-break: break-all; padding: 8px; border-radius: 8px; background: rgba(0,0,0,0.35); border: 1px solid rgba(0,210,255,0.15); }
+.hint { font-size: 0.68rem; color: #6b7280; margin-top: 8px; line-height: 1.4; }
+.prize-list { display: grid; gap: 6px; max-height: 180px; overflow: auto; }
+.prize-item { display: grid; grid-template-columns: 1fr 64px 36px; gap: 6px; align-items: center; }
+.prize-item input { width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: #0d0b14; color: #fff; padding: 6px 8px; font-family: inherit; font-size: 0.75rem; }
+.btn.danger { color: #ff8a9a; border-color: rgba(255,71,87,0.35); }
+.queue-chip { font-size: 0.7rem; color: #f5c842; margin-top: 6px; min-height: 1.2em; }
+
+.stage-wrap {
+    position: relative; display: grid; place-items: center;
+    background:
+        radial-gradient(ellipse at 50% 20%, rgba(120,40,200,0.18), transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(0,120,180,0.1), transparent 40%),
+        linear-gradient(160deg, #080610, #0e0a18 55%, #07060c);
+}
+body.overlay-mode .stage-wrap { background: transparent; }
+.stage {
+    position: relative; width: min(960px, 96vw); height: min(640px, 90vh);
+    border-radius: 22px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(8,6,16,0.4); box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+body.overlay-mode .stage { width: 100vw; height: 100vh; border: none; border-radius: 0; background: transparent; box-shadow: none; }
+
+.system-stage { position: absolute; inset: 0; display: none; }
+.system-stage.active { display: block; }
+.fx-layer, .prize-layer { position: absolute; inset: 0; pointer-events: none; z-index: 20; }
+.prize-card {
+    position: absolute; left: 50%; top: 72%; transform: translate(-50%, -50%) scale(0.85);
+    min-width: 240px; padding: 16px 22px; border-radius: 16px; text-align: center;
+    background: linear-gradient(160deg, rgba(24,14,42,0.96), rgba(10,8,20,0.98));
+    border: 1px solid rgba(188,19,254,0.4); box-shadow: 0 0 36px rgba(155,92,255,0.3);
+    opacity: 0; transition: 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+.prize-card.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.prize-card .tier { font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: #c084fc; font-weight: 800; }
+.prize-card .name { margin-top: 6px; font-size: 1.35rem; font-weight: 900; }
+.prize-card .user { margin-top: 6px; font-size: 0.78rem; color: #9aa3af; }
+
+/* shared playing card */
+.deck-slot, .card-host { position: absolute; inset: 0; perspective: 1400px; }
+.pcard {
+    position: absolute; width: 118px; height: 168px; border-radius: 14px;
+    transform-style: preserve-3d; left: 50%; top: 42%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.45);
+    will-change: transform;
+}
+.pcard .face {
+    position: absolute; inset: 0; border-radius: 14px; backface-visibility: hidden;
+    display: grid; place-items: center; padding: 10px; text-align: center;
+}
+.pcard .back {
+    background:
+        radial-gradient(circle at 50% 42%, rgba(90,40,160,0.55), transparent 55%),
+        linear-gradient(155deg, #1a0f2e 0%, #0c0818 48%, #140a24 100%);
+    border: 2px solid rgba(210, 205, 220, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+    overflow: hidden;
+}
+.pcard .back::before {
+    content: ''; position: absolute; inset: 8px; border-radius: 10px; z-index: 1;
+    border: 1px solid rgba(220, 215, 235, 0.28);
+    background:
+        radial-gradient(circle at 50% 50%, transparent 38%, rgba(255,255,255,0.04) 39%, transparent 42%),
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.035) 0 2px, transparent 2px 10px);
+    pointer-events: none;
+}
+.pcard .back::after {
+    content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+        radial-gradient(circle at 18% 16%, rgba(255,255,255,0.35) 0 1px, transparent 2px),
+        radial-gradient(circle at 82% 22%, rgba(255,255,255,0.28) 0 1px, transparent 2px),
+        radial-gradient(circle at 76% 78%, rgba(255,255,255,0.22) 0 1px, transparent 2px),
+        radial-gradient(circle at 22% 84%, rgba(255,255,255,0.2) 0 1px, transparent 2px);
+}
+.pcard .back .mark {
+    position: relative; z-index: 2; width: 58%; aspect-ratio: 1;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.02) 42%, transparent 70%),
+        url('/assets/tokcontrol-card-mark-clear.png') center / 88% no-repeat;
+    -webkit-mask-image: radial-gradient(circle, #000 62%, transparent 78%);
+    mask-image: radial-gradient(circle, #000 62%, transparent 78%);
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.18));
+    opacity: 0.92;
+}
+.pcard .back .corner {
+    position: absolute; z-index: 2; width: 10px; height: 10px;
+    border: 1.5px solid rgba(230,228,240,0.45);
+}
+.pcard .back .corner.tl { left: 11px; top: 11px; border-right: none; border-bottom: none; }
+.pcard .back .corner.tr { right: 11px; top: 11px; border-left: none; border-bottom: none; }
+.pcard .back .corner.bl { left: 11px; bottom: 11px; border-right: none; border-top: none; }
+.pcard .back .corner.br { right: 11px; bottom: 11px; border-left: none; border-top: none; }
+.pcard .front {
+    background: linear-gradient(165deg, #fff8ef, #f0e6ff 60%, #e8f7ff);
+    border: 2px solid rgba(255,255,255,0.7); color: #1a1028; transform: rotateY(180deg);
+}
+.pcard .front .glyph { font-size: 2.2rem; line-height: 1; filter: drop-shadow(0 2px 0 rgba(0,0,0,0.08)); }
+.pcard .front .label { margin-top: 8px; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.04em; color: #5b21b6; }
+.pcard.flipped { transform: translate(-50%, -50%) rotateY(180deg); }
+.pcard.winner {
+    box-shadow: 0 0 0 2px #f5c842, 0 0 40px rgba(245,200,66,0.55), 0 18px 36px rgba(0,0,0,0.4);
+}
+
+/* ===== NON-CARD: ORB / COIN / SCROLL / PORTAL ===== */
+.fx-host { position: absolute; inset: 0; }
+.orb-ball {
+    position: absolute; left: 50%; top: 42%; width: min(220px, 42vw); aspect-ratio: 1;
+    transform: translate(-50%, -50%); border-radius: 50%;
+    background:
+        radial-gradient(circle at 35% 28%, rgba(255,255,255,0.65), transparent 28%),
+        radial-gradient(circle at 50% 55%, rgba(155,92,255,0.55), rgba(20,8,40,0.95) 70%);
+    border: 2px solid rgba(200,170,255,0.45);
+    box-shadow: 0 0 50px rgba(155,92,255,0.4), inset 0 0 40px rgba(0,210,255,0.15);
+}
+.orb-ball .ring {
+    position: absolute; inset: -8%; border-radius: 50%;
+    border: 2px dashed rgba(0,210,255,0.35); animation: spinCW 6s linear infinite;
+}
+.orb-ball .ring.r2 { inset: -18%; border-style: solid; border-color: rgba(245,200,66,0.28); animation-duration: 9s; animation-direction: reverse; }
+.orb-ball.shatter { animation: orbPop 0.55s ease-out forwards; }
+@keyframes orbPop { to { opacity: 0; transform: translate(-50%, -50%) scale(1.45); filter: brightness(2); } }
+@keyframes spinCW { to { transform: rotate(360deg); } }
+
+.coin-piece {
+    position: absolute; left: 50%; top: 42%; width: 140px; height: 140px;
+    margin-left: -70px; margin-top: -70px; border-radius: 50%;
+    transform-style: preserve-3d;
+    background:
+        radial-gradient(circle at 35% 30%, #ffe9a8, #f5c842 45%, #a87a10 78%, #6a4a08);
+    border: 4px solid #ffe08a;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.45), inset 0 0 20px rgba(255,255,255,0.25);
+    display: grid; place-items: center;
+}
+.coin-piece .coin-mark {
+    width: 58%; aspect-ratio: 1;
+    background: url('/assets/tokcontrol-card-mark-clear.png') center / contain no-repeat;
+    filter: brightness(0) sepia(1) saturate(4) hue-rotate(5deg) drop-shadow(0 1px 0 rgba(255,255,255,0.25));
+    opacity: 0.45;
+}
+.coin-piece.flipping { animation: coinFlip 0.28s linear infinite; }
+@keyframes coinFlip {
+    0% { transform: rotateY(0deg) rotateX(12deg); }
+    100% { transform: rotateY(360deg) rotateX(12deg); }
+}
+
+.scroll-sheet {
+    position: absolute; left: 50%; top: 42%; width: min(320px, 70vw); height: 40px;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(180deg, #f3e2b8, #e4c98a);
+    border-radius: 8px; overflow: hidden;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.4);
+    transition: height 0.7s cubic-bezier(0.22,1,0.36,1);
+}
+.scroll-sheet.open { height: 210px; }
+.scroll-sheet .rod {
+    position: absolute; left: 0; right: 0; height: 18px;
+    background: linear-gradient(180deg, #c9a24a, #8a6a20);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.scroll-sheet .rod.top { top: 0; }
+.scroll-sheet .rod.bot { bottom: 0; }
+.scroll-sheet .body {
+    position: absolute; inset: 22px 18px; display: grid; place-items: center;
+    text-align: center; color: #3b2410; opacity: 0; transition: opacity 0.35s 0.35s;
+}
+.scroll-sheet.open .body { opacity: 1; }
+.scroll-sheet .body .tier { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 800; color: #7a4a10; }
+.scroll-sheet .body .name { margin-top: 8px; font-size: 1.25rem; font-weight: 900; }
+
+.portal-ring {
+    position: absolute; left: 50%; top: 42%; width: min(260px, 50vw); aspect-ratio: 1;
+    transform: translate(-50%, -50%) scale(0.2); border-radius: 50%;
+    border: 3px solid rgba(0,210,255,0.5);
+    box-shadow: 0 0 40px rgba(188,19,254,0.45), inset 0 0 50px rgba(0,210,255,0.25);
+    background: radial-gradient(circle, rgba(255,255,255,0.35), rgba(120,40,200,0.35) 40%, transparent 70%);
+    opacity: 0; transition: 0.55s cubic-bezier(0.22,1,0.36,1);
+}
+.portal-ring.open { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.portal-core {
+    position: absolute; left: 50%; top: 42%; width: 90px; height: 90px;
+    transform: translate(-50%, -50%) scale(0); border-radius: 16px;
+    background: linear-gradient(160deg, #fff8ef, #f0e6ff);
+    border: 2px solid rgba(255,255,255,0.7); color: #1a1028;
+    display: grid; place-items: center; text-align: center; padding: 8px;
+    opacity: 0; transition: 0.45s cubic-bezier(0.175,0.885,0.32,1.2); z-index: 5;
+    font-weight: 900; font-size: 0.85rem;
+}
+.portal-core.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+.stage-bg {
+    position: absolute; inset: 0;
+    background:
+        radial-gradient(1.5px 1.5px at 12% 18%, rgba(255,255,255,0.55), transparent),
+        radial-gradient(1px 1px at 78% 30%, rgba(160,200,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 40% 70%, rgba(255,255,255,0.35), transparent),
+        radial-gradient(circle at 50% 45%, rgba(120,40,200,0.14), transparent 42%);
+    opacity: 0.9;
+}
+.stage-title {
+    position: absolute; left: 50%; top: 7%; transform: translateX(-50%);
+    font-family: Cinzel, Kanit, serif; font-size: 0.95rem; letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.55); font-weight: 700; z-index: 2; pointer-events: none;
+}
+.user-banner {
+    position: absolute; left: 50%; top: 14%; transform: translateX(-50%);
+    font-size: 0.85rem; font-weight: 800; color: #e9d5ff; opacity: 0; z-index: 5;
+    transition: 0.3s; text-shadow: 0 0 18px rgba(188,19,254,0.5);
+}
+.user-banner.show { opacity: 1; }
+
+/* shuffle table */
+#stageShuffle .table {
+    position: absolute; left: 50%; top: 46%; width: 280px; height: 40px;
+    transform: translate(-50%, -50%); border-radius: 999px;
+    background: radial-gradient(ellipse, rgba(188,19,254,0.15), transparent 70%);
+}
+
+/* particles */
+.particle { position: absolute; border-radius: 50%; pointer-events: none; z-index: 30; }
+.burst-ring {
+    position: absolute; left: 50%; top: 42%; width: 40px; height: 40px; border-radius: 50%;
+    border: 2px solid rgba(245,200,66,0.7); transform: translate(-50%, -50%) scale(0.2); opacity: 0; z-index: 25;
+}
+.burst-ring.go { animation: radialBurst 0.7s ease-out forwards; }
+@keyframes radialBurst {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(0.2); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(7); border-width: 0; }
+}
+
+@media (max-width: 980px) {
+    .layout { grid-template-columns: 1fr; grid-template-rows: 40vh 1fr; }
+    .panel { border-right: none; border-bottom: 1px solid var(--line); }
+}
+</style>
+<link rel="stylesheet" href="/styles/overlay-brand.css">
+<script src="/js/overlay-brand.js" defer></script>
+</head>
+<body>
+<script src="/js/overlay-widget-boot.js"></script>
+<div class="layout" id="appLayout">
+    <aside class="panel" id="controlPanel">
+        <div>
+            <span class="kicker">Lucky Draw · Auto</span>
+            <h1>สุ่มรางวัล</h1>
+            <p class="sub">เล่นอัตโนมัติเหมือนกาชา/วงล้อ — ไพ่ + พิเศษอื่น คิวต่อคิว รองรับทริกเกอร์ของขวัญ</p>
+        </div>
+
+        <div class="sys-tabs" id="sysTabs">
+            <button type="button" class="sys-tab active" data-system="shuffle">🔀 สับไพ่<small>สับสำรับแล้วเปิดใบชัย</small></button>
+            <button type="button" class="sys-tab" data-system="draw">🃏 จั่วไพ่<small>จั่วจากกอง พลิกเปิดรางวัล</small></button>
+            <button type="button" class="sys-tab" data-system="fan">🎴 แผ่พัด<small>แผ่ไพ่เป็นพัด ใบหนึ่งลอยขึ้น</small></button>
+            <button type="button" class="sys-tab" data-system="ripple">💫 วงคลื่น<small>ไพ่กระจายวงแล้วรวมกลาง</small></button>
+            <button type="button" class="sys-tab" data-system="deal">✨ แจกห้าใบ<small>แจกเร็วแล้วไฮไลต์ใบชนะ</small></button>
+            <button type="button" class="sys-tab" data-system="orb">🔮 ลูกแก้ว<small>หมุนพลังแล้วแตกเปิดรางวัล</small></button>
+            <button type="button" class="sys-tab" data-system="coin">🪙 เหรียญทอย<small>หมุนเหรียญหลายรอบแล้วเปิด</small></button>
+            <button type="button" class="sys-tab" data-system="scroll">📜 ม้วนคัมภีร์<small>คลี่ม้วนเปิดข้อความรางวัล</small></button>
+            <button type="button" class="sys-tab" data-system="portal">🌀 พอร์ทัล<small>เปิดมิติ ดึงรางวัลออกมา</small></button>
+        </div>
+
+        <div class="block">
+            <h3>ทดสอบ / Overlay</h3>
+            <div class="row">
+                <button type="button" class="btn primary" id="btnPlay">▶ สุ่มอัตโนมัติ</button>
+                <button type="button" class="btn" id="btnReset">รีเซ็ต</button>
+                <button type="button" class="btn" id="btnCopyUrl">📋 คัดลอก OBS URL</button>
+            </div>
+            <div class="row" style="margin-top:8px;">
+                <button type="button" class="btn" id="btnGiftRules">🎁 Gift Rules</button>
+            </div>
+            <div class="field">
+                <label>ชื่อผู้เล่นทดสอบ</label>
+                <input type="text" id="testUser" value="Viewer">
+            </div>
+            <div class="queue-chip" id="queueChip"></div>
+            <div class="url-box" id="obsUrlBox">กำลังสร้างลิงก์…</div>
+            <p class="hint">Browser Source ใน OBS — โหมด overlay พื้นหลังใส · ของขวัญตั้งใน Gift Rules เลือกโหมด “สุ่มไพ่”</p>
+        </div>
+
+        <div class="block">
+            <h3>รางวัล (น้ำหนัก)</h3>
+            <div class="prize-list" id="prizeList"></div>
+            <div class="row" style="margin-top:8px;">
+                <button type="button" class="btn" id="btnAddPrize">+ เพิ่มรางวัล</button>
+                <button type="button" class="btn" id="btnSavePrizes">บันทึก</button>
+            </div>
+        </div>
+    </aside>
+
+    <main class="stage-wrap">
+        <div class="stage" id="stage">
+            <section class="system-stage active" id="stageShuffle" data-system="shuffle">
+                <div class="stage-bg"></div>
+                <div class="stage-title">SHUFFLE</div>
+                <div class="user-banner" id="bannerShuffle"></div>
+                <div class="table"></div>
+                <div class="card-host" id="hostShuffle"></div>
+                <div class="burst-ring" id="burstShuffle"></div>
+                <div class="fx-layer" id="fxShuffle"></div>
+                <div class="prize-layer"><div class="prize-card" id="prizeShuffle"><div class="tier"></div><div class="name"></div><div class="user"></div></div></div>
+            </section>
+
+            <section class="system-stage" id="stageDraw" data-system="draw">
+                <div class="stage-bg"></div>
+                <div class="stage-title">DRAW</div>
+                <div class="user-banner" id="bannerDraw"></div>
+                <div class="card-host" id="hostDraw"></div>
+                <div class="burst-ring" id="burstDraw"></div>
+                <div class="fx-layer" id="fxDraw"></div>
+                <div class="prize-layer"><div class="prize-card" id="prizeDraw"><div class="tier"></div><div class="name"></div><div class="user"></div></div></div>
+            </section>
+
+            <section class="system-stage" id="stageFan" data-system="fan">
+                <div class="stage-bg"></div>
+                <div class="stage-title">FAN</div>
+                <div class="user-banner" id="bannerFan"></div>
+                <div class="card-host" id="hostFan"></div>
+                <div class="burst-ring" id="burstFan"></div>
+                <div class="fx-layer" id="fxFan"></div>
+                <div class="prize-layer"><div class="prize-card" id="prizeFan"><div class="tier"></div><div class="name"></div><div class="user"></div></div></div>
+            </section>
+
+            <section class="system-stage" id="stageRipple" data-system="ripple">
+                <div class="stage-bg"></div>
+                <div class="stage-title">RIPPLE</div>
+                <div class="user-banner" id="bannerRipple"></div>
+                <div class="card-host" id="hostRipple"></div>
+                <div class="burst-ring" id="burstRipple"></div>
+                <div class="fx-layer" id="fxRipple"></div>
+                <div class="prize-layer"><div class="prize-card" id="prizeRipple"><div class="tier"></div><div class="name"></div><div class="user"></div></div></div>
+            </section>
+
+            <section class="system-stage" id="stageDeal" data-system="deal">
+                <div class="stage-bg"></div>
+                <div class="stage-title">DEAL</div>
+                <div class="user-banner" id="bannerDeal"></div>
+                <div class="card-host" id="hostDeal"></div>
+                <div class="burst-ring" id="burstDeal"></div>
+                <div class="fx-layer" id="fxDeal"></div>
+                <div class="prize-layer"><div class="prize-card" id="prizeDeal"><div class="tier"></div><div class="name"></div><div class="user"></div></div></div>
+            </section>
+
+            <section class="system-stage" id="stageOrb" data-system="orb">
+                <div class="stage-bg"></div>
+                <div class="stage-title">ORB</div>
+                <div class="user-banner" id="bannerOrb"></div>
+                <div class="fx-host" id="hostOrb"></div>
+                <div class="burst-ring" id="burstOrb"></div>
+                <div class="fx-layer" id="fxOrb"></div>
+                <div class="prize-layer"><div class="prize-card" id="prizeOrb"><div class="tier"></div><div class="name"></div><div class="user"></div></div></div>
+            </section>
+
+            <section class="system-stage" id="stageCoin" data-system="coin">
+                <div class="stage-bg"></div>
+                <div class="stage-title">COIN</div>
+                <div class="user-banner" id="bannerCoin"></div>
+                <div class="fx-host" id="hostCoin"></div>
+                <div class="burst-ring" id="burstCoin"></div>
+                <div class="fx-layer" id="fxCoin"></div>
+                <div class="prize-layer"><div class="prize-card" id="prizeCoin"><div class="tier"></div><div class="name"></div><div class="user"></div></div></div>
+            </section>
+
+            <section class="system-stage" id="stageScroll" data-system="scroll">
+                <div class="stage-bg"></div>
+                <div class="stage-title">SCROLL</div>
+                <div class="user-banner" id="bannerScroll"></div>
+                <div class="fx-host" id="hostScroll"></div>
+                <div class="burst-ring" id="burstScroll"></div>
+                <div class="fx-layer" id="fxScroll"></div>
+                <div class="prize-layer"><div class="prize-card" id="prizeScroll"><div class="tier"></div><div class="name"></div><div class="user"></div></div></div>
+            </section>
+
+            <section class="system-stage" id="stagePortal" data-system="portal">
+                <div class="stage-bg"></div>
+                <div class="stage-title">PORTAL</div>
+                <div class="user-banner" id="bannerPortal"></div>
+                <div class="fx-host" id="hostPortal"></div>
+                <div class="burst-ring" id="burstPortal"></div>
+                <div class="fx-layer" id="fxPortal"></div>
+                <div class="prize-layer"><div class="prize-card" id="prizePortal"><div class="tier"></div><div class="name"></div><div class="user"></div></div></div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    const SYSTEMS = ['shuffle', 'draw', 'fan', 'ripple', 'deal', 'orb', 'coin', 'scroll', 'portal'];
+    const GLYPHS = ['♠', '♥', '♦', '♣', '★', '✦', '☾', '☀'];
+    const STORAGE_KEY = 'tokcontrol_card_prizes_v1';
+    const DEFAULT_PRIZES = [
+        { name: 'Common Gift', weight: 40, tier: 'Common' },
+        { name: 'Rare Boost', weight: 30, tier: 'Rare' },
+        { name: 'Epic Drop', weight: 20, tier: 'Epic' },
+        { name: 'Legendary Win', weight: 10, tier: 'Legendary' }
+    ];
+
+    const params = new URLSearchParams(location.search);
+    const isOverlay = params.get('overlay') === '1' || params.get('mode') === 'ritual' || params.get('mode') === 'card'
+        || /^\/widget\//i.test(location.pathname)
+        || !!(window.__TC_WIDGET__ && window.__TC_WIDGET__.mode === 'ritual');
+    let system = (params.get('system') || (window.__TC_WIDGET__ && window.__TC_WIDGET__.defaults && window.__TC_WIDGET__.defaults.system) || (window.__TC_WIDGET__ && window.__TC_WIDGET__.type) || 'shuffle').toLowerCase();
+    if (system === 'rituals' || system === 'cards') system = 'shuffle';
+    if (!SYSTEMS.includes(system)) system = 'shuffle';
+
+    let prizes = loadPrizes();
+    let busy = false;
+    const queue = [];
+    let socket = null;
+    let streamToken = params.get('cid') || params.get('token') || '';
+    try {
+        if (!streamToken) streamToken = localStorage.getItem('pandy_stream_token') || '';
+        if (!streamToken && window.parent && window.parent !== window && window.parent.currentUser?.streamToken) {
+            streamToken = window.parent.currentUser.streamToken;
+        }
+    } catch (_) {}
+
+    if (isOverlay) document.body.classList.add('overlay-mode');
+
+    function loadPrizes() {
+        try {
+            const raw = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+            if (Array.isArray(raw) && raw.length) return raw;
+            // migrate old ritual prizes if present
+            const legacy = JSON.parse(localStorage.getItem('tokcontrol_ritual_prizes_v1') || 'null');
+            if (Array.isArray(legacy) && legacy.length) return legacy;
+        } catch (_) {}
+        return DEFAULT_PRIZES.map((p) => ({ ...p }));
+    }
+    function savePrizes() { localStorage.setItem(STORAGE_KEY, JSON.stringify(prizes)); }
+    function pickPrize() {
+        const total = prizes.reduce((s, p) => s + Math.max(1, Number(p.weight) || 1), 0);
+        let r = Math.random() * total;
+        for (const p of prizes) {
+            r -= Math.max(1, Number(p.weight) || 1);
+            if (r <= 0) return p;
+        }
+        return prizes[prizes.length - 1];
+    }
+    function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
+    function escapeHtml(s) {
+        return String(s || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function updateQueueChip() {
+        const el = document.getElementById('queueChip');
+        if (!el) return;
+        el.textContent = queue.length ? `คิวรอ: ${queue.length} รอบ` : '';
+    }
+
+    function setSystem(next) {
+        if (!SYSTEMS.includes(next)) return;
+        system = next;
+        document.querySelectorAll('.sys-tab').forEach((b) => b.classList.toggle('active', b.dataset.system === system));
+        document.querySelectorAll('.system-stage').forEach((el) => el.classList.toggle('active', el.dataset.system === system));
+        updateObsUrl();
+        clearHosts();
+        const url = new URL(location.href);
+        url.searchParams.set('system', system);
+        if (!isOverlay) history.replaceState(null, '', url);
+    }
+
+    function updateObsUrl() {
+        const box = document.getElementById('obsUrlBox');
+        if (!box) return '';
+        const u = new URL(location.origin + '/widget/' + (system || 'shuffle'));
+        u.searchParams.set('w', '1920');
+        u.searchParams.set('h', '1080');
+        if (streamToken) u.searchParams.set('cid', streamToken);
+        box.textContent = u.toString();
+        return u.toString();
+    }
+
+    function renderPrizeEditor() {
+        const host = document.getElementById('prizeList');
+        if (!host) return;
+        host.innerHTML = prizes.map((p, i) => `
+            <div class="prize-item" data-i="${i}">
+                <input data-k="name" value="${escapeHtml(p.name)}" placeholder="ชื่อรางวัล">
+                <input data-k="weight" type="number" min="1" value="${Number(p.weight) || 1}" title="น้ำหนัก">
+                <button type="button" class="btn danger" data-del="${i}" style="min-height:30px;padding:4px 8px;">✕</button>
+            </div>`).join('');
+    }
+
+    function showPrize(el, prize, username) {
+        if (!el) return;
+        const tier = el.querySelector('.tier');
+        const name = el.querySelector('.name');
+        const user = el.querySelector('.user');
+        if (tier) tier.textContent = prize.tier || 'Reward';
+        if (name) name.textContent = prize.name || 'Prize';
+        if (user) user.textContent = username ? '@' + username : '';
+        el.classList.add('show');
+    }
+
+    function spawnParticles(host, opts = {}) {
+        if (!host) return;
+        const n = opts.count || 28;
+        const colors = opts.colors || ['#fff', '#c084fc', '#bc13fe', '#00d2ff', '#f5c842'];
+        for (let i = 0; i < n; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = 3 + Math.random() * 5;
+            p.style.cssText = `left:50%;top:42%;width:${size}px;height:${size}px;background:${colors[i % colors.length]};box-shadow:0 0 10px currentColor;`;
+            host.appendChild(p);
+            const ang = Math.random() * Math.PI * 2;
+            const dist = 90 + Math.random() * 160;
+            p.animate([
+                { transform: 'translate(-50%,-50%) scale(1)', opacity: 1 },
+                { transform: `translate(calc(-50% + ${Math.cos(ang) * dist}px), calc(-50% + ${Math.sin(ang) * dist}px)) scale(0)`, opacity: 0 }
+            ], { duration: 700 + Math.random() * 450, easing: 'cubic-bezier(0.1,0.7,0.2,1)', fill: 'forwards' });
+            setTimeout(() => p.remove(), 1300);
+        }
+    }
+
+    function makeCard(glyph, label) {
+        const el = document.createElement('div');
+        el.className = 'pcard';
+        el.innerHTML = `
+            <div class="face back">
+                <span class="corner tl"></span><span class="corner tr"></span>
+                <span class="corner bl"></span><span class="corner br"></span>
+                <div class="mark" aria-hidden="true"></div>
+            </div>
+            <div class="face front"><div><div class="glyph">${glyph}</div><div class="label">${escapeHtml(label || '')}</div></div></div>`;
+        return el;
+    }
+
+    function clearHosts() {
+        ['Shuffle', 'Draw', 'Fan', 'Ripple', 'Deal', 'Orb', 'Coin', 'Scroll', 'Portal'].forEach((k) => {
+            const host = document.getElementById('host' + k);
+            if (host) host.innerHTML = '';
+            document.getElementById('prize' + k)?.classList.remove('show');
+            document.getElementById('burst' + k)?.classList.remove('go');
+            document.getElementById('banner' + k)?.classList.remove('show');
+        });
+    }
+
+    function capName(sys) {
+        return sys.charAt(0).toUpperCase() + sys.slice(1);
+    }
+
+    async function finishReveal(sys, prize, username) {
+        const K = capName(sys);
+        const burst = document.getElementById('burst' + K);
+        burst?.classList.remove('go');
+        void burst?.offsetWidth;
+        burst?.classList.add('go');
+        spawnParticles(document.getElementById('fx' + K));
+        showPrize(document.getElementById('prize' + K), prize, username);
+        emitPlay(sys, prize, username);
+        await wait(1600);
+    }
+
+    /* ---------- ANIMATIONS ---------- */
+    async function playShuffle(prize, username) {
+        const host = document.getElementById('hostShuffle');
+        const banner = document.getElementById('bannerShuffle');
+        host.innerHTML = '';
+        if (banner) { banner.textContent = username ? '@' + username : ''; banner.classList.add('show'); }
+        const cards = [];
+        for (let i = 0; i < 8; i++) {
+            const c = makeCard(GLYPHS[i % GLYPHS.length]);
+            c.style.zIndex = String(i);
+            host.appendChild(c);
+            cards.push(c);
+        }
+        // gather
+        cards.forEach((c) => {
+            c.style.transform = 'translate(-50%, -50%)';
+            c.style.transition = 'transform 0.25s ease';
+        });
+        await wait(200);
+        // shuffle toss
+        for (let round = 0; round < 10; round++) {
+            cards.forEach((c, i) => {
+                const dx = (Math.random() - 0.5) * 160;
+                const dy = (Math.random() - 0.5) * 70;
+                const rot = (Math.random() - 0.5) * 50;
+                c.style.transition = `transform ${160 + Math.random() * 80}ms cubic-bezier(0.22,0.8,0.3,1)`;
+                c.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) rotate(${rot}deg)`;
+                c.style.zIndex = String((i + round) % 8);
+            });
+            await wait(95);
+        }
+        // restack
+        cards.forEach((c, i) => {
+            c.style.transition = 'transform 0.35s ease';
+            c.style.transform = `translate(calc(-50% + ${(i - 3.5) * 2}px), calc(-50% + ${(i - 3.5) * 1.5}px))`;
+        });
+        await wait(380);
+        // winner pops
+        const win = cards[cards.length - 1];
+        win.style.transition = 'transform 0.45s cubic-bezier(0.175,0.885,0.32,1.2)';
+        win.style.transform = 'translate(-50%, calc(-50% - 36px)) scale(1.12)';
+        win.style.zIndex = '20';
+        await wait(280);
+        win.style.transform = 'translate(-50%, calc(-50% - 36px)) scale(1.12) rotateY(180deg)';
+        win.classList.add('winner');
+        const frontLabel = win.querySelector('.label');
+        if (frontLabel) frontLabel.textContent = prize.name || '';
+        await wait(420);
+        await finishReveal('shuffle', prize, username);
+    }
+
+    async function playDraw(prize, username) {
+        const host = document.getElementById('hostDraw');
+        const banner = document.getElementById('bannerDraw');
+        host.innerHTML = '';
+        if (banner) { banner.textContent = username ? '@' + username : ''; banner.classList.add('show'); }
+        // deck stack
+        for (let i = 0; i < 5; i++) {
+            const d = makeCard(GLYPHS[i % GLYPHS.length]);
+            d.style.transform = `translate(calc(-50% - 110px), calc(-50% + ${i * 2}px))`;
+            d.style.zIndex = String(i);
+            host.appendChild(d);
+        }
+        const drawn = makeCard(GLYPHS[Math.floor(Math.random() * GLYPHS.length)], prize.name);
+        drawn.style.transform = 'translate(calc(-50% - 110px), -50%) scale(0.98)';
+        drawn.style.zIndex = '10';
+        host.appendChild(drawn);
+        await wait(180);
+        drawn.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1)';
+        drawn.style.transform = 'translate(calc(-50% + 40px), calc(-50% - 20px)) rotate(8deg) scale(1.05)';
+        await wait(520);
+        drawn.style.transition = 'transform 0.5s cubic-bezier(0.175,0.885,0.32,1.15)';
+        drawn.style.transform = 'translate(-50%, -50%) scale(1.15) rotateY(180deg)';
+        drawn.classList.add('winner');
+        await wait(480);
+        await finishReveal('draw', prize, username);
+    }
+
+    async function playFan(prize, username) {
+        const host = document.getElementById('hostFan');
+        const banner = document.getElementById('bannerFan');
+        host.innerHTML = '';
+        if (banner) { banner.textContent = username ? '@' + username : ''; banner.classList.add('show'); }
+        const n = 7;
+        const cards = [];
+        const winIdx = Math.floor(n / 2);
+        for (let i = 0; i < n; i++) {
+            const c = makeCard(GLYPHS[i % GLYPHS.length], i === winIdx ? prize.name : '');
+            c.style.transform = 'translate(-50%, -50%)';
+            host.appendChild(c);
+            cards.push(c);
+        }
+        await wait(80);
+        cards.forEach((c, i) => {
+            const t = (i / (n - 1)) * 2 - 1; // -1..1
+            const rot = t * 42;
+            const x = t * 150;
+            const y = Math.abs(t) * 28;
+            c.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1)';
+            c.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${rot}deg)`;
+            c.style.zIndex = String(i);
+        });
+        await wait(700);
+        const win = cards[winIdx];
+        win.style.transition = 'transform 0.5s cubic-bezier(0.175,0.885,0.32,1.2)';
+        win.style.transform = 'translate(-50%, calc(-50% - 50px)) rotate(0deg) scale(1.18)';
+        win.style.zIndex = '30';
+        await wait(320);
+        win.style.transform = 'translate(-50%, calc(-50% - 50px)) scale(1.18) rotateY(180deg)';
+        win.classList.add('winner');
+        await wait(480);
+        await finishReveal('fan', prize, username);
+    }
+
+    async function playRipple(prize, username) {
+        const host = document.getElementById('hostRipple');
+        const banner = document.getElementById('bannerRipple');
+        host.innerHTML = '';
+        if (banner) { banner.textContent = username ? '@' + username : ''; banner.classList.add('show'); }
+        const n = 8;
+        const cards = [];
+        for (let i = 0; i < n; i++) {
+            const c = makeCard(GLYPHS[i % GLYPHS.length]);
+            c.style.transform = 'translate(-50%, -50%) scale(0.4)';
+            c.style.opacity = '0';
+            host.appendChild(c);
+            cards.push(c);
+        }
+        for (let i = 0; i < n; i++) {
+            const ang = (i / n) * Math.PI * 2 - Math.PI / 2;
+            const r = 150;
+            cards[i].style.transition = 'transform 0.45s cubic-bezier(0.22,1,0.36,1), opacity 0.3s';
+            cards[i].style.opacity = '1';
+            cards[i].style.transform = `translate(calc(-50% + ${Math.cos(ang) * r}px), calc(-50% + ${Math.sin(ang) * r}px)) rotate(${(ang * 180) / Math.PI + 90}deg)`;
+            await wait(55);
+        }
+        await wait(280);
+        cards.forEach((c) => {
+            c.style.transition = 'transform 0.5s cubic-bezier(0.22,1,0.36,1), opacity 0.4s';
+            c.style.transform = 'translate(-50%, -50%) scale(0.7)';
+            c.style.opacity = '0.25';
+        });
+        await wait(420);
+        const win = cards[0];
+        win.style.opacity = '1';
+        win.style.zIndex = '20';
+        win.style.transition = 'transform 0.5s cubic-bezier(0.175,0.885,0.32,1.15)';
+        win.style.transform = 'translate(-50%, -50%) scale(1.2) rotateY(180deg)';
+        win.classList.add('winner');
+        const lbl = win.querySelector('.label');
+        if (lbl) lbl.textContent = prize.name || '';
+        await wait(480);
+        await finishReveal('ripple', prize, username);
+    }
+
+    async function playDeal(prize, username) {
+        const host = document.getElementById('hostDeal');
+        const banner = document.getElementById('bannerDeal');
+        host.innerHTML = '';
+        if (banner) { banner.textContent = username ? '@' + username : ''; banner.classList.add('show'); }
+        const n = 5;
+        const winIdx = Math.floor(Math.random() * n);
+        const cards = [];
+        for (let i = 0; i < n; i++) {
+            const c = makeCard(GLYPHS[i % GLYPHS.length], i === winIdx ? prize.name : '');
+            c.style.transform = 'translate(calc(-50% - 220px), calc(-50% - 80px)) rotate(-18deg) scale(0.7)';
+            c.style.opacity = '0';
+            host.appendChild(c);
+            cards.push(c);
+        }
+        for (let i = 0; i < n; i++) {
+            const x = (i - (n - 1) / 2) * 108;
+            cards[i].style.transition = 'transform 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.25s';
+            cards[i].style.opacity = '1';
+            cards[i].style.transform = `translate(calc(-50% + ${x}px), -50%)`;
+            await wait(90);
+        }
+        await wait(350);
+        // flip all quickly then highlight winner
+        for (let i = 0; i < n; i++) {
+            cards[i].style.transition = 'transform 0.35s ease';
+            const x = (i - (n - 1) / 2) * 108;
+            cards[i].style.transform = `translate(calc(-50% + ${x}px), -50%) rotateY(180deg)`;
+            await wait(70);
+        }
+        await wait(280);
+        cards.forEach((c, i) => {
+            if (i === winIdx) return;
+            c.style.transition = 'opacity 0.35s, transform 0.35s';
+            c.style.opacity = '0.28';
+            c.style.filter = 'grayscale(0.4)';
+        });
+        const win = cards[winIdx];
+        const x = (winIdx - (n - 1) / 2) * 108;
+        win.style.transition = 'transform 0.45s cubic-bezier(0.175,0.885,0.32,1.2)';
+        win.style.transform = `translate(calc(-50% + ${x}px), calc(-50% - 28px)) scale(1.18) rotateY(180deg)`;
+        win.classList.add('winner');
+        win.style.zIndex = '20';
+        await wait(420);
+        await finishReveal('deal', prize, username);
+    }
+
+    async function playOrb(prize, username) {
+        const host = document.getElementById('hostOrb');
+        const banner = document.getElementById('bannerOrb');
+        host.innerHTML = '';
+        if (banner) { banner.textContent = username ? '@' + username : ''; banner.classList.add('show'); }
+        const ball = document.createElement('div');
+        ball.className = 'orb-ball';
+        ball.innerHTML = '<div class="ring"></div><div class="ring r2"></div>';
+        host.appendChild(ball);
+        await wait(700);
+        ball.style.transition = 'transform 0.2s';
+        ball.style.transform = 'translate(-50%, -50%) scale(1.08)';
+        await wait(180);
+        ball.style.transform = 'translate(-50%, -50%) scale(0.96)';
+        await wait(160);
+        ball.classList.add('shatter');
+        await wait(280);
+        await finishReveal('orb', prize, username);
+    }
+
+    async function playCoin(prize, username) {
+        const host = document.getElementById('hostCoin');
+        const banner = document.getElementById('bannerCoin');
+        host.innerHTML = '';
+        if (banner) { banner.textContent = username ? '@' + username : ''; banner.classList.add('show'); }
+        const coin = document.createElement('div');
+        coin.className = 'coin-piece flipping';
+        coin.innerHTML = '<div class="coin-mark"></div>';
+        host.appendChild(coin);
+        await wait(1100);
+        coin.classList.remove('flipping');
+        coin.style.transition = 'transform 0.45s cubic-bezier(0.175,0.885,0.32,1.15)';
+        coin.style.transform = 'scale(1.18) rotateY(0deg)';
+        await wait(350);
+        await finishReveal('coin', prize, username);
+    }
+
+    async function playScroll(prize, username) {
+        const host = document.getElementById('hostScroll');
+        const banner = document.getElementById('bannerScroll');
+        host.innerHTML = '';
+        if (banner) { banner.textContent = username ? '@' + username : ''; banner.classList.add('show'); }
+        const sheet = document.createElement('div');
+        sheet.className = 'scroll-sheet';
+        sheet.innerHTML = `
+            <div class="rod top"></div>
+            <div class="body"><div class="tier">${escapeHtml(prize.tier || 'Reward')}</div><div class="name">${escapeHtml(prize.name || '')}</div></div>
+            <div class="rod bot"></div>`;
+        host.appendChild(sheet);
+        await wait(200);
+        sheet.classList.add('open');
+        await wait(900);
+        await finishReveal('scroll', prize, username);
+    }
+
+    async function playPortal(prize, username) {
+        const host = document.getElementById('hostPortal');
+        const banner = document.getElementById('bannerPortal');
+        host.innerHTML = '';
+        if (banner) { banner.textContent = username ? '@' + username : ''; banner.classList.add('show'); }
+        const ring = document.createElement('div');
+        ring.className = 'portal-ring';
+        const core = document.createElement('div');
+        core.className = 'portal-core';
+        core.textContent = prize.name || 'Prize';
+        host.appendChild(ring);
+        host.appendChild(core);
+        await wait(80);
+        ring.classList.add('open');
+        await wait(550);
+        core.classList.add('show');
+        await wait(420);
+        await finishReveal('portal', prize, username);
+    }
+
+    const PLAYERS = {
+        shuffle: playShuffle,
+        draw: playDraw,
+        fan: playFan,
+        ripple: playRipple,
+        deal: playDeal,
+        orb: playOrb,
+        coin: playCoin,
+        scroll: playScroll,
+        portal: playPortal
+    };
+
+    async function runOne(job) {
+        busy = true;
+        updateQueueChip();
+        const sys = job.system && SYSTEMS.includes(job.system) ? job.system : system;
+        if (sys !== system) setSystem(sys);
+        clearHosts();
+        const prize = job.prize || pickPrize();
+        const username = job.username || document.getElementById('testUser')?.value || 'Viewer';
+        document.getElementById('btnPlay')?.setAttribute('disabled', 'true');
+        try {
+            await PLAYERS[sys](prize, username);
+        } catch (e) {
+            console.warn('[card-draw]', e);
+        }
+        document.getElementById('btnPlay')?.removeAttribute('disabled');
+        busy = false;
+        updateQueueChip();
+        drainQueue();
+    }
+
+    function enqueue(job) {
+        const count = Math.max(1, Math.min(10, Number(job.count) || 1));
+        for (let i = 0; i < count; i++) {
+            queue.push({
+                system: job.system || system,
+                prize: job.prize || null,
+                username: job.username || 'Viewer'
+            });
+        }
+        updateQueueChip();
+        drainQueue();
+    }
+
+    function drainQueue() {
+        if (busy || !queue.length) return;
+        const job = queue.shift();
+        runOne(job);
+    }
+
+    function resetStage(soft) {
+        queue.length = 0;
+        busy = false;
+        clearHosts();
+        updateQueueChip();
+        document.getElementById('btnPlay')?.removeAttribute('disabled');
+        if (!soft) emitIdle();
+    }
+
+    function playCurrent(forcedPrize, username, count) {
+        enqueue({
+            system,
+            prize: forcedPrize || null,
+            username: username || document.getElementById('testUser')?.value || 'Viewer',
+            count: count || 1
+        });
+    }
+
+    /* ---------- SOCKET ---------- */
+    function connectSocket() {
+        if (typeof io === 'undefined') return;
+        try {
+            socket = io({ transports: ['websocket', 'polling'] });
+            socket.on('connect', () => {
+                if (streamToken) socket.emit('join_overlay', streamToken);
+            });
+            socket.on('overlay_ritual_play', (payload) => {
+                if (!payload) return;
+                enqueue({
+                    system: payload.system || system,
+                    prize: payload.prize || null,
+                    username: payload.username || 'Viewer',
+                    count: payload.count || 1
+                });
+            });
+            socket.on('overlay_ritual_idle', () => resetStage(true));
+        } catch (_) {}
+    }
+    function emitPlay(sys, prize, username) {
+        if (!socket || isOverlay) return;
+        socket.emit('send_ritual_play', { token: streamToken, system: sys, prize, username });
+    }
+    function emitIdle() {
+        if (!socket || isOverlay) return;
+        socket.emit('send_ritual_idle', { token: streamToken, system });
+    }
+
+    /* ---------- UI ---------- */
+    document.getElementById('sysTabs')?.addEventListener('click', (e) => {
+        const tab = e.target.closest('.sys-tab');
+        if (!tab) return;
+        setSystem(tab.dataset.system);
+    });
+    document.getElementById('btnPlay')?.addEventListener('click', () => playCurrent());
+    document.getElementById('btnReset')?.addEventListener('click', () => resetStage());
+    document.getElementById('btnCopyUrl')?.addEventListener('click', async () => {
+        const url = updateObsUrl();
+        try {
+            await navigator.clipboard.writeText(url);
+            document.getElementById('btnCopyUrl').textContent = '✅ คัดลอกแล้ว';
+            setTimeout(() => { document.getElementById('btnCopyUrl').textContent = '📋 คัดลอก OBS URL'; }, 1200);
+        } catch (_) {
+            prompt('คัดลอก URL:', url);
+        }
+    });
+    document.getElementById('btnGiftRules')?.addEventListener('click', () => {
+        try {
+            if (window.parent && window.parent !== window && typeof window.parent.openGiftMappingModal === 'function') {
+                window.parent.openGiftMappingModal('card');
+            }
+        } catch (_) {}
+    });
+    document.getElementById('btnAddPrize')?.addEventListener('click', () => {
+        prizes.push({ name: 'New Prize', weight: 10, tier: 'Rare' });
+        renderPrizeEditor();
+    });
+    document.getElementById('btnSavePrizes')?.addEventListener('click', () => {
+        document.querySelectorAll('#prizeList .prize-item').forEach((row) => {
+            const i = Number(row.dataset.i);
+            const name = row.querySelector('[data-k="name"]')?.value || 'Prize';
+            const weight = Number(row.querySelector('[data-k="weight"]')?.value) || 1;
+            if (prizes[i]) {
+                prizes[i].name = name;
+                prizes[i].weight = weight;
+                const w = Number(weight);
+                prizes[i].tier = w >= 30 ? 'Common' : w >= 15 ? 'Rare' : w >= 8 ? 'Epic' : 'Legendary';
+            }
+        });
+        savePrizes();
+        document.getElementById('btnSavePrizes').textContent = '✅ บันทึกแล้ว';
+        setTimeout(() => { document.getElementById('btnSavePrizes').textContent = 'บันทึก'; }, 1000);
+    });
+    document.getElementById('prizeList')?.addEventListener('click', (e) => {
+        const del = e.target.closest('[data-del]');
+        if (!del) return;
+        prizes.splice(Number(del.getAttribute('data-del')), 1);
+        if (!prizes.length) prizes = DEFAULT_PRIZES.map((p) => ({ ...p }));
+        renderPrizeEditor();
+        savePrizes();
+    });
+
+    window.addEventListener('message', (ev) => {
+        const data = ev.data || {};
+        if (data.type === 'pandy_ritual_play' || data.type === 'pandy_card_auto_draw') {
+            if (data.system) setSystem(data.system);
+            enqueue({
+                system: data.system || system,
+                prize: data.prize || null,
+                username: data.username || 'Viewer',
+                count: data.count || data.rounds || 1
+            });
+        }
+        if (data.type === 'pandy_ritual_reset' || data.type === 'pandy_card_reset') resetStage();
+    });
+
+    renderPrizeEditor();
+    setSystem(system);
+    connectSocket();
+    updateObsUrl();
+})();
+</script>
+</body>
+</html>

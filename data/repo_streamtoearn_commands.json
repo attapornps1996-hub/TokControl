@@ -1,0 +1,235 @@
+{
+    "game": "REPO",
+    "gameVersion": "",
+    "pluginVersion": "1.0.0",
+    "author": "streamtoearn.io",
+    "commands": [
+        {
+            "name": "Spawn Enemy",
+            "command": "spawnenemy",
+            "description": "Spawn enemy near player",
+            "value": {
+                "required": true,
+                "name": "Enemy",
+                "defaultValue": "Duck",
+                "ngSelect": true,
+                "description": "Spawn selected enemy near player",
+                "values": [
+                    { "name": "Ceiling Eye", "command": "Ceiling Eye" },
+                    { "name": "Slow Mouth", "command": "Slow Mouth" },
+                    { "name": "Thin Man", "command": "Thin Man" },
+                    { "name": "Gnome", "command": "Gnome" },
+                    { "name": "Duck", "command": "Duck" },
+                    { "name": "Valuable Thrower", "command": "Valuable Thrower" },
+                    { "name": "Animal", "command": "Animal" },
+                    { "name": "Upscream", "command": "Upscream" },
+                    { "name": "Hidden", "command": "Hidden" },
+                    { "name": "Tumbler", "command": "Tumbler" },
+                    { "name": "Bowtie", "command": "Bowtie" },
+                    { "name": "Floater", "command": "Floater" },
+                    { "name": "Bang", "command": "Bang" },
+                    { "name": "Robe", "command": "Robe" },
+                    { "name": "Slow Walker", "command": "Slow Walker" },
+                    { "name": "Head", "command": "Head" },
+                    { "name": "Beamer", "command": "Beamer" },
+                    { "name": "Runner", "command": "Runner" },
+                    { "name": "Hunter", "command": "Hunter" }
+                ]
+            }
+        },
+        {
+            "name": "Spawn Item",
+            "command": "spawnitem",
+            "description": "Spawn item near player",
+            "value": {
+                "required": true,
+                "name": "Item",
+                "defaultValue": "Cart Medium",
+                "ngSelect": true,
+                "description": "Spawn selected item near player",
+                "values": [
+                    { "name": "Cart Medium", "command": "Cart Medium" },
+                    { "name": "Cart Small", "command": "Cart Small" },
+                    { "name": "Drone Battery", "command": "Drone Battery" },
+                    { "name": "Drone Feather", "command": "Drone Feather" },
+                    { "name": "Drone Indestructible", "command": "Drone Indestructible" },
+                    { "name": "Drone Torque", "command": "Drone Torque" },
+                    { "name": "Drone Zero Gravity", "command": "Drone Zero Gravity" },
+                    { "name": "Extraction Tracker", "command": "Extraction Tracker" },
+                    { "name": "Grenade Duct Taped", "command": "Grenade Duct Taped" },
+                    { "name": "Grenade Explosive", "command": "Grenade Explosive" },
+                    { "name": "Grenade Human", "command": "Grenade Human" },
+                    { "name": "Grenade Shockwave", "command": "Grenade Shockwave" },
+                    { "name": "Grenade Stun", "command": "Grenade Stun" },
+                    { "name": "Gun Handgun", "command": "Gun Handgun" },
+                    { "name": "Gun Shotgun", "command": "Gun Shotgun" },
+                    { "name": "Gun Tranq", "command": "Gun Tranq" },
+                    { "name": "Health Pack Large", "command": "Health Pack Large" },
+                    { "name": "Health Pack Medium", "command": "Health Pack Medium" },
+                    { "name": "Health Pack Small", "command": "Health Pack Small" },
+                    { "name": "Melee Baseball Bat", "command": "Melee Baseball Bat" },
+                    { "name": "Melee Frying Pan", "command": "Melee Frying Pan" },
+                    { "name": "Melee Inflatable Hammer", "command": "Melee Inflatable Hammer" },
+                    { "name": "Melee Sledge Hammer", "command": "Melee Sledge Hammer" },
+                    { "name": "Melee Sword", "command": "Melee Sword" },
+                    { "name": "Mine Explosive", "command": "Mine Explosive" },
+                    { "name": "Mine Shockwave", "command": "Mine Shockwave" },
+                    { "name": "Mine Stun", "command": "Mine Stun" },
+                    { "name": "Orb Zero Gravity", "command": "Orb Zero Gravity" },
+                    { "name": "Power Crystal", "command": "Power Crystal" },
+                    { "name": "Rubber Duck", "command": "Rubber Duck" },
+                    { "name": "Upgrade Map Player Count", "command": "Upgrade Map Player Count" },
+                    { "name": "Upgrade Player Energy", "command": "Upgrade Player Energy" },
+                    { "name": "Upgrade Player Extra Jump", "command": "Upgrade Player Extra Jump" },
+                    { "name": "Upgrade Player Grab Range", "command": "Upgrade Player Grab Range" },
+                    { "name": "Upgrade Player Grab Strength", "command": "Upgrade Player Grab Strength" },
+                    { "name": "Upgrade Player Health", "command": "Upgrade Player Health" },
+                    { "name": "Upgrade Player Sprint Speed", "command": "Upgrade Player Sprint Speed" },
+                    { "name": "Upgrade Player Tumble Launch", "command": "Upgrade Player Tumble Launch" },
+                    { "name": "Valuable Tracker", "command": "Valuable Tracker" }
+                ]
+            }
+        },
+        {
+            "name": "Spawn Valuable Item",
+            "command": "spawnvaluableitem",
+            "description": "Spawn valuable item near player",
+            "value": {
+                "required": true,
+                "name": "Valuable Item",
+                "defaultValue": "Diamond",
+                "ngSelect": true,
+                "description": "Spawn selected item near player",
+                "values": [
+                    { "name": "Diamond", "command": "Diamond" },
+                    { "name": "Emerald Bracelet", "command": "Emerald Bracelet" },
+                    { "name": "Goblet", "command": "Goblet" },
+                    { "name": "Ocarina", "command": "Ocarina" },
+                    { "name": "Pocket Watch", "command": "Pocket Watch" },
+                    { "name": "Uranium Mug", "command": "Uranium Mug" },
+                    { "name": "Arctic Bonsai", "command": "Arctic Bonsai" },
+                    { "name": "Arctic HDD", "command": "Arctic HDD" },
+                    { "name": "Chomp Book", "command": "Chomp Book" },
+                    { "name": "Crown", "command": "Crown" },
+                    { "name": "Doll", "command": "Doll" },
+                    { "name": "Frog", "command": "Frog" },
+                    { "name": "Gem Box", "command": "Gem Box" },
+                    { "name": "Globe", "command": "Globe" },
+                    { "name": "Love Potion", "command": "Love Potion" },
+                    { "name": "Money", "command": "Money" },
+                    { "name": "Music Box", "command": "Music Box" },
+                    { "name": "Toy Monkey", "command": "Toy Monkey" },
+                    { "name": "Uranium Plate", "command": "Uranium Plate" },
+                    { "name": "Vase Small", "command": "Vase Small" },
+                    { "name": "Arctic 3D Printer", "command": "Arctic 3D Printer" },
+                    { "name": "Arctic Laptop", "command": "Arctic Laptop" },
+                    { "name": "Arctic Propane Tank", "command": "Arctic Propane Tank" },
+                    { "name": "Arctic Sample", "command": "Arctic Sample" },
+                    { "name": "Arctic Sample Six Pack", "command": "Arctic Sample Six Pack" },
+                    { "name": "Bottle", "command": "Bottle" },
+                    { "name": "Clown", "command": "Clown" },
+                    { "name": "Computer", "command": "Computer" },
+                    { "name": "Fan", "command": "Fan" },
+                    { "name": "Gramophone", "command": "Gramophone" },
+                    { "name": "Marble Table", "command": "Marble Table" },
+                    { "name": "Radio", "command": "Radio" },
+                    { "name": "Ship in a bottle", "command": "Ship in a bottle" },
+                    { "name": "Trophy", "command": "Trophy" },
+                    { "name": "Vase", "command": "Vase" },
+                    { "name": "Wizard Goblin Head", "command": "Wizard Goblin Head" },
+                    { "name": "Wizard Power Crystal", "command": "Wizard Power Crystal" },
+                    { "name": "Wizard Time Glass", "command": "Wizard Time Glass" },
+                    { "name": "Arctic Barrel", "command": "Arctic Barrel" },
+                    { "name": "Arctic Big Sample", "command": "Arctic Big Sample" },
+                    { "name": "Arctic Creature Leg", "command": "Arctic Creature Leg" },
+                    { "name": "Arctic Flamethrower", "command": "Arctic Flamethrower" },
+                    { "name": "Arctic Guitar", "command": "Arctic Guitar" },
+                    { "name": "Arctic Sample Cooler", "command": "Arctic Sample Cooler" },
+                    { "name": "Diamond Display", "command": "Diamond Display" },
+                    { "name": "Ice Saw", "command": "Ice Saw" },
+                    { "name": "Scream Doll", "command": "Scream Doll" },
+                    { "name": "Television", "command": "Television" },
+                    { "name": "Vase Big", "command": "Vase Big" },
+                    { "name": "Wizard Cube of Knowledge", "command": "Wizard Cube of Knowledge" },
+                    { "name": "Wizard Master Potion", "command": "Wizard Master Potion" },
+                    { "name": "Animal Crate", "command": "Animal Crate" },
+                    { "name": "Arctic Ice Block", "command": "Arctic Ice Block" },
+                    { "name": "Dinosaur", "command": "Dinosaur" },
+                    { "name": "Piano", "command": "Piano" },
+                    { "name": "Wizard Griffin Statue", "command": "Wizard Griffin Statue" },
+                    { "name": "Arctic Science Station", "command": "Arctic Science Station" },
+                    { "name": "Harp", "command": "Harp" },
+                    { "name": "Painting", "command": "Painting" },
+                    { "name": "Wizard Dumgolfs Staff", "command": "Wizard Dumgolfs Staff" },
+                    { "name": "Wizard Sword", "command": "Wizard Sword" },
+                    { "name": "Arctic Server Rack", "command": "Arctic Server Rack" },
+                    { "name": "Golden Statue", "command": "Golden Statue" },
+                    { "name": "Grandfather Clock", "command": "Grandfather Clock" },
+                    { "name": "Wizard Broom", "command": "Wizard Broom" }
+                ]
+            }
+        },
+        {
+            "name": "Heal",
+            "command": "heal",
+            "description": "Heal player",
+            "value": {
+                "required": true,
+                "description": "Adds health to the player",
+                "name": "health",
+                "defaultValue": "100"
+            }
+        },
+        {
+            "name": "Stamina",
+            "command": "stamina",
+            "description": "Increase stamina level",
+            "value": {
+                "required": true,
+                "description": "Adds stamina to the player",
+                "name": "stamina",
+                "defaultValue": "100"
+            }
+        },
+        {
+            "name": "Increase Prices",
+            "command": "changecostup",
+            "description": "Increase the price of the nearest item by 20% within a 20-unit radius"
+        },
+        {
+            "name": "Decrease Prices",
+            "command": "changecostdown",
+            "description": "Decrease the price of the nearest item by 20% within a 20-unit radius"
+        },
+        {
+            "name": "Devalue Item",
+            "command": "removecost",
+            "description": "Devalue the nearest item on the level"
+        },
+        {
+            "name": "Delete Item",
+            "command": "destroyitem",
+            "description": "Delete the nearest item on the level"
+        },
+        {
+            "name": "Infinite Energy",
+            "command": "infinitystamina",
+            "description": "Grant 20 seconds of infinite energy"
+        },
+        {
+            "name": "Boost Speed",
+            "command": "bonusspeed",
+            "description": "Run faster for 20 seconds"
+        },
+        {
+            "name": "Random Upgrade",
+            "command": "randomupgrade",
+            "description": "Apply a random upgrade to the player"
+        },
+        {
+            "name": "Explode Mine",
+            "command": "spawnmine",
+            "description": "Spawn and detonate a random mine"
+        }
+    ]
+}

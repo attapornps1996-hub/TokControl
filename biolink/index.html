@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokBio | Bio Link</title>
+    <link rel="icon" type="image/png" href="/assets/tokcontrol-icon.png">
+    
+    <!-- External Font CDN & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/biolink/css/public.css?v=tokbio-1">
+    <link rel="stylesheet" href="/biolink/css/effects.css">
+
+    <script src="/biolink/js/database.js?v=tokbio-2"></script>
+    <script src="/biolink/js/mediadb.js"></script>
+    <script src="/biolink/js/public.js?v=tokbio-2"></script>
+</head>
+<body>
+
+    <!-- SECTION 1: PUBLIC MODULAR BIO PAGE -->
+    <div id="profile-page" style="display: none;">
+        <!-- Twinkling stars / particle floating canvas -->
+        <canvas id="bg-canvas"></canvas>
+        
+        <!-- Media BG (Looping video / looping GIF background) -->
+        <div id="media-bg-container"></div>
+        
+        <div class="bio-container" id="bio-render-container">
+            <!-- Dynamically populated modular blocks like Profile, Music, Links, YouTube, Images -->
+        </div>
+    </div>
+
+    <!-- SECTION 2: LANDING PAGE -->
+    <div id="landing-page" style="display: none;">
+        <!-- Gradient Blobs background -->
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        
+        <nav class="nav-bar">
+            <div class="nav-logo">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Super Bio Builder PRO</span>
+            </div>
+            <div>
+                <a href="/biolink/login.html" class="nav-btn-secondary">เข้าสู่ระบบ</a>
+                <a href="/biolink/login.html?tab=register" class="nav-btn-primary">เริ่มต้นใช้งานฟรี</a>
+            </div>
+        </nav>
+
+        <header class="hero-section">
+            <span class="badge">🪄 สร้างหน้าเว็บ Bio รายละเอียดสูงใน 1 คลิก</span>
+            <h1>หน้าเว็บเดียวสำหรับรวม<br><span class="gradient-text">ทุกความเป็นคุณอย่างมีสไตล์</span></h1>
+            <p>หมดปัญหา "ความไม่สุด" ด้วยระบบจัดวางอิสระ เพิ่มบล็อกเพลง วิดีโอ รูปภาพคู่ ช่องทางโซเชียล พร้อมระบบสุ่มปรับแต่งดีไซน์ด้วยปุ่มเดียวสำหรับคนขี้เกียจ!</p>
+            
+            <div class="hero-actions">
+                <div class="reserve-input-group">
+                    <span class="prefix">bio.link/</span>
+                    <input type="text" id="landing-username" placeholder="yourname" autocomplete="off">
+                    <button onclick="claimUsername()">จองชื่อฟรี</button>
+                </div>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.4); margin-top: 15px;">
+                💡 หรือทดลองใช้บัญชีเดโม่เพื่อเข้าไปลองเล่นเครื่องมือปรับแต่งได้ทันที!
+            </p>
+        </header>
+
+        <section class="features-section">
+            <h2>ฟีเจอร์เด่นระดับโปร</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fa-solid fa-music"></i>
+                    <h3>บล็อกเครื่องเล่นเพลง & วิดีโอ</h3>
+                    <p>ฝังวิดีโอ YouTube หรือใส่เพลง MP3/Spotify บนหน้าโปรไฟล์ของคุณให้มีชีวิตชีวา</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <h3>สุ่มแต่งธีมในคลิกเดียว</h3>
+                    <p>ระบบสร้างการสุ่มคู่สี แอนิเมชัน และพื้นหลังที่ลงตัวทันทีเมื่อกดปุ่มสุ่มดีไซน์</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fa-solid fa-video"></i>
+                    <h3>พื้นหลังวิดีโอ & GIF ขยับได้</h3>
+                    <p>สร้างบรรยากาศด้วยวิดีโอ MP4 เล่นวนซ้ำ หรือเลือกใช้แอนิเมชันละอองดาวกะพริบ</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+
+    
+    <script>
+        function claimUsername() {
+            const usernameInput = document.getElementById('landing-username').value.trim().toLowerCase();
+            if (!usernameInput) return;
+            
+            if (!/^[a-z0-9_]{3,15}$/.test(usernameInput)) {
+                alert('Username ต้องเป็นตัวอักษรภาษาอังกฤษ ตัวเลข หรือขีดล่าง (_) ความยาว 3-15 ตัวอักษร');
+                return;
+            }
+            
+            window.location.href = `login.html?reg=${usernameInput}`;
+        }
+    </script>
+</body>
+</html>

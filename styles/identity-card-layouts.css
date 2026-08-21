@@ -1,0 +1,539 @@
+/* Identity Cards — TikTok Card (8) + Roblox Card (8) */
+
+.id-card {
+    font-family: 'Kanit', sans-serif;
+    color: var(--id-text, #fff);
+    box-sizing: border-box;
+}
+
+.id-card * { box-sizing: border-box; }
+
+.id-live-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: #ff0050;
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    animation: id-live-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes id-live-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.65; }
+}
+
+.id-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 56px;
+}
+
+.id-stat-ico { font-size: 0.85rem; opacity: 0.85; }
+.id-stat-val { font-weight: 900; font-size: 0.82rem; }
+.id-stat-lbl { font-size: 0.55rem; font-weight: 700; opacity: 0.55; letter-spacing: 0.06em; }
+
+.id-tt-stats, .id-rbx-stats {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.id-last-follow {
+    margin-top: 8px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--id-accent, #00f2ea);
+    text-align: center;
+}
+
+.id-goal { margin-top: 10px; }
+.id-goal-bar {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden;
+}
+.id-goal-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--id-accent), color-mix(in srgb, var(--id-accent) 60%, #fff));
+    border-radius: inherit;
+    transition: width 0.6s ease;
+}
+.id-goal-txt {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.62rem;
+    opacity: 0.65;
+    text-align: center;
+}
+
+/* ── TikTok Classic ── */
+.id-tt-classic {
+    width: min(280px, 90vw);
+    padding: 16px 16px 14px;
+    border-radius: 18px;
+    background: var(--id-panel);
+    border: 1px solid color-mix(in srgb, var(--id-accent) 35%, transparent);
+    text-align: center;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+}
+
+.id-tt-classic-head { min-height: 22px; margin-bottom: 4px; }
+.id-tt-classic-av {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    border: 3px solid var(--id-accent);
+    object-fit: cover;
+    margin: 0 auto 10px;
+    display: block;
+}
+.id-tt-classic-name { font-weight: 900; font-size: 1rem; }
+.id-tt-classic-user { font-size: 0.78rem; opacity: 0.7; margin-bottom: 12px; }
+.id-tt-classic-follow-label { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.12em; opacity: 0.55; }
+.id-tt-classic-follow-num {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--id-accent);
+    line-height: 1.1;
+    margin: 4px 0 12px;
+}
+.id-tt-classic .id-tt-stats { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 10px; }
+
+/* ── TikTok Live Strip ── */
+.id-tt-livestrip {
+    width: min(420px, 94vw);
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    color: #111;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+}
+
+.id-tt-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: linear-gradient(135deg, #00f2ea, #25f4ee);
+    color: #fff;
+}
+
+.id-tt-strip-av {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    object-fit: cover;
+}
+
+.id-tt-strip-meta { flex: 1; min-width: 0; }
+.id-tt-strip-meta b { display: block; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.id-tt-strip-meta span { font-size: 0.72rem; opacity: 0.85; }
+
+.id-tt-strip-main { padding: 14px 16px 8px; text-align: center; }
+.id-tt-strip-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.1em; color: #888; }
+.id-tt-strip-num { font-size: 2.4rem; font-weight: 900; color: #111; line-height: 1; }
+
+.id-tt-livestrip .id-tt-stats { padding: 0 12px 12px; }
+.id-tt-livestrip .id-stat-val { color: #111; }
+.id-tt-livestrip .id-stat-lbl { color: #888; }
+.id-tt-livestrip .id-last-follow { color: #00b8b0; }
+.id-tt-livestrip .id-live-badge { margin-left: auto; }
+
+/* ── TikTok Compact / Pill ── */
+.id-tt-compact, .id-tt-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--id-panel);
+    border: 1px solid color-mix(in srgb, var(--id-accent) 40%, transparent);
+    max-width: min(360px, 92vw);
+}
+
+.id-tt-compact-av, .id-tt-pill img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--id-accent);
+}
+
+.id-tt-compact-body b, .id-tt-pill-mid b { display: block; font-size: 0.82rem; }
+.id-tt-compact-body span, .id-tt-pill-mid span { font-size: 0.68rem; opacity: 0.7; }
+.id-tt-pill-mid { flex: 1; min-width: 0; }
+
+/* ── TikTok Glass ── */
+.id-tt-glass {
+    width: min(260px, 88vw);
+    padding: 18px 16px;
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--id-panel) 70%, transparent);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,0.18);
+    text-align: center;
+}
+
+.id-tt-glass-av {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: 2px solid var(--id-accent);
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+.id-tt-glass-name { font-weight: 900; }
+.id-tt-glass-user { font-size: 0.75rem; opacity: 0.65; margin-bottom: 10px; }
+.id-tt-glass-followers span { font-size: 0.62rem; letter-spacing: 0.1em; opacity: 0.55; display: block; }
+.id-tt-glass-followers b { font-size: 1.8rem; color: var(--id-accent); }
+
+/* ── TikTok Neon ── */
+.id-tt-neon {
+    width: min(280px, 90vw);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--id-accent);
+    border-radius: 4px;
+    background: #0a0612;
+    text-align: center;
+    box-shadow: 0 0 24px color-mix(in srgb, var(--id-accent) 30%, transparent);
+}
+
+.id-tt-neon-scan {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--id-accent) 15%, transparent), transparent);
+    animation: id-scan 2.5s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes id-scan {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(100%); }
+}
+
+.id-tt-neon-av {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--id-accent);
+    object-fit: cover;
+    position: relative;
+    z-index: 1;
+}
+.id-tt-neon-name, .id-tt-neon-user, .id-tt-neon-big, .id-tt-neon-label, .id-tt-neon .id-tt-stats { position: relative; z-index: 1; }
+.id-tt-neon-big { font-size: 2rem; font-weight: 900; color: var(--id-accent); font-family: 'Press Start 2P', monospace, 'Kanit', sans-serif; font-size: 1.2rem; margin-top: 6px; }
+.id-tt-neon-label { font-size: 0.62rem; letter-spacing: 0.14em; opacity: 0.7; margin-bottom: 8px; }
+
+/* ── TikTok Banner ── */
+.id-tt-banner {
+    width: min(480px, 96vw);
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: var(--id-panel);
+    border: 1px solid color-mix(in srgb, var(--id-accent) 30%, transparent);
+}
+
+.id-tt-banner-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.id-tt-banner-head img {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid var(--id-accent);
+    object-fit: cover;
+}
+
+.id-tt-banner-head b { display: block; font-size: 0.92rem; }
+.id-tt-banner-head span { font-size: 0.72rem; opacity: 0.65; }
+.id-tt-banner-follow { margin-left: auto; text-align: right; }
+.id-tt-banner-follow small { display: block; font-size: 0.58rem; letter-spacing: 0.08em; opacity: 0.55; }
+.id-tt-banner-follow strong { font-size: 1.4rem; color: var(--id-accent); }
+.id-tt-banner .id-tt-stats-row { margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); }
+
+/* ── TikTok Split ── */
+.id-tt-split {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    width: min(420px, 94vw);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--id-panel);
+    border: 1px solid color-mix(in srgb, var(--id-accent) 28%, transparent);
+}
+
+.id-tt-split-left {
+    padding: 16px 12px;
+    text-align: center;
+    background: color-mix(in srgb, var(--id-accent) 12%, transparent);
+}
+
+.id-tt-split-left img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid var(--id-accent);
+    object-fit: cover;
+    margin-top: 8px;
+}
+
+.id-tt-split-right { padding: 16px 14px; }
+.id-tt-split-label { font-size: 0.62rem; letter-spacing: 0.1em; opacity: 0.55; }
+.id-tt-split-num { font-size: 1.8rem; font-weight: 900; color: var(--id-accent); margin-bottom: 8px; }
+
+/* ── Roblox shared ── */
+.id-rbx-logo {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 0.75rem;
+    opacity: 0.35;
+    color: var(--id-accent);
+}
+
+.id-rbx-stat { text-align: center; min-width: 72px; }
+.id-rbx-stat-val { display: block; font-weight: 900; font-size: 1rem; color: var(--id-accent); }
+.id-rbx-stat-lbl { font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em; opacity: 0.55; }
+
+.id-rbx-err, .id-rbx-loading {
+    font-size: 0.68rem;
+    text-align: center;
+    opacity: 0.75;
+    margin-bottom: 6px;
+    color: #ff6b8a;
+}
+
+.id-rbx-classic {
+    position: relative;
+    width: min(280px, 90vw);
+    padding: 18px 16px 14px;
+    border-radius: 16px;
+    background: #2b2f33;
+    border: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+}
+
+.id-rbx-classic-av {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 3px solid #3ba55d;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.id-rbx-classic-name { font-weight: 900; font-size: 1rem; }
+.id-rbx-classic-user { font-size: 0.75rem; opacity: 0.65; margin-bottom: 14px; }
+.id-rbx-classic .id-rbx-stats { border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; }
+
+/* ── Roblox Neon ── */
+.id-rbx-neon {
+    position: relative;
+    width: min(280px, 90vw);
+    padding: 18px 16px;
+    border-radius: 8px;
+    background: #0c0818;
+    border: 2px solid #bc13fe;
+    text-align: center;
+    box-shadow: 0 0 28px rgba(188,19,254,0.35);
+}
+
+.id-rbx-neon-av {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 3px solid #00d2ff;
+    box-shadow: 0 0 16px rgba(0,210,255,0.5);
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.id-rbx-neon-name { font-weight: 900; color: #00d2ff; }
+.id-rbx-neon-user { font-size: 0.75rem; color: #bc13fe; margin-bottom: 12px; }
+.id-rbx-stats-neon .id-rbx-stat-val { color: #00d2ff; text-shadow: 0 0 10px rgba(0,210,255,0.5); }
+
+/* ── Roblox Minimal ── */
+.id-rbx-minimal {
+    position: relative;
+    width: min(260px, 88vw);
+    padding: 16px;
+    border-radius: 20px;
+    background: #fff;
+    color: #111;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.id-rbx-min-av {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.id-rbx-min-name { font-weight: 900; color: #111; }
+.id-rbx-min-user { font-size: 0.75rem; color: #666; margin-bottom: 10px; }
+.id-rbx-minimal .id-rbx-stat-val { color: #5865f2; }
+.id-rbx-minimal .id-rbx-stat-lbl { color: #888; }
+
+/* ── Roblox Badge ── */
+.id-rbx-badge {
+    position: relative;
+    width: min(240px, 86vw);
+    padding: 20px 16px 14px;
+    text-align: center;
+    background: var(--id-panel);
+    border-radius: 22px;
+    border: 1px solid color-mix(in srgb, var(--id-accent) 35%, transparent);
+}
+
+.id-rbx-badge-wrap img {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 4px solid var(--id-accent);
+    object-fit: cover;
+    box-shadow: 0 0 20px color-mix(in srgb, var(--id-accent) 35%, transparent);
+}
+
+.id-rbx-badge-name { font-weight: 900; margin-top: 10px; }
+.id-rbx-badge-user { font-size: 0.75rem; opacity: 0.65; margin-bottom: 12px; }
+
+/* ── Roblox Stats Bar ── */
+.id-rbx-statsbar {
+    position: relative;
+    width: min(400px, 94vw);
+    border-radius: 14px;
+    background: var(--id-panel);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.id-rbx-statsbar-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+}
+
+.id-rbx-statsbar-top img {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.id-rbx-stats-bar {
+    padding: 10px 14px 14px;
+    background: color-mix(in srgb, var(--id-accent) 10%, transparent);
+    justify-content: space-around;
+}
+
+/* ── Roblox Blocky ── */
+.id-rbx-blocky {
+    position: relative;
+    width: min(280px, 90vw);
+    padding: 16px;
+    background: #393b3d;
+    text-align: center;
+    clip-path: polygon(0 8px, 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px));
+}
+
+.id-rbx-blocky-av {
+    width: 68px;
+    height: 68px;
+    border-radius: 4px;
+    object-fit: cover;
+    image-rendering: pixelated;
+    border: 3px solid #fff;
+    margin-bottom: 8px;
+}
+
+.id-rbx-blocky-name { font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; }
+.id-rbx-blocky-user { font-size: 0.72rem; opacity: 0.65; margin-bottom: 12px; }
+
+/* ── Roblox Gradient ── */
+.id-rbx-gradient {
+    position: relative;
+    width: min(280px, 90vw);
+    padding: 18px 16px;
+    border-radius: 18px;
+    background: linear-gradient(145deg, #5865f2, #bc13fe 55%, #ff0050);
+    text-align: center;
+    box-shadow: 0 14px 32px rgba(88,101,242,0.35);
+}
+
+.id-rbx-grad-av {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.id-rbx-grad-name { font-weight: 900; }
+.id-rbx-grad-user { font-size: 0.75rem; opacity: 0.85; margin-bottom: 12px; }
+.id-rbx-gradient .id-rbx-stat-val { color: #fff; }
+
+/* ── Roblox HUD ── */
+.id-rbx-hud {
+    position: relative;
+    width: min(300px, 92vw);
+    padding: 16px;
+    overflow: hidden;
+    background: #0a0e14;
+    border: 1px solid #3ba55d;
+    border-radius: 4px;
+    text-align: center;
+    clip-path: polygon(0 10px, 10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px));
+}
+
+.id-rbx-hud-scan {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent, rgba(59,165,93,0.12), transparent);
+    animation: id-scan 2.2s linear infinite;
+    pointer-events: none;
+}
+
+.id-rbx-hud-tag {
+    position: relative;
+    z-index: 1;
+    font-size: 0.58rem;
+    letter-spacing: 0.16em;
+    color: #3ba55d;
+    margin-bottom: 8px;
+}
+
+.id-rbx-hud-av {
+    position: relative;
+    z-index: 1;
+    width: 68px;
+    height: 68px;
+    border-radius: 8px;
+    border: 2px solid #3ba55d;
+    object-fit: cover;
+    margin-bottom: 8px;
+}
+
+.id-rbx-hud-name, .id-rbx-hud-user, .id-rbx-stats-hud { position: relative; z-index: 1; }
+.id-rbx-stats-hud .id-rbx-stat-val { color: #3ba55d; }
+
+/* Gallery preview */
+.id-preview-wrap .id-card { transform-origin: top center; max-width: 100%; }

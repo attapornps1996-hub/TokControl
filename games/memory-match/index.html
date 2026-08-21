@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมจับคู่ — TokControl</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="memory-match.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/styles/overlay-brand.css">
+    <script src="/js/overlay-brand.js" defer></script>
+</head>
+<body>
+<script src="/js/overlay-widget-boot.js"></script>
+    <div id="mmRoot">
+        <div id="mmHud">
+            <div class="mm-hud-pill">🎯 คู่ <span class="mm-val" id="mmMatched">0/8</span></div>
+            <div class="mm-hud-pill">🏆 ชนะ <span class="mm-val" id="mmWins">0</span></div>
+            <div class="mm-hud-pill countdown-pill" id="mmCountdownPill" style="display:none;">
+                ⏱️ <span class="mm-val" id="mmCountdown">10</span> วิ
+            </div>
+        </div>
+        <div id="mmBoard"></div>
+        <div id="mmPanelControls">
+            <button class="primary" onclick="mmStartGame()">▶ เริ่มเกม</button>
+            <button onclick="mmResetGame()">🔄 รีเซ็ต</button>
+        </div>
+    </div>
+    <div id="mmActionToast"></div>
+    <div id="mmVictory">
+        <h2>🎉 ชนะ!</h2>
+        <p id="mmVictoryMsg">+1 WIN — เริ่มรอบใหม่...</p>
+    </div>
+
+    <script src="memory-match.js"></script>
+    <script>
+    (function () {
+        const params = new URLSearchParams(location.search);
+        const isOverlay = params.get('overlay') === '1';
+        const root = document.getElementById('mmRoot');
+        if (isOverlay) root.classList.add('overlay-mode');
+
+        const board = document.getElementById('mmBoard');
+        const matchedEl = document.getElementById('mmMatched');
+        const winsEl = document.getElementById('mmWins');
+        const countdownEl = document.getElementById('mmCountdown');
+        const countdownPill = document.getElementById('mmCountdownPill');
+        const toastEl = document.getElementById('mmActionToast');
+        const victoryEl = document.getElementById('mmVictory');
+        const victoryMsg = document.getElementById('mmVictoryMsg');
+
+        let hintSymbol = null;
+        let socket = null;
+        let streamToken = params.get('token') || '';
+        let lastVictoryShown = -1;
+        let broadcastTimer = null;
+
+        function renderBoard(s) {
+            board.style.gridTemplateColumns = `repeat(${s.cols}, 1fr)`;
+            board.innerHTML = '';
+            s.cards.forEach(card => {
+                const el = document.createElement('div');
+                el.className = 'mm-card' +
+                    (card.flipped || card.matched ? ' flipped' : '') +
+                    (card.matched ? ' matched' : '') +
+                    (hintSymbol && card.symbol === hintSymbol && !card.matched ? ' hint-glow' : '');
+                el.dataset.id = card.id;
+                el.innerHTML = `
+                    <div class="mm-card-back"></div>
+                    <div class="mm-card-face">${card.symbol}</div>
+                `;
+                if (!isOverlay) {
+                    el.addEventListener('click', () => {
+                        MemoryMatch.flipCard(card.id);
+                    });
+                }
+                board.appendChild(el);
+            });
+            matchedEl.textContent = `${s.matched}/${s.totalPairs}`;
+            winsEl.textContent = s.wins;
+            if (s.phase === 'countdown') {
+                countdownPill.style.display = 'flex';
+                countdownEl.textContent = s.countdown;
+            } else {
+                countdownPill.style.display = 'none';
+            }
+            if (s.phase === 'victory' && s.wins !== lastVictoryShown) {
+                lastVictoryShown = s.wins;
+                victoryEl.classList.add('show');
+                victoryMsg.textContent = `+1 WIN (รวม ${s.wins}) — เริ่มรอบใหม่...`;
+                setTimeout(() => victoryEl.classList.remove('show'), 2200);
+            }
+            if (s.locked) {
+                board.querySelectorAll('.mm-card').forEach(c => c.classList.add('locked'));
+            }
+        }
+
+        function showToast(msg, type) {
+            toastEl.textContent = msg;
+            toastEl.className = type || '';
+            toastEl.classList.add('show');
+            setTimeout(() => toastEl.classList.remove('show'), 2800);
+        }
+
+        function broadcastState(s) {
+            if (isOverlay || !socket || !streamToken) return;
+            clearTimeout(broadcastTimer);
+            broadcastTimer = setTimeout(() => {
+                socket.emit('memory_match_state', { token: streamToken, state: s });
+            }, 40);
+        }
+
+        MemoryMatch.setOnStateChange((s) => {
+            renderBoard(s);
+            broadcastState(s);
+        });
+        MemoryMatch.setOnActionToast(showToast);
+        MemoryMatch.setOnWin((wins) => {
+            if (socket && streamToken) {
+                socket.emit('memory_match_win', { token: streamToken, wins });
+            }
+        });
+
+        window.mmStartGame = function () {
+            const mode = localStorage.getItem('mm_game_mode') || 'normal';
+            MemoryMatch.buildBoard(mode);
+        };
+        window.mmResetGame = function () {
+            MemoryMatch.reset();
+            board.innerHTML = '';
+            matchedEl.textContent = '0/8';
+        };
+
+        // Socket
+        async function initSocket() {
+            if (!streamToken) {
+                try {
+                    const res = await fetch('/api/overlay/session');
+                    const data = await res.json();
+                    if (data.success) streamToken = data.streamToken;
+                } catch (e) {}
+            }
+            socket = io();
+            socket.on('connect', () => {
+                if (streamToken) socket.emit('join_overlay', streamToken);
+            });
+            socket.on('memory_match_action', (data) => {
+                if (isOverlay) return;
+                const result = MemoryMatch.applyAction(data.action, data.user, data.amount);
+                if (data.action === 'help_hint' && result) {
+                    hintSymbol = result;
+                    renderBoard(MemoryMatch.getState());
+                    setTimeout(() => {
+                        hintSymbol = null;
+                        renderBoard(MemoryMatch.getState());
+                    }, 3600);
+                }
+            });
+            socket.on('memory_match_sync', (data) => {
+                if (data.state) {
+                    MemoryMatch.loadState(data.state);
+                    return;
+                }
+                if (data.mode && !isOverlay) {
+                    localStorage.setItem('mm_game_mode', data.mode);
+                    if (data.reset || !MemoryMatch.getState().cards.length) {
+                        MemoryMatch.buildBoard(data.mode);
+                    }
+                }
+            });
+        }
+
+        initSocket();
+
+        // Auto-start if mode saved
+        const savedMode = localStorage.getItem('mm_game_mode');
+        if (savedMode) MemoryMatch.buildBoard(savedMode);
+    })();
+    </script>
+</body>
+</html>

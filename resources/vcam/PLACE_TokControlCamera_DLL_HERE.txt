@@ -1,0 +1,6 @@
+# Place TokControlCamera.dll here
+#
+# Expected device name after DirectShow registration:
+#   TokControl Virtual Camera
+#
+# Then run install-vcam.bat (Administrator) or use Camera Studio → Install Driver

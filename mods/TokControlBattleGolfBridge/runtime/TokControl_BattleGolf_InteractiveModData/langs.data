@@ -1,0 +1,242 @@
+{
+    "%template_msg%": {
+        "ru": "активировал",
+        "en": "activates",
+        "th": "เปิดใช้"
+    },
+    "airplane_warning": {
+        "ru": "активируется когда вы покинете аэропорт",
+        "en": "activates after leaving the Airport",
+        "th": "ทำงานเมื่อออกจากสนามบิน"
+    },
+    "test_event": {
+        "ru": "Тестовое событие",
+        "en": "Test Event",
+        "th": "ทดสอบอีเวนต์"
+    },
+    "buff_activate_shield": {
+        "ru": "Активировать щит",
+        "en": "Activate Shield",
+        "th": "เปิดโล่"
+    },
+    "effect_emote_random": {
+        "ru": "Случайная эмоция",
+        "en": "Random Emote",
+        "th": "อิโมจิสุ่ม"
+    },
+    "effect_emote_dance": {
+        "ru": "Станцевать",
+        "en": "Dance",
+        "th": "เต้น"
+    },
+    "buff_mega_speed": {
+        "ru": "Мега скорость",
+        "en": "Mega Speed",
+        "th": "ความเร็วสุดๆ"
+    },
+    "buff_mega_jumps": {
+        "ru": "Мега прыжки",
+        "en": "Mega Jumps",
+        "th": "กระโดดสูง"
+    },
+    "debuff_kick_forward": {
+        "ru": "Пнуть вперед",
+        "en": "Kick Forward",
+        "th": "เตะไปข้างหน้า"
+    },
+    "debuff_kick_backward": {
+        "ru": "Пнуть назад",
+        "en": "Kick Backward",
+        "th": "เตะไปข้างหลัง"
+    },
+    "debuff_kick_right_side": {
+        "ru": "Пнуть вправо",
+        "en": "Kick Right",
+        "th": "เตะไปขวา"
+    },
+    "debuff_kick_left_side": {
+        "ru": "Пнуть влево",
+        "en": "Kick Left",
+        "th": "เตะไปซ้าย"
+    },
+    "debuff_kick_ass": {
+        "ru": "Пендель",
+        "en": "Launch",
+        "th": "เด้งขึ้นฟ้า"
+    },
+    "effect_shuffle_players": {
+        "ru": "Перемешать игроков",
+        "en": "Shuffle Players",
+        "th": "สลับตำแหน่งผู้เล่น"
+    },
+    "buff_low_gravity": {
+        "ru": "Пониженная гравитация",
+        "en": "Low Gravity",
+        "th": "แรงโน้มถ่วงต่ำ"
+    },
+    "debuff_high_gravity": {
+        "ru": "Повышенная гравитация",
+        "en": "High Gravity",
+        "th": "แรงโน้มถ่วงสูง"
+    },
+    "debuff_clear_inventory": {
+        "ru": "Очистить инвентарь",
+        "en": "Clear Inventory",
+        "th": "ล้างช่องของ"
+    },
+    "debuff_knock_out": {
+        "ru": "Оглушить",
+        "en": "Knock Out",
+        "th": "น็อกเอาต์"
+    },
+    "effect_head_scale_up": {
+        "ru": "Увеличить голову",
+        "en": "Big Head",
+        "th": "หัวโต"
+    },
+    "debuff_high_sens": {
+        "ru": "Ускорить камеру",
+        "en": "Ultra Sensitivity",
+        "th": "เซนส์สูง"
+    },
+    "debuff_low_sens": {
+        "ru": "Замедлить камеру",
+        "en": "Low Sensitivity",
+        "th": "เซนส์ต่ำ"
+    },
+    "debuff_invert_mouse": {
+        "ru": "Инвертировать камеру",
+        "en": "Invert Mouse",
+        "th": "กลับเมาส์"
+    },
+    "debuff_cam_lock": {
+        "ru": "Блок камеры",
+        "en": "Camera Lock",
+        "th": "ล็อกกล้อง"
+    },
+    "debuff_shuffle_wasd": {
+        "ru": "Перемешать управление",
+        "en": "Shuffle Controls",
+        "th": "สลับปุ่มเดิน"
+    },
+    "debuff_mine": {
+        "ru": "Подложить мину",
+        "en": "Plant Mine",
+        "th": "วางระเบิด"
+    },
+    "debuff_minefield": {
+        "ru": "Минное поле",
+        "en": "Minefield",
+        "th": "ทุ่นระเบิด"
+    },
+    "debuff_laser_strike": {
+        "ru": "Удар с небес",
+        "en": "Laser Strike",
+        "th": "เลเซอร์จากฟ้า"
+    },
+    "debuff_laser_multi": {
+        "ru": "Лазерный дождь",
+        "en": "Laser Rain",
+        "th": "ฝนเลเซอร์"
+    },
+    "debuff_laser_auto": {
+        "ru": "Лазер-снайпер",
+        "en": "Sniper Laser",
+        "th": "เลเซอร์เล็งอัตโนมัติ"
+    },
+    "debuff_laser_armageddon": {
+        "ru": "Армагеддон",
+        "en": "Armageddon",
+        "th": "อาร์มาเกดดอน"
+    },
+    "give_random_item": {
+        "ru": "Случайный предмет",
+        "en": "Give Random Item",
+        "th": "สุ่มไอเทม"
+    },
+    "give_item_coffee": {
+        "ru": "Выдать Кофе",
+        "en": "Give Coffee",
+        "th": "ให้กาแฟ"
+    },
+    "give_item_boots": {
+        "ru": "Выдать Ботинки",
+        "en": "Give Boots",
+        "th": "ให้รองเท้าสปริง"
+    },
+    "give_item_airhorn": {
+        "ru": "Выдать Гудок",
+        "en": "Give Airhorn",
+        "th": "ให้แตร"
+    },
+    "give_item_landmine": {
+        "ru": "Выдать Мины",
+        "en": "Give Landmine",
+        "th": "ให้ระเบิด"
+    },
+    "give_item_magnet": {
+        "ru": "Выдать Магнит",
+        "en": "Give Magnet",
+        "th": "ให้แม่เหล็ก"
+    },
+    "give_item_pistol": {
+        "ru": "Выдать Пистолет",
+        "en": "Give Pistol",
+        "th": "ให้ปืนพก"
+    },
+    "give_item_shotgun": {
+        "ru": "Выдать Обрез",
+        "en": "Give Shotgun",
+        "th": "ให้ช็อตกัน"
+    },
+    "give_item_laser": {
+        "ru": "Выдать Орбитальный Лазер",
+        "en": "Give Orbital Laser",
+        "th": "ให้เลเซอร์ออร์บิทัล"
+    },
+    "give_item_golfcart": {
+        "ru": "Выдать Гольфкар",
+        "en": "Give Golf Cart",
+        "th": "ให้รถกอล์ฟ"
+    },
+    "give_item_driver": {
+        "ru": "Выдать Турбоклюшку",
+        "en": "Give Rocket Driver",
+        "th": "ให้ไม้กอล์ฟจรวด"
+    },
+    "give_item_freeze": {
+        "ru": "Выдать Морозильник",
+        "en": "Give Freeze Bomb",
+        "th": "ให้ระเบิดแช่แข็ง"
+    },
+    "give_item_rocket": {
+        "en": "ให้จรวด",
+        "th": "ให้จรวด",
+        "ru": "ให้จรวด"
+    },
+    "cut_buff_mega_jump": {
+        "en": "กระโดดพิเศษ",
+        "th": "กระโดดพิเศษ",
+        "ru": "กระโดดพิเศษ"
+    },
+    "cut_debuff_drop_hands_item": {
+        "en": "ทิ้งของในมือ",
+        "th": "ทิ้งของในมือ",
+        "ru": "ทิ้งของในมือ"
+    },
+    "cut_effect_head_scale_down": {
+        "en": "หัวเล็กลง",
+        "th": "หัวเล็กลง",
+        "ru": "หัวเล็กลง"
+    },
+    "cut_effect_emote_wave_emote": {
+        "en": "โบกมือ",
+        "th": "โบกมือ",
+        "ru": "โบกมือ"
+    },
+    "cut_effect_tp_to_random_player": {
+        "en": "วาร์ปหาผู้เล่นสุ่ม",
+        "th": "วาร์ปหาผู้เล่นสุ่ม",
+        "ru": "วาร์ปหาผู้เล่นสุ่ม"
+    }
+}

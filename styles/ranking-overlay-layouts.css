@@ -1,0 +1,411 @@
+/* Ranking Overlay — 8 new layouts with motion */
+
+.rk-layout {
+    font-family: 'Kanit', sans-serif;
+    color: #fff;
+    --rk-accent: #ffcc00;
+    width: min(420px, 92vw);
+}
+
+.rk-layout img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: inherit;
+}
+
+.rk-empty {
+    text-align: center;
+    padding: 24px;
+    color: rgba(255,255,255,0.45);
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* ── 1. PODIUM ── */
+.rk-podium {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr 1fr;
+    align-items: end;
+    gap: 8px;
+    padding-top: 28px;
+}
+.rk-podium-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.rk-podium-slot.r1 { order: 2; }
+.rk-podium-slot.r2 { order: 1; }
+.rk-podium-slot.r3 { order: 3; }
+.rk-podium-av {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 3px solid #c0c8d0; background: #1a1a2e; overflow: hidden;
+    margin-bottom: 8px;
+}
+.rk-podium-slot.r1 .rk-podium-av {
+    width: 72px; height: 72px; border-color: #ffd76a;
+    box-shadow: 0 0 24px rgba(255,204,0,0.45);
+    animation: rk-bounce 2.4s ease-in-out infinite;
+}
+.rk-podium-slot.r2 .rk-podium-av { border-color: #dfe4e8; }
+.rk-podium-slot.r3 .rk-podium-av { border-color: #cd7f32; }
+@keyframes rk-bounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.rk-podium-crown {
+    font-size: 1.1rem; margin-bottom: 2px;
+    animation: rk-wiggle 2s ease-in-out infinite;
+}
+@keyframes rk-wiggle {
+    0%,100% { transform: rotate(-6deg); }
+    50% { transform: rotate(6deg); }
+}
+.rk-podium-name {
+    font-size: 0.72rem; font-weight: 800;
+    max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rk-podium-slot.r1 .rk-podium-name { font-size: 0.85rem; color: #fff6db; }
+.rk-podium-val {
+    font-size: 0.68rem; font-weight: 900; color: var(--rk-accent); margin-top: 2px;
+}
+.rk-podium-base {
+    width: 100%; margin-top: 10px; border-radius: 8px 8px 0 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+    border: 1px solid rgba(255,255,255,0.12); border-bottom: none;
+    display: flex; align-items: flex-end; justify-content: center;
+    font-size: 1.2rem; font-weight: 900; color: rgba(255,255,255,0.5);
+    padding-bottom: 8px;
+}
+.rk-podium-slot.r1 .rk-podium-base { height: 72px; background: linear-gradient(180deg, rgba(255,215,106,0.35), rgba(255,215,106,0.08)); color: #ffd76a; }
+.rk-podium-slot.r2 .rk-podium-base { height: 54px; }
+.rk-podium-slot.r3 .rk-podium-base { height: 42px; }
+
+/* ── 2. BARS (racing bars) ── */
+.rk-bars { display: flex; flex-direction: column; gap: 10px; }
+.rk-bar-row {
+    display: grid; grid-template-columns: 28px 1fr auto; gap: 10px; align-items: center;
+}
+.rk-bar-rank {
+    font-size: 0.78rem; font-weight: 900; color: rgba(255,255,255,0.55); text-align: center;
+}
+.rk-bar-track {
+    height: 28px; border-radius: 8px; background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1); overflow: hidden; position: relative;
+}
+.rk-bar-fill {
+    height: 100%; border-radius: 7px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--rk-accent) 55%, #000), var(--rk-accent));
+    width: 0%;
+    transition: width 1.35s cubic-bezier(0.22,1,0.36,1);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--rk-accent) 35%, transparent);
+    position: relative;
+}
+.rk-bar-fill::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+    animation: rk-shine 2.2s linear infinite;
+}
+@keyframes rk-shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+.rk-bar-meta {
+    position: absolute; inset: 0; display: flex; align-items: center; gap: 8px;
+    padding: 0 8px; pointer-events: none;
+}
+.rk-bar-av {
+    width: 20px; height: 20px; border-radius: 50%; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.4); flex-shrink: 0;
+}
+.rk-bar-name {
+    font-size: 0.68rem; font-weight: 800;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+}
+.rk-bar-val { font-size: 0.72rem; font-weight: 900; color: var(--rk-accent); min-width: 52px; text-align: right; }
+
+/* ── 3. CARDS (floating stack) ── */
+.rk-cards { display: flex; flex-direction: column; gap: 10px; }
+.rk-card {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: rgba(10,10,18,0.92);
+    border: 1px solid color-mix(in srgb, var(--rk-accent) 30%, transparent);
+    border-radius: 14px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+    animation: rk-float 3.6s ease-in-out infinite;
+}
+.rk-card:nth-child(2) { animation-delay: 0.35s; }
+.rk-card:nth-child(3) { animation-delay: 0.7s; }
+.rk-card:nth-child(4) { animation-delay: 1.05s; }
+.rk-card:nth-child(5) { animation-delay: 1.4s; }
+@keyframes rk-float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+.rk-card.r1 {
+    border-color: color-mix(in srgb, var(--rk-accent) 65%, transparent);
+    box-shadow: 0 12px 32px color-mix(in srgb, var(--rk-accent) 22%, transparent);
+}
+.rk-card-rank {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 0.78rem; flex-shrink: 0;
+}
+.rk-card.r1 .rk-card-rank { background: var(--rk-accent); color: #1a1000; }
+.rk-card-av {
+    width: 40px; height: 40px; border-radius: 12px; overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0;
+}
+.rk-card.r1 .rk-card-av { border-color: var(--rk-accent); }
+.rk-card-info { flex: 1; min-width: 0; }
+.rk-card-name { font-size: 0.88rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rk-card-val { font-size: 0.78rem; font-weight: 900; color: var(--rk-accent); }
+
+/* ── 4. TICKER (horizontal scroll) ── */
+.rk-ticker {
+    width: min(720px, 96vw);
+    overflow: hidden;
+    background: rgba(6,8,14,0.92);
+    border: 1px solid color-mix(in srgb, var(--rk-accent) 35%, transparent);
+    border-radius: 12px;
+    padding: 10px 0;
+}
+.rk-ticker-track {
+    display: flex; gap: 14px; width: max-content;
+    animation: rk-marquee 18s linear infinite;
+    padding: 0 14px;
+}
+@keyframes rk-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+.rk-ticker-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.rk-ticker-item.r1 {
+    border-color: var(--rk-accent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--rk-accent) 30%, transparent);
+}
+.rk-ticker-av { width: 28px; height: 28px; border-radius: 50%; overflow: hidden; }
+.rk-ticker-rank { font-size: 0.62rem; font-weight: 900; color: var(--rk-accent); }
+.rk-ticker-name { font-size: 0.75rem; font-weight: 800; }
+.rk-ticker-val { font-size: 0.7rem; font-weight: 900; color: var(--rk-accent); }
+
+/* ── 5. RADAR ── */
+.rk-radar {
+    width: min(300px, 84vw);
+    margin: 0 auto;
+    position: relative;
+    aspect-ratio: 1;
+}
+.rk-radar-ring {
+    position: absolute; inset: 12%;
+    border: 1px solid color-mix(in srgb, var(--rk-accent) 25%, transparent);
+    border-radius: 50%;
+}
+.rk-radar-ring.r-mid { inset: 24%; }
+.rk-radar-ring.r-in { inset: 38%; }
+.rk-radar-sweep {
+    position: absolute; inset: 12%;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, transparent 0deg, color-mix(in srgb, var(--rk-accent) 35%, transparent) 40deg, transparent 70deg);
+    animation: rk-spin 4s linear infinite;
+}
+@keyframes rk-spin { to { transform: rotate(360deg); } }
+.rk-radar-node {
+    position: absolute;
+    width: 44px; transform: translate(-50%, -50%);
+    text-align: center; z-index: 2;
+}
+.rk-radar-node .rk-radar-av {
+    width: 36px; height: 36px; margin: 0 auto 2px;
+    border-radius: 50%; overflow: hidden;
+    border: 2px solid var(--rk-accent);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--rk-accent) 40%, transparent);
+    animation: rk-pulse 2s ease-in-out infinite;
+}
+.rk-radar-node.r1 .rk-radar-av { width: 48px; height: 48px; animation-duration: 1.4s; }
+@keyframes rk-pulse {
+    0%,100% { box-shadow: 0 0 8px color-mix(in srgb, var(--rk-accent) 30%, transparent); }
+    50% { box-shadow: 0 0 20px color-mix(in srgb, var(--rk-accent) 60%, transparent); }
+}
+.rk-radar-node .rk-radar-name {
+    font-size: 0.55rem; font-weight: 800;
+    white-space: nowrap; max-width: 64px; margin: 0 auto;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.rk-radar-center {
+    position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    font-size: 0.58rem; font-weight: 900; letter-spacing: 1px;
+    color: var(--rk-accent); z-index: 1;
+}
+
+/* ── 6. LADDER ── */
+.rk-ladder { display: flex; flex-direction: column; gap: 0; }
+.rk-ladder-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px;
+    border-left: 3px solid color-mix(in srgb, var(--rk-accent) 40%, transparent);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--rk-accent) 12%, transparent), transparent 70%);
+    margin-left: calc(var(--rk-step, 0) * 10px);
+    animation: rk-climb 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    animation-delay: calc(var(--rk-step, 0) * 0.12s);
+}
+@keyframes rk-climb {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.rk-ladder-row.r1 {
+    border-left-color: var(--rk-accent);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--rk-accent) 28%, transparent), transparent 75%);
+}
+.rk-ladder-step {
+    font-size: 0.9rem; font-weight: 900; width: 24px; text-align: center;
+    color: var(--rk-accent);
+}
+.rk-ladder-av {
+    width: 36px; height: 36px; border-radius: 10px; overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.2); flex-shrink: 0;
+}
+.rk-ladder-row.r1 .rk-ladder-av {
+    border-color: var(--rk-accent);
+    animation: rk-bounce 2.2s ease-in-out infinite;
+}
+.rk-ladder-info { flex: 1; min-width: 0; }
+.rk-ladder-name { font-size: 0.82rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rk-ladder-val { font-size: 0.72rem; font-weight: 900; color: var(--rk-accent); }
+
+/* ── 7. NEON STRIP ── */
+.rk-neon {
+    display: flex; flex-direction: column; gap: 8px;
+    padding: 4px;
+}
+.rk-neon-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: rgba(4,8,14,0.94);
+    border: 1px solid color-mix(in srgb, var(--rk-accent) 45%, transparent);
+    border-radius: 10px;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--rk-accent) 18%, transparent);
+    position: relative; overflow: hidden;
+}
+.rk-neon-row::before {
+    content: '';
+    position: absolute; top: 0; left: -40%; width: 40%; height: 100%;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--rk-accent) 25%, transparent), transparent);
+    animation: rk-scan 2.8s linear infinite;
+}
+@keyframes rk-scan {
+    0% { left: -40%; }
+    100% { left: 120%; }
+}
+.rk-neon-row.r1 {
+    border-color: var(--rk-accent);
+    box-shadow: 0 0 22px color-mix(in srgb, var(--rk-accent) 35%, transparent);
+}
+.rk-neon-rank {
+    font-family: 'Courier New', monospace;
+    font-size: 0.78rem; font-weight: 900; color: var(--rk-accent);
+    text-shadow: 0 0 8px color-mix(in srgb, var(--rk-accent) 60%, transparent);
+    min-width: 28px;
+}
+.rk-neon-av {
+    width: 34px; height: 34px; border-radius: 6px; overflow: hidden;
+    border: 1px solid var(--rk-accent); flex-shrink: 0;
+}
+.rk-neon-name {
+    flex: 1; min-width: 0; font-size: 0.8rem; font-weight: 800;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    color: #9fffea;
+}
+.rk-neon-val {
+    font-size: 0.78rem; font-weight: 900; color: var(--rk-accent);
+    text-shadow: 0 0 10px color-mix(in srgb, var(--rk-accent) 50%, transparent);
+}
+
+/* ── 8. MEDAL WALL ── */
+.rk-medals {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+.rk-medal {
+    text-align: center;
+    padding: 12px 8px;
+    background: rgba(10,10,18,0.9);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+}
+.rk-medal.r1 {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; gap: 14px; text-align: left;
+    padding: 14px 16px;
+    border-color: var(--rk-accent);
+    background: linear-gradient(120deg, color-mix(in srgb, var(--rk-accent) 22%, transparent), rgba(10,10,18,0.95));
+}
+.rk-medal::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.12), transparent 70%);
+    transform: translateX(-100%);
+    animation: rk-shimmer 3.5s ease-in-out infinite;
+}
+@keyframes rk-shimmer {
+    0%, 40% { transform: translateX(-100%); }
+    70%, 100% { transform: translateX(100%); }
+}
+.rk-medal-badge {
+    font-size: 1.4rem; line-height: 1; margin-bottom: 6px;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+.rk-medal.r1 .rk-medal-badge { font-size: 2rem; margin: 0; animation: rk-wiggle 2.4s ease-in-out infinite; }
+.rk-medal-av {
+    width: 40px; height: 40px; margin: 0 auto 6px;
+    border-radius: 50%; overflow: hidden;
+    border: 2px solid rgba(255,255,255,0.25);
+}
+.rk-medal.r1 .rk-medal-av {
+    width: 56px; height: 56px; margin: 0;
+    border-color: var(--rk-accent);
+}
+.rk-medal-name {
+    font-size: 0.68rem; font-weight: 800;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.rk-medal.r1 .rk-medal-name { font-size: 0.95rem; }
+.rk-medal-val { font-size: 0.65rem; font-weight: 900; color: var(--rk-accent); margin-top: 2px; }
+.rk-medal.r1 .rk-medal-val { font-size: 0.85rem; }
+.rk-medal.r1 .rk-medal-body { flex: 1; min-width: 0; }
+
+/* Positioning */
+#overlayGoalLastX.rk-mode-ticker {
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 4vh;
+}
+html.ov-card-preview #overlayGoalLastX.rk-mode-ticker,
+body.ov-card-preview #overlayGoalLastX.rk-mode-ticker {
+    align-items: center !important;
+    padding: 16px !important;
+}
+html.ov-card-preview .rk-ticker-track,
+body.ov-card-preview .rk-ticker-track {
+    animation-duration: 12s;
+}
+
+body.overlay-portrait-reflow .rk-layout { width: min(340px, 92vw); }
+body.overlay-portrait-reflow .rk-ticker { width: min(340px, 94vw); }
+body.overlay-portrait-reflow .rk-podium { gap: 4px; }

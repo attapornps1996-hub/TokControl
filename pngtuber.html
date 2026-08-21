@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokControl — Avatar Overlay</title>
+    <style>
+        * { box-sizing: border-box; }
+        html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+        #pngtuberProjectileLayer {
+            position: fixed; inset: 0; pointer-events: none; z-index: 8; overflow: hidden;
+        }
+        #pngtuberRoot {
+            position: fixed;
+            pointer-events: none;
+            z-index: 5;
+            transform-origin: center center;
+        }
+        #pngtuberWrap { position: relative; display: inline-block; }
+        #pngtuberAura {
+            position: absolute;
+            inset: -18% -12%;
+            border-radius: 50%;
+            display: none;
+            filter: blur(18px);
+            opacity: 0.85;
+            z-index: 0;
+        }
+        #pngtuberImg {
+            position: relative;
+            z-index: 1;
+            display: block;
+            max-width: min(42vw, 520px);
+            max-height: min(72vh, 720px);
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
+            filter: drop-shadow(0 10px 28px rgba(0, 0, 0, 0.4));
+            transition: filter 0.15s ease;
+        }
+        #pngtuberImg.pt-fx-glow { filter: drop-shadow(0 10px 28px rgba(0,0,0,0.4)) drop-shadow(0 0 22px rgba(188,19,254,0.55)); }
+        #pngtuberImg.pt-fx-pulse { animation: ptPulse 0.55s ease-in-out infinite alternate; }
+        #pngtuberImg.pt-bounce-soft { animation: ptBounceSoft 0.45s ease-in-out infinite; }
+        #pngtuberImg.pt-bounce-lively { animation: ptBounceLively 0.32s ease-in-out infinite; }
+        #pngtuberImg.pt-throw-hit { animation: ptThrowHit 0.35s ease-out; }
+        @keyframes ptBounceSoft { 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-6px); } }
+        @keyframes ptBounceLively { 0%,100%{ transform: translateY(0) rotate(0deg); } 25%{ transform: translateY(-10px) rotate(-2deg); } 75%{ transform: translateY(-4px) rotate(2deg); } }
+        @keyframes ptPulse { from { transform: scale(1); } to { transform: scale(1.04); } }
+        @keyframes ptThrowHit {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(calc(1 + 0.06 * var(--pt-hit-intensity, 0.5))) rotate(-3deg); }
+            50% { transform: scale(calc(1 - 0.03 * var(--pt-hit-intensity, 0.5))) rotate(2deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        #pngtuberWrap.pt-no-image::after {
+            content: 'อัปโหลดรูปในแอป → กดส่งไป OBS';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 12px;
+            min-width: 140px;
+            min-height: 120px;
+            max-width: 220px;
+            border: 2px dashed rgba(188, 19, 254, 0.35);
+            border-radius: 14px;
+            color: rgba(255, 255, 255, 0.4);
+            font: 600 13px Kanit, sans-serif;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        #pngtuberWrap.pt-loading::after { content: 'กำลังโหลด...'; }
+        #pngtuberWrap.pt-no-image #pngtuberImg { display: none !important; }
+        .pt-throw-projectile {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.45));
+        }
+        .pt-throw-projectile img { width: 100%; height: 100%; object-fit: contain; }
+        .pt-throw-projectile.pt-throw-emoji { font-size: 2.2rem; }
+        .pt-throw-projectile.pt-throw-pop { opacity: 0; transform: translate(-50%,-50%) scale(1.8) !important; transition: opacity 0.18s, transform 0.18s; }
+        .pt-throw-impact {
+            position: fixed;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.85) 0%, rgba(188,19,254,0.4) 35%, transparent 70%);
+            pointer-events: none;
+            z-index: 7;
+            animation: ptImpactFlash 0.42s ease-out forwards;
+        }
+        @keyframes ptImpactFlash {
+            from { opacity: 1; transform: translate(-50%,-50%) scale(0.3); }
+            to { opacity: 0; transform: translate(-50%,-50%) scale(1.6); }
+        }
+        #pngtuberStatusBadge {
+            position: fixed; left: 10px; bottom: 10px; font: 600 10px/1.2 Kanit, sans-serif;
+            color: rgba(255,255,255,0.45); background: rgba(0,0,0,0.28); padding: 3px 7px; border-radius: 6px; display: none;
+        }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/pngtuber-core.js"></script>
+    <script src="/pngtuber-throw.js"></script>
+    <link rel="stylesheet" href="/styles/overlay-brand.css">
+    <script src="/js/overlay-brand.js" defer></script>
+</head>
+<body>
+<script src="/js/overlay-widget-boot.js"></script>
+    <div id="pngtuberProjectileLayer"></div>
+    <div id="pngtuberRoot" style="display:none;">
+        <div id="pngtuberWrap">
+            <div id="pngtuberAura"></div>
+            <img id="pngtuberImg" alt="" draggable="false">
+        </div>
+    </div>
+    <div id="pngtuberStatusBadge"></div>
+    <script>
+        (async function () {
+            const params = new URLSearchParams(window.location.search);
+            const isPreview = params.get('preview') === '1';
+            let token = params.get('cid') || params.get('token') || (window.__TC_WIDGET__ && window.__TC_WIDGET__.cid) || '';
+            if (!token) {
+                try {
+                    const res = await fetch('/api/overlay/session');
+                    const data = await res.json();
+                    if (data.success && data.streamToken) token = data.streamToken;
+                } catch (e) {}
+            }
+            const socket = io(params.get('serverUrl') || undefined);
+            const root = document.getElementById('pngtuberRoot');
+            const wrap = document.getElementById('pngtuberWrap');
+            const aura = document.getElementById('pngtuberAura');
+            const img = document.getElementById('pngtuberImg');
+            const badge = document.getElementById('pngtuberStatusBadge');
+            const throwLayer = document.getElementById('pngtuberProjectileLayer');
+            let settings = PngTuber.mergeSettings();
+            let engine = null;
+            let lastTalkEmit = null;
+            let lastTalkAt = 0;
+
+            function render() {
+                const state = engine ? engine.getDisplayState() : (settings.manualState || 'idle');
+                PngTuber.applyDomState(root, aura, img, settings, state, wrap);
+            }
+
+            function ensureEngine() {
+                if (engine) return engine;
+                engine = new PngTuber.PngTuberEngine({
+                    settings,
+                    onStateChange: () => render(),
+                    onLevel: () => {
+                        if (settings.audioSource !== 'panel' && socket.connected && token) {
+                            const now = Date.now();
+                            const talking = engine.talking;
+                            if (talking !== lastTalkEmit && now - lastTalkAt > 80) {
+                                lastTalkEmit = talking;
+                                lastTalkAt = now;
+                                socket.emit('send_pngtuber_talk_state', { token, talking });
+                            }
+                        }
+                    }
+                });
+                return engine;
+            }
+
+            async function applyMicMode() {
+                const eng = ensureEngine();
+                eng.updateSettings(settings);
+                badge.style.display = settings.enabled === false ? 'none' : 'block';
+                if (settings.enabled === false) {
+                    eng.stop();
+                    return;
+                }
+                if (settings.audioSource === 'overlay' && settings.captureMic !== false) {
+                    badge.textContent = '🎙️ จับเสียงจาก OBS';
+                    try {
+                        await eng.startMic(settings.micDeviceId || undefined);
+                        eng.start();
+                    } catch (e) {
+                        badge.textContent = '⚠️ อนุญาตไมค์ใน OBS';
+                    }
+                } else if (settings.audioSource === 'panel') {
+                    eng.stopMic();
+                    badge.textContent = '📡 รับสัญญาณจากแอป';
+                    eng.start();
+                } else {
+                    eng.stopMic();
+                    badge.textContent = '⏸ ปิดจับเสียง';
+                    eng.start();
+                }
+                render();
+            }
+
+            function applyStatus(data) {
+                if (!data) return;
+                settings = PngTuber.mergeSettings(settings, data);
+                if (engine) engine.updateSettings(settings);
+                render();
+                applyMicMode();
+            }
+
+            async function fetchOverlayState() {
+                if (!token) return;
+                try {
+                    const res = await fetch('/api/pngtuber/overlay-state?token=' + encodeURIComponent(token));
+                    const data = await res.json();
+                    if (data.success && data.settings) applyStatus(data.settings);
+                } catch (e) { /* ignore */ }
+            }
+
+            await fetchOverlayState();
+            render();
+            if (isPreview && window.parent !== window) {
+                try {
+                    window.parent.postMessage({
+                        type: 'tokcontrol-overlay-preview-ready',
+                        mode: 'pngtuber'
+                    }, '*');
+                } catch (_) { /* standalone OBS source */ }
+            }
+
+            socket.on('connect', () => {
+                if (token) socket.emit('join_overlay', token);
+                fetchOverlayState();
+            });
+            socket.on('overlay_pngtuber_status', applyStatus);
+            socket.on('overlay_pngtuber_talk_state', (data) => {
+                if (!data || settings.audioSource !== 'panel') return;
+                ensureEngine().setRemoteTalking(!!data.talking);
+                render();
+            });
+
+            PngTuberThrow.bindThrowSocket(socket, () => settings, () => ({
+                layer: throwLayer,
+                root: root,
+                img: img
+            }));
+
+            if (token) socket.emit('join_overlay', token);
+        })();
+    </script>
+</body>
+</html>

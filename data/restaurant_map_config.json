@@ -1,0 +1,290 @@
+{
+  "id": "tokcontrol-cafe",
+  "name": "Tok Cafe",
+  "dimension": "minecraft:overworld",
+  "origin": {
+    "x": 0,
+    "y": -60,
+    "z": 0,
+    "relativeToPlayer": false
+  },
+  "queue": { "minIntervalMs": 80 },
+  "cooldowns": {
+    "CUSTOMER_ARRIVE": 2500,
+    "ORDER_FOOD": 2000,
+    "KITCHEN_DISASTER": 8000,
+    "BONUS_REWARD": 4000,
+    "SERVE": 600,
+    "CRAFT": 900
+  },
+  "moneyPerServe": 15,
+  "missPenalty": 8,
+  "maxCustomers": 4,
+  "defaultPatienceMs": 45000,
+  "chefSpawn": { "x": 5, "y": 1, "z": 5, "yaw": -90 },
+  "zones": {
+    "COFFEE_ZONE": {
+      "label": "บาร์กาแฟ / ชงเครื่องดื่ม",
+      "min": { "x": 0, "y": 0, "z": 0 },
+      "max": { "x": 10, "y": 5, "z": 6 }
+    },
+    "GRILL_ZONE": {
+      "label": "เตาพิซซ่า / ย่าง",
+      "min": { "x": 0, "y": 0, "z": 6 },
+      "max": { "x": 10, "y": 5, "z": 12 }
+    },
+    "KITCHEN_ZONE": {
+      "label": "ครัวรวม",
+      "min": { "x": 0, "y": 0, "z": 0 },
+      "max": { "x": 10, "y": 5, "z": 12 }
+    },
+    "COUNTER_ZONE": {
+      "label": "เคาน์เตอร์เสิร์ฟ",
+      "min": { "x": 10, "y": 0, "z": 0 },
+      "max": { "x": 14, "y": 5, "z": 12 }
+    },
+    "DINING_ZONE": {
+      "label": "คิวลูกค้า",
+      "min": { "x": 14, "y": 0, "z": 0 },
+      "max": { "x": 30, "y": 5, "z": 16 }
+    },
+    "PANTRY_ZONE": {
+      "label": "ตู้วัตถุดิบ",
+      "min": { "x": 0, "y": 0, "z": 12 },
+      "max": { "x": 10, "y": 5, "z": 16 }
+    }
+  },
+  "kitchenStations": {
+    "coffee": [
+      { "x": 2, "y": 1, "z": 1, "facing": "south" },
+      { "x": 3, "y": 1, "z": 1, "facing": "south" },
+      { "x": 4, "y": 1, "z": 1, "facing": "south" }
+    ],
+    "grill": [
+      { "x": 2, "y": 1, "z": 10, "facing": "north" },
+      { "x": 3, "y": 1, "z": 10, "facing": "north" },
+      { "x": 4, "y": 1, "z": 10, "facing": "north" }
+    ],
+    "fryer": [
+      { "x": 6, "y": 1, "z": 10, "facing": "north" },
+      { "x": 7, "y": 1, "z": 10, "facing": "north" }
+    ],
+    "soda": [
+      { "x": 8, "y": 1, "z": 2 }
+    ]
+  },
+  "counterBlocks": [
+    { "x": 13, "y": 1, "z": 3 },
+    { "x": 13, "y": 1, "z": 4 },
+    { "x": 13, "y": 1, "z": 5 },
+    { "x": 13, "y": 1, "z": 6 },
+    { "x": 13, "y": 1, "z": 7 },
+    { "x": 13, "y": 1, "z": 8 }
+  ],
+  "seats": [
+    { "id": "s1", "x": 16, "y": 1, "z": 3, "yaw": 90 },
+    { "id": "s2", "x": 16, "y": 1, "z": 5, "yaw": 90 },
+    { "id": "s3", "x": 16, "y": 1, "z": 7, "yaw": 90 },
+    { "id": "s4", "x": 16, "y": 1, "z": 9, "yaw": 90 }
+  ],
+  "tables": [
+    { "x": 20, "y": 1, "z": 4 },
+    { "x": 20, "y": 1, "z": 8 },
+    { "x": 24, "y": 1, "z": 4 },
+    { "x": 24, "y": 1, "z": 8 }
+  ],
+  "pantryChests": [
+    { "x": 1, "y": 1, "z": 14 },
+    { "x": 2, "y": 1, "z": 14 },
+    { "x": 3, "y": 1, "z": 14 },
+    { "x": 4, "y": 1, "z": 14 },
+    { "x": 5, "y": 1, "z": 14 }
+  ],
+  "menu": [
+    {
+      "id": "hot_cocoa",
+      "station": "coffee",
+      "item": "farmersdelight:hot_cocoa",
+      "fallback": "minecraft:honey_bottle",
+      "label": "Hot Cocoa",
+      "labelTh": "โกโก้ร้อน",
+      "price": 12,
+      "patienceMs": 40000,
+      "ingredients": [
+        { "item": "minecraft:cocoa_beans", "count": 1 },
+        { "item": "minecraft:sugar", "count": 1 },
+        { "item": "minecraft:milk_bucket", "count": 1 }
+      ]
+    },
+    {
+      "id": "apple_cider",
+      "station": "coffee",
+      "item": "farmersdelight:apple_cider",
+      "fallback": "minecraft:apple",
+      "label": "Apple Cider",
+      "labelTh": "น้ำแอปเปิลไซเดอร์",
+      "price": 10,
+      "patienceMs": 40000,
+      "ingredients": [
+        { "item": "minecraft:apple", "count": 1 },
+        { "item": "minecraft:sugar", "count": 1 }
+      ]
+    },
+    {
+      "id": "melon_juice",
+      "station": "coffee",
+      "item": "farmersdelight:melon_juice",
+      "fallback": "minecraft:melon_slice",
+      "label": "Melon Juice",
+      "labelTh": "น้ำเมลอน",
+      "price": 9,
+      "patienceMs": 35000,
+      "ingredients": [
+        { "item": "minecraft:melon_slice", "count": 2 },
+        { "item": "minecraft:sugar", "count": 1 }
+      ]
+    },
+    {
+      "id": "milk_bottle",
+      "station": "coffee",
+      "item": "farmersdelight:milk_bottle",
+      "fallback": "minecraft:milk_bucket",
+      "label": "Milk Bottle",
+      "labelTh": "นมขวด",
+      "price": 6,
+      "patienceMs": 30000,
+      "ingredients": [
+        { "item": "minecraft:milk_bucket", "count": 1 }
+      ]
+    },
+    {
+      "id": "hamburger",
+      "station": "grill",
+      "item": "farmersdelight:hamburger",
+      "fallback": "minecraft:cooked_beef",
+      "label": "Hamburger",
+      "labelTh": "แฮมเบอร์เกอร์",
+      "price": 16,
+      "patienceMs": 50000,
+      "ingredients": [
+        { "item": "minecraft:bread", "count": 1 },
+        { "item": "minecraft:cooked_beef", "count": 1 }
+      ]
+    },
+    {
+      "id": "chicken_sandwich",
+      "station": "grill",
+      "item": "farmersdelight:chicken_sandwich",
+      "fallback": "minecraft:cooked_chicken",
+      "label": "Chicken Sandwich",
+      "labelTh": "แซนด์วิชไก่",
+      "price": 14,
+      "patienceMs": 45000,
+      "ingredients": [
+        { "item": "minecraft:bread", "count": 1 },
+        { "item": "minecraft:cooked_chicken", "count": 1 }
+      ]
+    },
+    {
+      "id": "bacon_and_eggs",
+      "station": "grill",
+      "item": "farmersdelight:bacon_and_eggs",
+      "fallback": "minecraft:cooked_porkchop",
+      "label": "Bacon and Eggs",
+      "labelTh": "เบคอนไข่ดาว",
+      "price": 13,
+      "patienceMs": 45000,
+      "ingredients": [
+        { "item": "minecraft:cooked_porkchop", "count": 1 },
+        { "item": "minecraft:egg", "count": 1 }
+      ]
+    },
+    {
+      "id": "steak_and_potatoes",
+      "station": "grill",
+      "item": "farmersdelight:steak_and_potatoes",
+      "fallback": "minecraft:baked_potato",
+      "label": "Steak and Potatoes",
+      "labelTh": "สเต็กมันฝรั่ง",
+      "price": 18,
+      "patienceMs": 55000,
+      "ingredients": [
+        { "item": "minecraft:cooked_beef", "count": 1 },
+        { "item": "minecraft:baked_potato", "count": 1 }
+      ]
+    },
+    {
+      "id": "fruit_salad",
+      "station": "grill",
+      "item": "farmersdelight:fruit_salad",
+      "fallback": "minecraft:sweet_berries",
+      "label": "Fruit Salad",
+      "labelTh": "สลัดผลไม้",
+      "price": 11,
+      "patienceMs": 40000,
+      "ingredients": [
+        { "item": "minecraft:apple", "count": 1 },
+        { "item": "minecraft:sweet_berries", "count": 1 },
+        { "item": "minecraft:melon_slice", "count": 1 }
+      ]
+    },
+    {
+      "id": "honey_cookie",
+      "station": "grill",
+      "item": "farmersdelight:honey_cookie",
+      "fallback": "minecraft:cookie",
+      "label": "Honey Cookie",
+      "labelTh": "คุกกี้ผึ้ง",
+      "price": 7,
+      "patienceMs": 35000,
+      "ingredients": [
+        { "item": "minecraft:honey_bottle", "count": 1 },
+        { "item": "minecraft:wheat", "count": 1 }
+      ]
+    },
+    {
+      "id": "dumplings",
+      "station": "grill",
+      "item": "farmersdelight:dumplings",
+      "fallback": "minecraft:cooked_porkchop",
+      "label": "Dumplings",
+      "labelTh": "เกี๊ยว",
+      "price": 12,
+      "patienceMs": 45000,
+      "ingredients": [
+        { "item": "minecraft:wheat", "count": 1 },
+        { "item": "minecraft:cooked_porkchop", "count": 1 }
+      ]
+    },
+    {
+      "id": "stuffed_potato",
+      "station": "grill",
+      "item": "farmersdelight:stuffed_potato",
+      "fallback": "minecraft:baked_potato",
+      "label": "Stuffed Potato",
+      "labelTh": "มันฝรั่งยัดไส้",
+      "price": 12,
+      "patienceMs": 45000,
+      "ingredients": [
+        { "item": "minecraft:baked_potato", "count": 1 },
+        { "item": "minecraft:cooked_beef", "count": 1 }
+      ]
+    }
+  ],
+  "pantryLoot": [
+    { "item": "minecraft:cocoa_beans", "count": 16 },
+    { "item": "minecraft:sugar", "count": 16 },
+    { "item": "minecraft:milk_bucket", "count": 8 },
+    { "item": "minecraft:apple", "count": 16 },
+    { "item": "minecraft:melon_slice", "count": 16 },
+    { "item": "minecraft:sweet_berries", "count": 16 },
+    { "item": "minecraft:bread", "count": 16 },
+    { "item": "minecraft:cooked_beef", "count": 16 },
+    { "item": "minecraft:cooked_chicken", "count": 16 },
+    { "item": "minecraft:cooked_porkchop", "count": 16 },
+    { "item": "minecraft:baked_potato", "count": 16 },
+    { "item": "minecraft:wheat", "count": 16 },
+    { "item": "minecraft:egg", "count": 16 },
+    { "item": "minecraft:honey_bottle", "count": 8 }
+  ]
+}

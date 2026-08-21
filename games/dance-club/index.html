@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dance Club — แสดงผล</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="dance-club.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <link rel="stylesheet" href="/styles/overlay-brand.css">
+    <script src="/js/overlay-brand.js" defer></script>
+</head>
+<body class="dc-view-mode">
+<script src="/js/overlay-widget-boot.js"></script>
+    <div id="dcApp">
+        <div id="dcViewport"></div>
+
+        <div id="dcYtBox" class="dc-yt-box" hidden>
+            <div class="dc-yt-head">
+                <span>▶ YouTube · เสียง 144p</span>
+                <div class="dc-yt-head-btns">
+                    <button type="button" class="dc-mini" id="dcYtToggleSize" title="ย่อ/ขยาย">▾</button>
+                    <button type="button" class="dc-mini" id="dcYtClose" title="ปิด">✕</button>
+                </div>
+            </div>
+            <div id="ytMount"></div>
+        </div>
+
+        <input type="file" id="dcAudioFile" accept="audio/*" hidden>
+        <input type="file" id="dcAudioQueue" accept="audio/*" multiple hidden>
+        <input type="file" id="dcVideoFile" accept="video/*" hidden>
+
+        <div id="dcHud">
+            <div class="dc-top-bar dc-view-top">
+                <div class="dc-status-pills">
+                    <div class="dc-pill" id="dcMusicPill"><span class="dot"></span><span class="label">Music OFF</span></div>
+                    <div class="dc-pill" id="dcBpmPill"><span class="dot"></span><span class="label">128 BPM</span></div>
+                </div>
+                <div class="dc-view-actions">
+                    <button type="button" class="dc-view-link" id="dcOpenControl" title="เปิดหน้าตั้งค่า">🎛️ ตั้งค่า</button>
+                    <button type="button" class="dc-view-link" id="dcHideHud" title="ซ่อน HUD (H)">👁</button>
+                </div>
+            </div>
+
+            <div class="dc-toast" id="dcToast"></div>
+
+            <div class="dc-quick-dock dc-view-dock">
+                <button type="button" class="dc-dock-btn primary" id="dcDockPlay" title="เล่น/หยุด (Space)">▶</button>
+                <button type="button" class="dc-dock-btn" id="dcDockGift" title="ทดสอบของขวัญ (G)">🎁</button>
+                <div class="dc-dock-roster" id="dcDockRoster" title="เลือกนักเต้น"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('#dcOpenControl')) {
+                if (window.PandyBridge?.openDanceClubControl) {
+                    e.preventDefault();
+                    window.PandyBridge.openDanceClubControl();
+                }
+            }
+        });
+        window.addEventListener('error', function (ev) {
+            var vp = document.getElementById('dcViewport');
+            if (vp && !vp.querySelector('canvas')) {
+                vp.innerHTML = '<div style="padding:24px;color:#ff6b81;font-family:Kanit,sans-serif;pointer-events:auto;">'
+                    + '<h2>⚠️ โหลดสคริปต์ไม่สำเร็จ</h2>'
+                    + '<p style="color:#888;font-size:0.85rem;">' + (ev.message || 'Unknown error') + '</p>'
+                    + '<p style="color:#666;font-size:0.8rem;">รีเฟรชหน้านี้ (F5)</p></div>';
+            }
+        });
+    </script>
+    <script type="module" src="js/view-main.js?v=viewport-full-1"></script>
+</body>
+</html>
