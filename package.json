@@ -96,7 +96,12 @@
         "from": "data",
         "to": "data",
         "filter": [
-          "**/*"
+          "**/*",
+          "!local-*.txt",
+          "!mc-bridge-token.txt",
+          "!mc-rcon-password.txt",
+          "!team_members_cache.json",
+          "!emotes_cache.json"
         ]
       }
     ]
