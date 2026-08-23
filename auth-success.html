@@ -50,6 +50,7 @@
         } else if (token) {
             title.textContent = 'เข้าสู่ระบบสำเร็จ!';
             msg.textContent = 'กำลังกลับไปที่ TokControl...';
+            try { window.__oauthToken = token; } catch (e) { /* ignore */ }
             postToken(token);
             try { history.replaceState({}, '', location.pathname); } catch (e) { /* ignore */ }
             setTimeout(() => window.close(), 900);

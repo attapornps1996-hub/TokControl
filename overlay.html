@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/media-sniff.js"></script>
     <script src="/overlay-gallery-tiktok.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
     <script src="/jar-physics.js"></script>
@@ -3182,6 +3183,8 @@
         .fx-emote { font-size:2rem; animation:fxEmoteFloat 3s ease-in-out infinite; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
         @keyframes fxEmoteFloat { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-8px);} }
         .fx-firework-stage { position:fixed; inset:0; overflow:hidden; pointer-events:none; }
+        #overlayGoalLastX.firework-mode.active { padding:0; align-items:stretch; justify-content:stretch; }
+        #overlayGoalLastX.firework-mode #overlayGoalLastXContent { width:100%; height:100%; }
         #overlayGoalLastX.chute-mode.active { padding:0; align-items:stretch; justify-content:stretch; }
         #overlayGoalLastX.chute-mode #overlayGoalLastXContent { width:100%; height:100%; }
         .fx-chute-stage { position:fixed; inset:0; overflow:hidden; pointer-events:none; }
@@ -4896,7 +4899,11 @@
         const isGalleryDemo = urlParams.get('demo') === '1';
         const isGalleryPreview = urlParams.get('preview') === '1';
         const isGalleryCardPreview = urlParams.get('card') === '1';
-        const isPreviewMuted = isGalleryPreview || isGalleryDemo || urlParams.get('mute') === '1';
+        const isEmbeddedFrame = (function () {
+            try { return window.self !== window.top; } catch (e) { return true; }
+        })();
+        const isElectronShell = /Electron/i.test(navigator.userAgent || '');
+        const isPreviewMuted = isGalleryPreview || isGalleryDemo || urlParams.get('mute') === '1' || isEmbeddedFrame || isElectronShell;
         if (isGalleryPreview) {
             document.documentElement.classList.add('ov-panel-preview');
             document.body.classList.add('ov-panel-preview');
@@ -5446,6 +5453,28 @@
         function giftFireworkPassesMinCoins(coins, settings) {
             const min = settings.minCoins != null ? settings.minCoins : 0;
             return min === 0 || (parseInt(coins, 10) || 0) >= min;
+        }
+
+        function normalizeFxType(raw) {
+            const t = String(raw || '').toLowerCase().replace(/[_-\s]/g, '');
+            if (t === 'giftfirework' || t === 'giftfirework' || t === 'firework' || t === 'fireworks' || t === 'giftfw') {
+                return 'giftfirework';
+            }
+            return String(raw || 'giftfeed');
+        }
+
+        function liveGiftCoinsOf(g) {
+            if (!g) return 0;
+            const direct = Number(g.totalCoins || g.coins || 0);
+            if (direct) return direct;
+            const diamonds = Number(g.diamondCount || g.diamondCount || 0);
+            const repeats = Number(g.repeatCount || g.repeatCount || 1) || 1;
+            return diamonds * repeats;
+        }
+
+        function liveGiftImageOf(g) {
+            if (!g) return '';
+            return g.giftImage || g.imageUrl || g.giftPictureUrl || g.giftPictureUrl || g.pictureUrl || g.giftIcon || '';
         }
 
         function playFireworkSound(settings) {
@@ -6408,6 +6437,8 @@
             specialgift: { accent: '#ffcc00' },
             emotewall: { accent: '#00d2ff', emotes: ['😂','🔥','💜','👏','🎉','😍','✨','🥳','💖','😎','🤣','💯'] },
             giftfirework: { accent: '#bc13fe' },
+            giftfirework: { accent: '#bc13fe' },
+            firework: { accent: '#bc13fe' },
             giftchute: { accent: '#d9cbb0' },
             coinmatch: { accent: '#ffcc00', text: '#ffffff', panel: 'rgba(18, 14, 36, 0.92)' }
         };
@@ -6492,7 +6523,7 @@
                 if (window.GiftIconHelper) await GiftIconHelper.loadGiftCatalog();
             hideAllOverlayLayers();
             const ovId = urlParams.get('ovId') || '';
-            const effectType = urlParams.get('effectType') || 'giftfeed';
+            const effectType = normalizeFxType(urlParams.get('effectType') || 'giftfeed');
             const isPreview = isGalleryPreview;
             const settings = loadGoalLastXSettings(ovId);
             const meta = EFFECTS_OV_META[effectType] || EFFECTS_OV_META.giftfeed;
@@ -6500,6 +6531,7 @@
             const content = document.getElementById('overlayGoalLastXContent');
             if (!root || !content) return;
             root.classList.add('active');
+            if (effectType === 'giftfirework') root.classList.add('firework-mode');
             const colors = resolveOverlayColors(settings, meta);
             applyOverlayColorVars(root, colors);
             if (fxAnimTimer) { clearInterval(fxAnimTimer); fxAnimTimer = null; }
@@ -8847,7 +8879,7 @@
                     if (ev.type === wanted) show();
                 });
             } else if (mode === 'effects') {
-                const effectType = urlParams.get('effectType') || 'giftfeed';
+                const effectType = normalizeFxType(urlParams.get('effectType') || 'giftfeed');
                 const meta = EFFECTS_OV_META[effectType] || EFFECTS_OV_META.giftfeed;
                 const content = document.getElementById('overlayGoalLastXContent');
                 if (!content) return;
@@ -9022,18 +9054,19 @@
                     });
                     paint();
                 } else if (effectType === 'giftfirework') {
+                    const fwRoot = document.getElementById('overlayGoalLastX');
+                    if (fwRoot) fwRoot.classList.add('active', 'firework-mode');
                     content.innerHTML = `<div class="fx-firework-stage" id="fxFirework"></div>`;
                     bridge.onEvent((ev) => {
                         if (ev.type !== 'gift' || !ev.gift) return;
-                        const coins = ev.gift.totalCoins || (ev.gift.diamondCount || 0) * (ev.gift.repeatCount || 1) || 0;
+                        const coins = liveGiftCoinsOf(ev.gift);
                         if (!giftFireworkPassesMinCoins(coins, settings)) return;
-                        const root = document.getElementById('overlayGoalLastX');
-                        if (root) root.classList.add('active');
+                        if (fwRoot) fwRoot.classList.add('active', 'firework-mode');
                         const liveStage = document.getElementById('fxFirework');
                         triggerGiftFirework(liveStage, {
                             nickname: ev.gifter?.nickname || ev.gift.nickname || ev.gift.uniqueId,
                             giftIcon: ev.gift.giftIcon || '🎁',
-                            giftImage: ev.gift.giftImage || ev.gift.imageUrl || '',
+                            giftImage: liveGiftImageOf(ev.gift),
                             giftName: ev.gift.giftName,
                             coins
                         }, settings, meta.accent);
@@ -12850,10 +12883,11 @@
             return new Promise((resolve) => {
                 let audioEl = null;
                 const finish = () => resolve();
-                if (payload?.soundData) {
-                    try { audioEl = new Audio(payload.soundData); } catch (e) { finish(); return; }
-                } else if (payload?.soundUrl) {
-                    try { audioEl = new Audio(payload.soundUrl); } catch (e) { finish(); return; }
+                const src = (window.TokMediaSniff && TokMediaSniff.pickSrc)
+                    ? TokMediaSniff.pickSrc(payload?.soundData, payload?.soundUrl)
+                    : (payload?.soundData || payload?.soundUrl);
+                if (src) {
+                    try { audioEl = new Audio(src); } catch (e) { finish(); return; }
                 } else {
                     finish();
                     return;
@@ -12915,15 +12949,24 @@
             if (!aeOvPlaying) aeOvPlayNext();
         }
 
+        function ovMediaSrc() {
+            const sniff = window.TokMediaSniff;
+            if (sniff && sniff.pickSrc) return sniff.pickSrc.apply(sniff, arguments);
+            for (let i = 0; i < arguments.length; i++) {
+                const s = arguments[i];
+                if (s && (String(s).slice(0, 5) === 'data:' || /^https?:\/\//i.test(s) || String(s).charAt(0) === '/')) return s;
+            }
+            return '';
+        }
+
         function aeOvPlaySound(payload) {
             if (mode !== 'actions' || isPreviewMuted) return null;
             const volRaw = payload?.soundVolume != null ? Number(payload.soundVolume) : 85;
             const vol = Math.max(0, Math.min(1, (isNaN(volRaw) ? 85 : volRaw) / 100));
             let audioEl = null;
-            if (payload?.soundData) {
-                try { audioEl = new Audio(payload.soundData); } catch (e) { return null; }
-            } else if (payload?.soundUrl) {
-                try { audioEl = new Audio(payload.soundUrl); } catch (e) { return null; }
+            const soundSrc = ovMediaSrc(payload?.soundData, payload?.soundUrl, payload?.soundUrl, payload?.audioUrl);
+            if (soundSrc) {
+                try { audioEl = new Audio(soundSrc); } catch (e) { return null; }
             } else {
                 return null;
             }
@@ -13006,24 +13049,24 @@
             const m = action.media || {};
             const duration = Math.max(1, (action.duration || 10)) * 1000;
             const layers = [];
-            if ((m.picture || action.imageData || action.imageUrl) && (action.imageData || action.imageUrl)) {
+            if ((m.picture || action.imageData || action.imageUrl || action.imageUrl) && ovMediaSrc(action.imageData, action.imageUrl, action.imageUrl)) {
                 const img = document.createElement('img');
                 img.className = 'ae-ov-layer ae-ov-img';
-                img.src = action.imageData || action.imageUrl;
+                img.src = ovMediaSrc(action.imageData, action.imageUrl, action.imageUrl);
                 stage.appendChild(img);
                 layers.push(img);
             }
-            if (m.animation && (action.animationData || action.animationUrl)) {
+            if (m.animation && ovMediaSrc(action.animationData, action.animationUrl, action.animationUrl)) {
                 const anim = document.createElement('img');
                 anim.className = 'ae-ov-layer ae-ov-anim';
-                anim.src = action.animationData || action.animationUrl;
+                anim.src = ovMediaSrc(action.animationData, action.animationUrl, action.animationUrl);
                 stage.appendChild(anim);
                 layers.push(anim);
             }
-            if (m.video && action.videoData) {
+            if (m.video && ovMediaSrc(action.videoData, action.videoUrl, action.videoUrl)) {
                 const vid = document.createElement('video');
                 vid.className = 'ae-ov-layer ae-ov-video';
-                vid.src = action.videoData;
+                vid.src = ovMediaSrc(action.videoData, action.videoUrl, action.videoUrl);
                 vid.autoplay = true;
                 vid.muted = false;
                 vid.playsInline = true;
@@ -13032,7 +13075,7 @@
                 const p = vid.play();
                 if (p && typeof p.catch === 'function') p.catch(() => {});
             }
-            if (m.sound && (action.soundData || action.soundUrl)) {
+            if (m.sound && (action.soundData || action.soundUrl || action.soundUrl || action.audioUrl)) {
                 aeOvActiveAudio = aeOvPlaySound(action);
             }
             const fadeOut = action.fadeInOut !== false;

@@ -184,6 +184,10 @@ app.get('/profile/:username', (_req, res) => {
 app.get(['/profile', '/profile/'], (_req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+app.get('/vendor/crypto-js.js', (_req, res) => {
+    res.type('application/javascript');
+    res.sendFile(path.join(__dirname, 'node_modules', 'crypto-js', 'crypto-js.js'));
+});
 app.use(blockSensitiveStatic);
 app.use(express.static(path.join(__dirname)));
 
@@ -3571,7 +3575,8 @@ async function executeRepoBridgeCommand(host, command, opts = {}) {
                 message: ok ? 'pong' : 'bridge_unreachable',
                 detail: res.data,
                 pendingWinDelta: Number(res.data?.pendingWinDelta || 0),
-                mod: res.data.mod || (label === 'Minecraft' ? 'TokControl_Minecraft_TestBridge' : 'TokControl_REPO_Tiktoklive')
+                mod: res.data.mod || (label === 'Minecraft' ? 'TokControl_Minecraft_TestBridge' : 'TokControl_REPO_Tiktoklive'),
+                version: res.data?.version || ''
             };
         }
         const body = cmd.startsWith('{') ? cmd : cmd;

@@ -101,7 +101,7 @@ const OVERLAY_ROUTE_DEFS = [
     { route: 'cards', file: 'lucky_rituals.html', mode: 'ritual', title: 'Card Draw Hub', defaults: { overlay: '1', system: 'shuffle' } },
     { route: 'win', file: 'overlay.html', mode: 'win', title: 'Win Counter' },
     { route: 'timer', file: 'overlay.html', mode: 'timer', title: 'Countdown Timer' },
-    { route: 'vote', file: 'overlay.html', mode: 'vote', title: 'Vote / VS' },
+    { route: 'vote', file: 'vote-overlay.html', mode: 'vote', title: 'Vote Overlay' },
     { route: 'songrequest', file: 'overlay.html', mode: 'songrequest', title: 'Song Request' },
     { route: 'songrequest-h', file: 'overlay.html', mode: 'songrequest-h', title: 'Song Request (แนวนอน)' },
     { route: 'songrequest-skip', file: 'overlay.html', mode: 'sr-skip', title: 'Skip Vote Counter' },

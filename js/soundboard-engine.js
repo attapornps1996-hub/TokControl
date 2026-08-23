@@ -10,7 +10,7 @@
     const DB_VERSION = 1;
     const BLOB_STORE = 'blobs';
     const MAX_FILE_BYTES = 25 * 1024 * 1024;
-    const ALLOWED_EXT = ['mp3', 'wav', 'ogg', 'oga', 'm4a', 'aac', 'webm'];
+    const ALLOWED_EXT = ['mp3', 'wav', 'ogg', 'oga', 'm4a', 'aac', 'webm', 'bin', 'flac'];
     const ALLOWED_MIME = [
         'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/wave', 'audio/x-wav',
         'audio/ogg', 'application/ogg', 'audio/mp4', 'audio/m4a', 'audio/x-m4a',
@@ -252,10 +252,10 @@
         const name = safeFilename(file.name);
         const ext = extOf(name);
         const mime = String(file.type || '').toLowerCase();
-        const okExt = ALLOWED_EXT.includes(ext);
-        const okMime = !mime || ALLOWED_MIME.includes(mime) || mime.startsWith('audio/');
-        if (!okExt && !okMime) return 'รองรับเฉพาะ MP3, WAV, OGG, M4A, WEBM';
-        if (!okExt && mime && !mime.startsWith('audio/')) return 'ชนิดไฟล์ไม่รองรับ';
+        const okExt = ALLOWED_EXT.includes(ext) || ext === 'bin';
+        const okMime = !mime || ALLOWED_MIME.includes(mime) || mime.startsWith('audio/') || mime === 'application/octet-stream';
+        if (!okExt && !okMime) return 'รองรับ MP3, WAV, OGG, M4A, WEBM และไฟล์ .bin';
+        if (!okExt && mime && !mime.startsWith('audio/') && mime !== 'application/octet-stream') return 'ชนิดไฟล์ไม่รองรับ';
         return null;
     }
 
@@ -621,14 +621,24 @@
     }
 
     async function addSoundFromFile(file, meta, opts) {
-        const err = validateFile(file);
+        let work = file;
+        if (window.TokMediaSniff && TokMediaSniff.fileAsTypedBlob) {
+            try {
+                const typed = await TokMediaSniff.fileAsTypedBlob(file);
+                if (typed.sniff && (typed.sniff.kind === 'image' || typed.sniff.kind === 'video' || typed.sniff.kind === 'json' || typed.sniff.kind === 'zip')) {
+                    return { ok: false, error: 'ไม่ใช่ไฟล์เสียง', filename: file && file.name };
+                }
+                work = typed.blob || file;
+            } catch (_) { work = file; }
+        }
+        const err = validateFile(work);
         if (err) return { ok: false, error: err, filename: file && file.name };
         const filename = safeFilename(file.name);
         const existing = state.sounds.find((s) => s.filename === filename && s.fileSize === file.size);
         if (existing && !(opts && opts.replace)) {
             return { ok: false, duplicate: true, existingId: existing.id, filename };
         }
-        const duration = await probeDuration(file);
+        const duration = await probeDuration(work);
         const id = (existing && opts && opts.replace) ? existing.id : uid('snd');
         const patch = meta || {};
         const record = Object.assign({}, existing || {}, {
@@ -654,7 +664,7 @@
         if (record.hotkey && (isReservedHotkey(record.hotkey, id) || isHotkeyTaken(record.hotkey, id))) {
             record.hotkey = nextHotkey();
         }
-        await idbPut(id, file, file.type);
+        await idbPut(id, work, work.type || file.type);
         await revokeUrl(id);
         if (existing && opts && opts.replace) {
             const idx = state.sounds.findIndex((s) => s.id === id);

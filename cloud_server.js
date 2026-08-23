@@ -215,7 +215,7 @@ app.get('/api/features', (_appReq, appRes) => {
 });
 
 app.get('/api/app/version', (_appReq, appRes) => {
-    let version = '2.1.19';
+    let version = '2.1.20';
     try {
         const pkg = require('./package.json');
         version = pkg.version || version;
@@ -228,6 +228,10 @@ app.get('/profile/:username', (_appReq, appRes) => {
 });
 app.get(['/profile', '/profile/'], (_appReq, appRes) => {
     appRes.sendFile(path.join(__dirname, 'index.html'));
+});
+app.get('/vendor/crypto-js.js', (_appReq, appRes) => {
+    appRes.type('application/javascript');
+    appRes.sendFile(path.join(__dirname, 'node_modules', 'crypto-js', 'crypto-js.js'));
 });
 app.get('/', (_appReq, appRes) => {
     appRes.set('Cache-Control', 'no-store, no-cache, must-revalidate');

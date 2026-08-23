@@ -835,7 +835,7 @@
 
     function copyPngTuberOverlayLink() {
         const url = typeof buildOverlayUrl === 'function' ? buildOverlayUrl('pngtuber') : '';
-        if (url && typeof copyToClipboard === 'function') copyToClipboard(url);
+        if (url && typeof copyToClipboard === 'function') copyToClipboard(url, true);
         if (typeof showCustomMsg === 'function') {
             showCustomMsg('success', 'คัดลอกแล้ว', 'ลิงก์ Avatar Overlay สำหรับ OBS / TikTok Studio');
         }

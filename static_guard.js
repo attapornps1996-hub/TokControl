@@ -18,16 +18,21 @@ const BLOCKED_PREFIXES = [
     '.freebuff/', 'deploy/'
 ];
 
+/** Public JSON catalogs the desktop UI fetches (REPO, Minecraft, gifts, …). */
+const PUBLIC_DATA_JSON = /^data\/[A-Za-z0-9._-]+\.json$/i;
+
 function isBlockedStaticPath(urlPath) {
     const rel = decodeURIComponent(String(urlPath || '').split('?')[0])
         .replace(/^\/+/, '')
         .replace(/\\/g, '/');
     if (!rel) return false;
+    const relLower = rel.toLowerCase();
+    if (PUBLIC_DATA_JSON.test(relLower)) return false;
     const base = path.posix.basename(rel).toLowerCase();
-    if (BLOCKED_FILES.has(base) || BLOCKED_FILES.has(rel.toLowerCase())) return true;
+    if (BLOCKED_FILES.has(base) || BLOCKED_FILES.has(relLower)) return true;
     if (rel.startsWith('.') || base.startsWith('.env')) return true;
     if (rel.endsWith('.md') || rel.endsWith('.sql') || rel.endsWith('.db')) return true;
-    return BLOCKED_PREFIXES.some((p) => rel.toLowerCase().startsWith(p));
+    return BLOCKED_PREFIXES.some((p) => relLower.startsWith(p));
 }
 
 function blockSensitiveStatic(req, res, next) {

@@ -1027,6 +1027,8 @@
         state.announcementTab = name;
         document.querySelectorAll('#adminSec-announce .adm2-ann-tab').forEach((btn) => btn.classList.toggle('active', btn.dataset.annTab === name));
         document.querySelectorAll('#adminSec-announce .adm2-ann-pane').forEach((pane) => { pane.hidden = pane.dataset.annPane !== name; });
+        const actions = document.querySelector('#adminSec-announce .adm2-ann-actions');
+        if (actions) actions.hidden = name === 'popup';
         if (name === 'manage') renderAnnouncementManagement();
         if (name === 'templates') renderAnnouncementTemplates();
         if (name === 'analytics') {

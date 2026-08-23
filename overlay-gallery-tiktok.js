@@ -109,7 +109,10 @@
     }
 
     function giftImageOf(gift) {
-        const candidates = [gift?.giftImage, gift?.imageUrl, gift?.giftIcon];
+            const candidates = [
+                gift?.giftImage, gift?.imageUrl, gift?.giftPictureUrl, gift?.giftPictureUrl,
+                gift?.pictureUrl, gift?.giftIcon, gift?.icon
+            ];
         for (const raw of candidates) {
             if (!raw || typeof raw !== 'string') continue;
             const url = raw.trim();
@@ -213,7 +216,7 @@
         if (!gift) return;
         if (!acceptsScopedTest(gift)) return;
         if (!shouldProcessGiftEvent(gift)) return;
-        const coins = gift.totalCoins || (gift.diamondCount || 0) * (gift.repeatCount || 1) || 0;
+        const coins = gift.totalCoins || gift.coins || (gift.diamondCount || gift.diamondCount || 0) * (gift.repeatCount || gift.repeatCount || 1) || 0;
         if (isTestPayload(gift)) {
             testTracker.gifterKeys.add(gift.uniqueId || gift.nickname || 'unknown');
             testTracker.coins += coins;

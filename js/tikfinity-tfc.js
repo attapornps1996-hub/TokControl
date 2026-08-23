@@ -6,14 +6,14 @@
     'use strict';
 
     let CryptoJS = null;
-    try {
-        CryptoJS = require('crypto-js');
-    } catch (_) {
+    function getCryptoJS() {
+        if (CryptoJS) return CryptoJS;
         try {
+            CryptoJS = require('crypto-js');
+        } catch (_) {
             CryptoJS = global.CryptoJS || null;
-        } catch (__) {
-            CryptoJS = null;
         }
+        return CryptoJS;
     }
 
     const LAYER1_PW = 'lolsurghwi378ukasfjsdf_s';
@@ -107,6 +107,7 @@
     }
 
     function decryptTfc(fileContent) {
+        const CryptoJS = getCryptoJS();
         if (!CryptoJS) {
             throw new Error('ต้องการ crypto-js เพื่อถอดรหัสไฟล์ .tfc (npm install crypto-js)');
         }
@@ -148,6 +149,6 @@
         decryptTfc,
         tryDecryptTfc,
         shash,
-        hasCrypto: () => !!CryptoJS
+        hasCrypto: () => !!getCryptoJS()
     };
 })(typeof window !== 'undefined' ? window : globalThis);

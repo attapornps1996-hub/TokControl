@@ -18,6 +18,8 @@
         lastValidation: { ok: true, errors: [] },
         layers: { bg: true, mascot: true, header: true, content: true, cta: true }
     };
+    let previewTimer = null;
+    let layersBound = false;
 
     function esc(v) { return Render.esc(v); }
     function $(sel, root) { return (root || document).querySelector(sel); }
@@ -56,10 +58,18 @@
 
     function notifyChange() {
         state.dirty = true;
-        validate();
-        preview();
         const status = $('#tcPopedStatusText');
         if (status) status.textContent = current().status || 'draft';
+        schedulePreview();
+    }
+
+    function schedulePreview() {
+        if (previewTimer) clearTimeout(previewTimer);
+        previewTimer = setTimeout(() => {
+            previewTimer = null;
+            preview();
+            validate();
+        }, 160);
     }
 
     function validate() {
@@ -81,36 +91,28 @@
     function preview() {
         const stage = $('#tcPopedPreviewStage');
         if (!stage || !Render) return;
-        const html = Render.renderPopup(current(), { mode: state.previewMode, lockClose: false });
+        const html = Render.renderPopup(current(), { mode: state.previewMode, preview: true, lockClose: false });
         stage.innerHTML = html;
         const root = stage.querySelector('.tc-pop-root');
         if (root) {
             root.classList.add('is-preview');
             if (state.previewMode === 'mobile') root.classList.add('is-mobile');
             root.style.zoom = String((Number(state.zoom) || 100) / 100);
-            if (!state.layers.bg) root.classList.add('hide-layer-bg');
-            if (!state.layers.mascot) root.classList.add('hide-layer-mascot');
-            if (!state.layers.header) root.classList.add('hide-layer-header');
-            if (!state.layers.content) root.classList.add('hide-layer-content');
-            if (!state.layers.cta) root.classList.add('hide-layer-cta');
+            root.classList.toggle('hide-layer-bg', !state.layers.bg);
+            root.classList.toggle('hide-layer-mascot', !state.layers.mascot);
+            root.classList.toggle('hide-layer-header', !state.layers.header);
+            root.classList.toggle('hide-layer-content', !state.layers.content);
+            root.classList.toggle('hide-layer-cta', !state.layers.cta);
         }
         const layers = $('#tcPopedLayers');
-        if (layers) {
-            const rows = [
-                ['bg', 'พื้นหลัง'],
-                ['mascot', 'มาสคอต'],
-                ['header', 'หัวข้อ'],
-                ['content', 'เนื้อหา'],
-                ['cta', 'ปุ่ม CTA']
-            ];
-            layers.innerHTML = rows.map(([key, label]) =>
-                `<label class="tc-poped-layer"><input type="checkbox" data-layer="${key}" ${state.layers[key] !== false ? 'checked' : ''}><span>${esc(label)}</span></label>`
-            ).join('');
-            layers.querySelectorAll('[data-layer]').forEach((cb) => {
-                cb.addEventListener('change', () => {
-                    state.layers[cb.dataset.layer] = cb.checked;
-                    preview();
-                });
+        if (layers && !layersBound) {
+            layersBound = true;
+            layers.addEventListener('change', (e) => {
+                const cb = e.target.closest('[data-layer]');
+                if (!cb) return;
+                state.layers[cb.dataset.layer] = cb.checked;
+                const live = $('#tcPopedPreviewStage .tc-pop-root');
+                if (live) live.classList.toggle('hide-layer-' + cb.dataset.layer, !cb.checked);
             });
         }
         const idEl = $('#tcPopedId');
@@ -296,6 +298,23 @@
             </button>`).join('');
     }
 
+    function ctaFieldsHtml() {
+        const cfg = current().popupConfig;
+        const primary = cfg.ctas[0] || Cfg.cta('primary', 'รับทราบ', 'acknowledge');
+        const secondary = cfg.ctas[1];
+        return `<div class="tc-poped-grid">
+                ${field('ข้อความปุ่มหลัก', `<input id="tcCta1Text" value="${esc(primary.text)}">`)}
+                ${field('ไอคอนปุ่มหลัก', `<input id="tcCta1Icon" value="${esc(primary.icon || 'check')}">`)}
+                ${field('Action', `<select id="tcCta1Act">${Cfg.CTA_ACTIONS.map((a) => `<option ${primary.actionType === a ? 'selected' : ''}>${a}</option>`).join('')}</select>`)}
+                ${field('ค่า / URL / route', `<input id="tcCta1Val" value="${esc(primary.actionValue || '')}">`, true)}
+                <label class="tc-poped-check span-2"><input type="checkbox" id="tcCta2On" ${secondary ? 'checked' : ''}> เปิดปุ่มรอง</label>
+                ${field('ข้อความปุ่มรอง', `<input id="tcCta2Text" value="${esc(secondary && secondary.text || 'ปิด')}">`)}
+                ${field('ไอคอนปุ่มรอง', `<input id="tcCta2Icon" value="${esc(secondary && secondary.icon || 'close')}">`)}
+                ${field('Action รอง', `<select id="tcCta2Act">${Cfg.CTA_ACTIONS.map((a) => `<option ${secondary && secondary.actionType === a ? 'selected' : ''}>${a}</option>`).join('')}</select>`)}
+                ${field('ค่า / URL ปุ่มรอง', `<input id="tcCta2Val" value="${esc(secondary && secondary.actionValue || '')}">`, true)}
+            </div>`;
+    }
+
     function tabHtml(tab) {
         const item = current();
         const cfg = item.popupConfig;
@@ -322,7 +341,9 @@
                     </div>
                 </div>
                 <div id="tcPopSectionList">${renderSectionEditors()}</div>
-            </div>`;
+            </div>
+            <h3 class="tc-poped-h3">ปุ่มกดในป๊อปอัป</h3>
+            ${ctaFieldsHtml()}`;
         }
         if (tab === 'mascot') {
             const m = cfg.mascot;
@@ -360,63 +381,52 @@
                 <label class="tc-poped-check"><input type="checkbox" id="tcMascotParts" ${m.particles ? 'checked' : ''}> Particles</label>
             </div>`;
         }
-        if (tab === 'style') {
+        if (tab === 'look') {
             const s = cfg.style;
+            const l = cfg.layout;
             return `<div class="tc-poped-grid">
-                ${field('Primary', `<input id="tcStPrimary" type="color" value="${/^#/.test(s.primary) ? s.primary.slice(0, 7) : '#b026ff'}">`)}
-                ${field('Secondary', `<input id="tcStSecondary" type="color" value="${/^#/.test(s.secondary) ? s.secondary.slice(0, 7) : '#ff26b0'}">`)}
-                ${field('Accent', `<input id="tcStAccent" type="color" value="${/^#/.test(s.accent) ? s.accent.slice(0, 7) : '#c4b5fd'}">`)}
-                ${field('Background', `<input id="tcStBg" type="color" value="${/^#/.test(s.background) ? s.background.slice(0, 7) : '#12081f'}">`)}
-                ${field('Glow', `<input id="tcStGlow" type="range" min="0" max="100" value="${esc(s.glowIntensity)}">`)}
-                ${field('Radius', `<input id="tcStRadius" type="range" min="8" max="40" value="${esc(s.radius)}">`)}
-                ${field('Overlay opacity', `<input id="tcStOverlay" type="range" min="20" max="90" value="${esc(s.overlayOpacity)}">`)}
-                ${field('Card opacity', `<input id="tcStCard" type="range" min="60" max="100" value="${esc(s.cardOpacity)}">`)}
-                ${field('Typography %', `<input id="tcStType" type="range" min="80" max="130" value="${esc(s.typographyScale)}">`)}
+                ${field('สีหลัก', `<input id="tcStPrimary" type="color" value="${/^#/.test(s.primary) ? s.primary.slice(0, 7) : '#b026ff'}">`)}
+                ${field('สีรอง', `<input id="tcStSecondary" type="color" value="${/^#/.test(s.secondary) ? s.secondary.slice(0, 7) : '#ff26b0'}">`)}
+                ${field('สีเน้น', `<input id="tcStAccent" type="color" value="${/^#/.test(s.accent) ? s.accent.slice(0, 7) : '#c4b5fd'}">`)}
+                ${field('พื้นหลังการ์ด', `<input id="tcStBg" type="color" value="${/^#/.test(s.background) ? s.background.slice(0, 7) : '#12081f'}">`)}
+                ${field('แสง Glow', `<input id="tcStGlow" type="range" min="0" max="100" value="${esc(s.glowIntensity)}">`)}
+                ${field('มุมโค้ง', `<input id="tcStRadius" type="range" min="8" max="40" value="${esc(s.radius)}">`)}
+                ${field('ความมืดพื้นหลัง', `<input id="tcStOverlay" type="range" min="20" max="90" value="${esc(s.overlayOpacity)}">`)}
+                ${field('ความทึบการ์ด', `<input id="tcStCard" type="range" min="60" max="100" value="${esc(s.cardOpacity)}">`)}
+                ${field('ขนาดตัวอักษร', `<input id="tcStType" type="range" min="80" max="130" value="${esc(s.typographyScale)}">`)}
                 ${field('ขนาดป๊อปอัป', `<select id="tcPopSize"><option>md</option><option>lg</option><option>xl</option></select>`)}
+                ${field('ตำแหน่งจอ', `<select id="tcLayPlace"><option ${l.placement === 'center' ? 'selected' : ''}>center</option><option ${l.placement === 'top' ? 'selected' : ''}>top</option><option ${l.placement === 'bottom' ? 'selected' : ''}>bottom</option></select>`)}
+                ${field('ปุ่มปิด', `<select id="tcLayClose"><option ${l.closePosition === 'top-right' ? 'selected' : ''}>top-right</option><option ${l.closePosition === 'top-left' ? 'selected' : ''}>top-left</option></select>`)}
                 <label class="tc-poped-check"><input type="checkbox" id="tcStSpark" ${s.sparkles ? 'checked' : ''}> Sparkles</label>
                 <label class="tc-poped-check"><input type="checkbox" id="tcStGrid" ${s.grid ? 'checked' : ''}> Grid</label>
                 <label class="tc-poped-check"><input type="checkbox" id="tcStOrbit" ${s.orbit ? 'checked' : ''}> Orbit</label>
                 <label class="tc-poped-check"><input type="checkbox" id="tcStCorner" ${s.cornerDeco ? 'checked' : ''}> Corner deco</label>
-                <label class="tc-poped-check span-2"><input type="checkbox" id="tcLayOverlayClick" ${cfg.layout.overlayClick !== false ? 'checked' : ''}> คลิกพื้นหลังเพื่อปิด</label>
-                <label class="tc-poped-check span-2"><input type="checkbox" id="tcCloseOn" ${cfg.close.enabled !== false ? 'checked' : ''}> แสดงปุ่ม X</label>
-            </div>`;
-        }
-        if (tab === 'layout') {
-            const l = cfg.layout;
-            return `<div class="tc-poped-grid">
-                ${field('ตำแหน่งจอ', `<select id="tcLayPlace"><option ${l.placement === 'center' ? 'selected' : ''}>center</option><option ${l.placement === 'top' ? 'selected' : ''}>top</option><option ${l.placement === 'bottom' ? 'selected' : ''}>bottom</option></select>`)}
-                ${field('ปุ่มปิด', `<select id="tcLayClose"><option ${l.closePosition === 'top-right' ? 'selected' : ''}>top-right</option><option ${l.closePosition === 'top-left' ? 'selected' : ''}>top-left</option></select>`)}
                 <label class="tc-poped-check span-2"><input type="checkbox" id="tcLayOverlayClick" ${l.overlayClick !== false ? 'checked' : ''}> คลิกพื้นหลังเพื่อปิด</label>
                 <label class="tc-poped-check span-2"><input type="checkbox" id="tcCloseOn" ${cfg.close.enabled !== false ? 'checked' : ''}> แสดงปุ่ม X</label>
             </div>`;
         }
-        if (tab === 'schedule') {
+        if (tab === 'when') {
             const s = cfg.schedule;
-            return `<div class="tc-poped-grid">
-                ${field('Publish at', `<input id="tcPubAt" type="datetime-local" value="${esc(toLocal(item.publishAt))}">`)}
-                ${field('Expire at', `<input id="tcExpAt" type="datetime-local" value="${esc(toLocal(item.expireAt))}">`)}
-                ${field('Maintenance start', `<input id="tcMaintStart" type="datetime-local" value="${esc(toLocal(s.maintenanceStart))}">`)}
-                ${field('Maintenance end', `<input id="tcMaintEnd" type="datetime-local" value="${esc(toLocal(s.maintenanceEnd))}">`)}
-                ${field('Expected finish text', `<input id="tcMaintText" value="${esc(s.expectedFinishText)}">`, true)}
-                ${field('Timezone', `<select id="tcTz"><option>Asia/Bangkok</option><option>UTC</option></select>`)}
-            </div>`;
-        }
-        if (tab === 'audience') {
             const t = cfg.targeting;
+            const r = cfg.rules;
             return `<div class="tc-poped-grid">
+                <h3 class="tc-poped-h3">เวลาแสดง</h3>
+                ${field('เริ่มเผยแพร่', `<input id="tcPubAt" type="datetime-local" value="${esc(toLocal(item.publishAt))}">`)}
+                ${field('หมดอายุ', `<input id="tcExpAt" type="datetime-local" value="${esc(toLocal(item.expireAt))}">`)}
+                ${field('Maintenance เริ่ม', `<input id="tcMaintStart" type="datetime-local" value="${esc(toLocal(s.maintenanceStart))}">`)}
+                ${field('Maintenance จบ', `<input id="tcMaintEnd" type="datetime-local" value="${esc(toLocal(s.maintenanceEnd))}">`)}
+                ${field('ข้อความคาดว่าแล้วเสร็จ', `<input id="tcMaintText" value="${esc(s.expectedFinishText)}">`, true)}
+                ${field('Timezone', `<select id="tcTz"><option>Asia/Bangkok</option><option>UTC</option></select>`)}
+                <h3 class="tc-poped-h3">ใครเห็น</h3>
                 ${field('กลุ่มเป้าหมาย', `<select id="tcAud"><option value="all">ทุกคน</option><option value="pro">PRO</option><option value="free">Free</option><option value="custom">Custom IDs</option></select>`)}
                 ${field('User IDs', `<input id="tcAudIds" placeholder="id1,id2" value="${esc(item.audienceConfig)}">`, true)}
                 ${field('แพลตฟอร์ม', `<select id="tcPlat"><option value="all">ทั้งหมด</option><option value="desktop">Desktop</option><option value="mobile">Mobile</option></select>`)}
                 ${field('App version ขั้นต่ำ', `<input id="tcVerMin" value="${esc(t.appVersionMin)}">`)}
                 <label class="tc-poped-check span-2"><input type="checkbox" id="tcFirstLogin" ${t.firstLogin ? 'checked' : ''}> เฉพาะล็อกอินครั้งแรก</label>
-            </div>`;
-        }
-        if (tab === 'rules') {
-            const r = cfg.rules;
-            return `<div class="tc-poped-grid">
+                <h3 class="tc-poped-h3">กติกาการแสดง</h3>
                 <label class="tc-poped-check"><input type="checkbox" id="tcRuleOnce" ${r.showOnce ? 'checked' : ''}> แสดงครั้งเดียว</label>
                 <label class="tc-poped-check"><input type="checkbox" id="tcRuleVersion" ${r.showOncePerVersion ? 'checked' : ''}> ครั้งเดียวต่อเวอร์ชัน</label>
-                <label class="tc-poped-check"><input type="checkbox" id="tcRuleBlock" ${r.blocking ? 'checked' : ''}> Blocking</label>
+                <label class="tc-poped-check"><input type="checkbox" id="tcRuleBlock" ${r.blocking ? 'checked' : ''}> บังคับอ่าน (Blocking)</label>
                 <label class="tc-poped-check"><input type="checkbox" id="tcRuleAck" ${r.requireAcknowledgement ? 'checked' : ''}> บังคับรับทราบ</label>
                 <label class="tc-poped-check"><input type="checkbox" id="tcRuleLogin" ${r.showOnLogin ? 'checked' : ''}> แสดงตอนล็อกอิน</label>
                 <label class="tc-poped-check"><input type="checkbox" id="tcRuleDash" ${r.showOnDashboard ? 'checked' : ''}> แสดงหน้าแดชบอร์ด</label>
@@ -424,21 +434,6 @@
                 ${field('หน่วงก่อนปิด (วินาที)', `<input id="tcRuleDelay" type="number" min="0" value="${esc(r.delayBeforeClose)}">`)}
                 ${field('Max impressions / user', `<input id="tcRuleMax" type="number" min="0" value="${esc(r.maxImpressions)}">`)}
                 ${field('Queue priority', `<input id="tcRuleQueue" type="number" min="0" max="100" value="${esc(r.queuePriority)}">`)}
-            </div>`;
-        }
-        if (tab === 'cta') {
-            const primary = cfg.ctas[0] || Cfg.cta('primary', 'รับทราบ', 'acknowledge');
-            const secondary = cfg.ctas[1];
-            return `<div class="tc-poped-grid">
-                ${field('ข้อความปุ่มหลัก', `<input id="tcCta1Text" value="${esc(primary.text)}">`)}
-                ${field('ไอคอนปุ่มหลัก', `<input id="tcCta1Icon" value="${esc(primary.icon || 'check')}">`)}
-                ${field('Action', `<select id="tcCta1Act">${Cfg.CTA_ACTIONS.map((a) => `<option ${primary.actionType === a ? 'selected' : ''}>${a}</option>`).join('')}</select>`)}
-                ${field('ค่า / URL / route', `<input id="tcCta1Val" value="${esc(primary.actionValue || '')}">`, true)}
-                <label class="tc-poped-check span-2"><input type="checkbox" id="tcCta2On" ${secondary ? 'checked' : ''}> เปิดปุ่มรอง</label>
-                ${field('ข้อความปุ่มรอง', `<input id="tcCta2Text" value="${esc(secondary && secondary.text || 'ปิด')}">`)}
-                ${field('ไอคอนปุ่มรอง', `<input id="tcCta2Icon" value="${esc(secondary && secondary.icon || 'close')}">`)}
-                ${field('Action รอง', `<select id="tcCta2Act">${Cfg.CTA_ACTIONS.map((a) => `<option ${secondary && secondary.actionType === a ? 'selected' : ''}>${a}</option>`).join('')}</select>`)}
-                ${field('ค่า / URL ปุ่มรอง', `<input id="tcCta2Val" value="${esc(secondary && secondary.actionValue || '')}">`, true)}
             </div>`;
         }
         return `<div class="tc-poped-grid">
@@ -457,6 +452,28 @@
         if (Number.isNaN(d.getTime())) return '';
         const pad = (n) => String(n).padStart(2, '0');
         return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function bindCtaFields() {
+        const cfg = current().popupConfig;
+        const syncCtas = () => {
+            const primary = cfg.ctas[0] || Cfg.cta('primary', 'รับทราบ', 'acknowledge');
+            primary.text = $('#tcCta1Text')?.value || 'รับทราบ';
+            primary.actionType = $('#tcCta1Act')?.value || 'acknowledge';
+            primary.actionValue = $('#tcCta1Val')?.value || '';
+            primary.icon = $('#tcCta1Icon')?.value || 'check';
+            cfg.ctas = [primary];
+            if ($('#tcCta2On')?.checked) {
+                const second = Cfg.cta('secondary', $('#tcCta2Text')?.value || 'ปิด', $('#tcCta2Act')?.value || 'close', $('#tcCta2Val')?.value || '');
+                second.icon = $('#tcCta2Icon')?.value || 'close';
+                cfg.ctas.push(second);
+            }
+            notifyChange();
+        };
+        ['#tcCta1Text', '#tcCta1Act', '#tcCta1Val', '#tcCta1Icon', '#tcCta2On', '#tcCta2Text', '#tcCta2Act', '#tcCta2Icon', '#tcCta2Val'].forEach((sel) => {
+            $(sel)?.addEventListener('input', syncCtas);
+            $(sel)?.addEventListener('change', syncCtas);
+        });
     }
 
     function bindTab() {
@@ -489,6 +506,7 @@
                 renderForm();
                 notifyChange();
             });
+            bindCtaFields();
         }
         if (state.tab === 'mascot') {
             const m = cfg.mascot;
@@ -558,7 +576,7 @@
                 notifyChange();
             }));
         }
-        if (state.tab === 'style') {
+        if (state.tab === 'look') {
             const s = cfg.style;
             const color = (id, key) => $(id)?.addEventListener('input', (e) => { s[key] = e.target.value; notifyChange(); });
             color('#tcStPrimary', 'primary'); color('#tcStSecondary', 'secondary'); color('#tcStAccent', 'accent'); color('#tcStBg', 'background');
@@ -574,14 +592,10 @@
             });
             $('#tcLayOverlayClick')?.addEventListener('change', (e) => { cfg.layout.overlayClick = e.target.checked; cfg.rules.overlayClickCloses = e.target.checked; notifyChange(); });
             $('#tcCloseOn')?.addEventListener('change', (e) => { cfg.close.enabled = e.target.checked; notifyChange(); });
-        }
-        if (state.tab === 'layout') {
             $('#tcLayPlace')?.addEventListener('change', (e) => { cfg.layout.placement = e.target.value; notifyChange(); });
             $('#tcLayClose')?.addEventListener('change', (e) => { cfg.layout.closePosition = e.target.value; notifyChange(); });
-            $('#tcLayOverlayClick')?.addEventListener('change', (e) => { cfg.layout.overlayClick = e.target.checked; cfg.rules.overlayClickCloses = e.target.checked; notifyChange(); });
-            $('#tcCloseOn')?.addEventListener('change', (e) => { cfg.close.enabled = e.target.checked; notifyChange(); });
         }
-        if (state.tab === 'schedule') {
+        if (state.tab === 'when') {
             const toIso = (v) => v ? new Date(v).toISOString() : '';
             $('#tcPubAt')?.addEventListener('change', (e) => { item.publishAt = toIso(e.target.value); notifyChange(); });
             $('#tcExpAt')?.addEventListener('change', (e) => { item.expireAt = toIso(e.target.value); notifyChange(); });
@@ -589,15 +603,11 @@
             $('#tcMaintEnd')?.addEventListener('change', (e) => { cfg.schedule.maintenanceEnd = toIso(e.target.value); notifyChange(); });
             $('#tcMaintText')?.addEventListener('input', (e) => { cfg.schedule.expectedFinishText = e.target.value; notifyChange(); });
             bindValue('#tcTz', 'timezone');
-        }
-        if (state.tab === 'audience') {
             const aud = $('#tcAud'); if (aud) { aud.value = item.audience || 'all'; aud.onchange = (e) => { item.audience = e.target.value; cfg.targeting.audienceType = e.target.value; notifyChange(); }; }
             bindValue('#tcAudIds', 'audienceConfig');
             $('#tcPlat')?.addEventListener('change', (e) => { cfg.targeting.platform = e.target.value; notifyChange(); });
             $('#tcVerMin')?.addEventListener('input', (e) => { cfg.targeting.appVersionMin = e.target.value; notifyChange(); });
             $('#tcFirstLogin')?.addEventListener('change', (e) => { cfg.targeting.firstLogin = e.target.checked; notifyChange(); });
-        }
-        if (state.tab === 'rules') {
             const r = cfg.rules;
             const chk = (id, key) => $(id)?.addEventListener('change', (e) => { r[key] = e.target.checked; notifyChange(); });
             chk('#tcRuleOnce', 'showOnce'); chk('#tcRuleVersion', 'showOncePerVersion'); chk('#tcRuleBlock', 'blocking');
@@ -606,26 +616,6 @@
             $('#tcRuleDelay')?.addEventListener('input', (e) => { r.delayBeforeClose = Number(e.target.value) || 0; notifyChange(); });
             $('#tcRuleMax')?.addEventListener('input', (e) => { r.maxImpressions = Number(e.target.value) || 0; notifyChange(); });
             $('#tcRuleQueue')?.addEventListener('input', (e) => { r.queuePriority = Number(e.target.value) || 0; notifyChange(); });
-        }
-        if (state.tab === 'cta') {
-            const syncCtas = () => {
-                const primary = cfg.ctas[0] || Cfg.cta('primary', 'รับทราบ', 'acknowledge');
-                primary.text = $('#tcCta1Text')?.value || 'รับทราบ';
-                primary.actionType = $('#tcCta1Act')?.value || 'acknowledge';
-                primary.actionValue = $('#tcCta1Val')?.value || '';
-                primary.icon = $('#tcCta1Icon')?.value || 'check';
-                cfg.ctas = [primary];
-                if ($('#tcCta2On')?.checked) {
-                    const second = Cfg.cta('secondary', $('#tcCta2Text')?.value || 'ปิด', $('#tcCta2Act')?.value || 'close', $('#tcCta2Val')?.value || '');
-                    second.icon = $('#tcCta2Icon')?.value || 'close';
-                    cfg.ctas.push(second);
-                }
-                notifyChange();
-            };
-            ['#tcCta1Text', '#tcCta1Act', '#tcCta1Val', '#tcCta1Icon', '#tcCta2On', '#tcCta2Text', '#tcCta2Act', '#tcCta2Icon', '#tcCta2Val'].forEach((sel) => {
-                $(sel)?.addEventListener('input', syncCtas);
-                $(sel)?.addEventListener('change', syncCtas);
-            });
         }
         if (state.tab === 'publish') {
             bindValue('#tcStatus', 'status');
@@ -797,22 +787,21 @@
             <div class="tc-poped-top">
                 <div>
                     <div class="tc-poped-crumb">ประกาศ <span>›</span> แก้ไขป๊อปอัป</div>
-                    <h2>Popup Announcement Editor</h2>
-                    <p>ปรับแต่งขั้นสูง · ควบคุมทุกองค์ประกอบได้ 100% ภายใต้ระบบประกาศเดิม</p>
+                    <h2>แก้ไขป๊อปอัปประกาศ</h2>
+                    <p>เลือกเทมเพลต แล้วแก้ข้อความด้านซ้าย — ตัวอย่างอัปเดตอัตโนมัติทางขวา</p>
                 </div>
                 <div class="tc-poped-actions">
                     <span class="tc-poped-status"><i class="tc-poped-dot"></i> สถานะ: <b id="tcPopedStatusText">${esc(item.status || 'draft')}</b></span>
-                    ${isAdminUi() ? '<button type="button" class="admin-btn tc-poped-test" id="tcPopTestLive">ทดสอบป๊อปอัปจริง</button>' : ''}
+                    ${isAdminUi() ? '<button type="button" class="admin-btn tc-poped-test" id="tcPopTestLive">ทดสอบจริง</button>' : ''}
                     <button type="button" class="admin-btn admin-btn-ghost" id="tcPopSaveDraft">บันทึกร่าง</button>
-                    <button type="button" class="admin-btn admin-btn-ghost" id="tcPopPreviewBtn">ดูตัวอย่าง</button>
                     <button type="button" class="admin-btn admin-btn-accent tc-poped-publish" id="tcPopPublish">เผยแพร่</button>
                 </div>
             </div>
             <div class="tc-poped-templates">${renderTemplates()}</div>
             <div class="tc-poped-form">
                 <div class="tc-poped-tabs">
-                    ${['content','mascot','style','schedule','cta','audience','rules','publish'].map((t) => {
-                        const labels = { content:'เนื้อหา', mascot:'มาสคอต', style:'สไตล์', schedule:'เวลา', cta:'ปุ่ม / Action', audience:'กลุ่มเป้าหมาย', rules:'การมองเห็น', publish:'เผยแพร่' };
+                    ${['content','mascot','look','when','publish'].map((t) => {
+                        const labels = { content:'เนื้อหา', mascot:'มาสคอต', look:'สี / เลย์เอาต์', when:'เวลา / กลุ่ม', publish:'เผยแพร่' };
                         return `<button type="button" data-pop-tab="${t}" class="${state.tab === t ? 'active' : ''}">${labels[t]}</button>`;
                     }).join('')}
                 </div>
@@ -834,7 +823,13 @@
                     <div class="tc-poped-ruler" aria-hidden="true"></div>
                     <div class="tc-poped-preview-stage" id="tcPopedPreviewStage"></div>
                 </div>
-                <div class="tc-poped-layers" id="tcPopedLayers"></div>
+                <div class="tc-poped-layers" id="tcPopedLayers">
+                    <label class="tc-poped-layer"><input type="checkbox" data-layer="bg" checked><span>พื้นหลัง</span></label>
+                    <label class="tc-poped-layer"><input type="checkbox" data-layer="mascot" checked><span>มาสคอต</span></label>
+                    <label class="tc-poped-layer"><input type="checkbox" data-layer="header" checked><span>หัวข้อ</span></label>
+                    <label class="tc-poped-layer"><input type="checkbox" data-layer="content" checked><span>เนื้อหา</span></label>
+                    <label class="tc-poped-layer"><input type="checkbox" data-layer="cta" checked><span>ปุ่ม</span></label>
+                </div>
                 <div class="tc-poped-warn" id="tcPopedPreviewWarn" style="padding:0 12px 10px"></div>
             </aside>
             <div class="tc-poped-foot">
@@ -909,6 +904,8 @@
     function mount(host, announcement) {
         const el = typeof host === 'string' ? document.querySelector(host) : host;
         if (!el) return;
+        layersBound = false;
+        if (!['content', 'mascot', 'look', 'when', 'publish'].includes(state.tab)) state.tab = 'content';
         load(announcement || emptyAnnouncement());
         el.innerHTML = shellHtml();
         bindShell(el);
@@ -921,9 +918,11 @@
     function open(host, announcement) {
         const el = typeof host === 'string' ? document.querySelector(host) : host;
         if (!el) return;
+        if (!['content', 'mascot', 'look', 'when', 'publish'].includes(state.tab)) state.tab = 'content';
         if (announcement) load(announcement);
         else if (!state.announcement) load(emptyAnnouncement());
         if (!el.querySelector('.tc-poped')) {
+            layersBound = false;
             el.innerHTML = shellHtml();
             bindShell(el);
         }

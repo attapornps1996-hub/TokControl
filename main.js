@@ -555,9 +555,19 @@ ipcMain.on('open-oauth-window', (_event, url) => {
       contextIsolation: true
     }
   });
+  try {
+    authWin.webContents.setUserAgent(
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+    );
+  } catch (e) { /* ignore */ }
 
-  const finishOAuth = (token) => {
-    if (token && mainWindow && !mainWindow.isDestroyed()) {
+  let oauthDone = false;
+  const finishOAuth = (token, error) => {
+    if (oauthDone) return;
+    oauthDone = true;
+    if (error && mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('oauth-token', { error: String(error) });
+    } else if (token && mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send('oauth-token', { token });
     }
     if (!authWin.isDestroyed()) authWin.close();
@@ -566,25 +576,49 @@ ipcMain.on('open-oauth-window', (_event, url) => {
   const inspectOAuthUrl = (rawUrl) => {
     try {
       const parsed = new URL(rawUrl);
-      if (parsed.pathname.includes('auth-success.html')) {
-        const token = parsed.searchParams.get('token');
-        const error = parsed.searchParams.get('error');
-        if (error && mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.webContents.send('oauth-token', { error: decodeURIComponent(error) });
-        }
-        if (token) finishOAuth(token);
-      }
+      const hashParams = new URLSearchParams(String(parsed.hash || '').replace(/^#/, ''));
+      const token = parsed.searchParams.get('token') || hashParams.get('token');
+      const error = parsed.searchParams.get('error') || hashParams.get('error');
+      const isSuccess = /auth-success\.html/i.test(parsed.pathname);
+      if (!isSuccess && !token && !error) return;
+      if (error) finishOAuth(null, decodeURIComponent(error));
+      else if (token) finishOAuth(token);
     } catch (e) {}
   };
 
   authWin.webContents.setWindowOpenHandler(({ url: childUrl }) => {
     inspectOAuthUrl(childUrl);
+    try {
+      const host = new URL(childUrl).hostname;
+      if (/(^|\.)google\.com$|(^|\.)accounts\.google\.com$|(^|\.)googleusercontent\.com$|(^|\.)gstatic\.com$/.test(host)) {
+        return { action: 'allow' };
+      }
+    } catch (e) {}
     return { action: 'deny' };
   });
 
   authWin.webContents.on('will-redirect', (_e, redirectUrl) => inspectOAuthUrl(redirectUrl));
   authWin.webContents.on('will-navigate', (_e, navUrl) => inspectOAuthUrl(navUrl));
   authWin.webContents.on('did-navigate', (_e, navUrl) => inspectOAuthUrl(navUrl));
+  authWin.webContents.on('did-navigate-in-page', (_e, navUrl) => inspectOAuthUrl(navUrl));
+  authWin.webContents.on('did-finish-load', async () => {
+    try {
+      inspectOAuthUrl(authWin.webContents.getURL());
+      const extracted = await authWin.webContents.executeJavaScript(`(() => {
+        try {
+          if (window.__oauthToken) return { token: window.__oauthToken };
+          const p = new URLSearchParams(location.search);
+          const h = new URLSearchParams(String(location.hash || '').replace(/^#/, ''));
+          return {
+            token: h.get('token') || p.get('token'),
+            error: p.get('error') || h.get('error')
+          };
+        } catch (e) { return {}; }
+      })()`, true);
+      if (extracted?.error) finishOAuth(null, extracted.error);
+      else if (extracted?.token) finishOAuth(extracted.token);
+    } catch (e) {}
+  });
   authWin.loadURL(url).catch((err) => {
     console.error('[OAuth] loadURL failed:', err);
   });

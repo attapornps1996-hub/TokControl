@@ -246,7 +246,7 @@
             ? '<div class="tc-pop-dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>'
             : '';
 
-        return `<div class="tc-pop-root ${deco} ${opts.mode === 'mobile' ? 'is-mobile' : ''}" style="${cssVars(style)}" data-popup-id="${esc(item.id || '')}" data-overlay-click="${overlayClick ? '1' : '0'}">
+        return `<div class="tc-pop-root ${deco}${opts.preview ? ' is-preview' : ''}${opts.mode === 'mobile' ? ' is-mobile' : ''}" style="${cssVars(style)}" data-popup-id="${esc(item.id || '')}" data-overlay-click="${opts.preview ? '0' : (overlayClick ? '1' : '0')}">
             <div class="tc-pop-backdrop" data-tc-pop-backdrop></div>
             <div class="tc-pop-stage" role="dialog" aria-modal="true" aria-labelledby="tc-pop-title">
                 ${closeEnabled ? `<button type="button" class="tc-pop-close" data-tc-pop-close aria-label="ปิด">${icon('close', 18)}</button>` : ''}

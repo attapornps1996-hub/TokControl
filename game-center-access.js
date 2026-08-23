@@ -28,13 +28,27 @@ const GAME_UNLOCK_LABELS = {
 
 /** End of beta day in Thailand (2026-08-06 23:59:59 ICT) */
 const DEFAULT_BETA_ENDS_AT = '2026-08-06T16:59:59.999Z';
-/** Signup PRO trial window start (2026-08-03 00:00:00 ICT) */
+/** Signup PRO trial is off unless SIGNUP_PRO_TRIAL_ENABLED=1 */
 const DEFAULT_SIGNUP_TRIAL_START = '2026-08-02T17:00:00.000Z';
-/** Signup PRO trial window end (2026-08-06 23:59:59 ICT) */
 const DEFAULT_SIGNUP_TRIAL_END = '2026-08-06T16:59:59.999Z';
 const DEFAULT_EARLY_ACCESS_DAYS = 30;
 const DEFAULT_SIGNUP_TRIAL_DAYS = 3;
 const DEFAULT_GAME_UNLOCK_DAYS = 7;
+
+function envFlagOn(name) {
+    const v = String(process.env[name] || '').trim().toLowerCase();
+    return v === '1' || v === 'true' || v === 'yes';
+}
+
+function isSignupProTrialEnabled() {
+    return envFlagOn('SIGNUP_PRO_TRIAL_ENABLED') || envFlagOn('SIGNUP_PRO_TRIAL_ENABLED');
+}
+
+function trialEnv(name, altName) {
+    const a = process.env[name];
+    const b = altName ? process.env[altName] : '';
+    return (a && String(a).trim()) || (b && String(b).trim()) || '';
+}
 
 function parseIso(raw, fallback) {
     if (!raw) return new Date(fallback);
@@ -80,19 +94,22 @@ function getGameCenterFlags(now = new Date()) {
 }
 
 function getSignupTrialInfo(now = new Date()) {
-    const start = parseIso(process.env.SIGNUP_PRO_TRIAL_START, DEFAULT_SIGNUP_TRIAL_START);
-    const end = parseIso(process.env.SIGNUP_PRO_TRIAL_END, DEFAULT_SIGNUP_TRIAL_END);
-    const days = Number(process.env.SIGNUP_PRO_TRIAL_DAYS) || DEFAULT_SIGNUP_TRIAL_DAYS;
-    const active = now.getTime() >= start.getTime() && now.getTime() <= end.getTime();
+    const start = parseIso(trialEnv('SIGNUP_PRO_TRIAL_START', 'SIGNUP_PRO_TRIAL_START'), DEFAULT_SIGNUP_TRIAL_START);
+    const end = parseIso(trialEnv('SIGNUP_PRO_TRIAL_END', 'SIGNUP_PRO_TRIAL_END'), DEFAULT_SIGNUP_TRIAL_END);
+    const days = Number(trialEnv('SIGNUP_PRO_TRIAL_DAYS', 'SIGNUP_PRO_TRIAL_DAYS')) || DEFAULT_SIGNUP_TRIAL_DAYS;
+    const active = isSignupProTrialEnabled()
+        && now.getTime() >= start.getTime()
+        && now.getTime() <= end.getTime();
     return {
         active,
         days,
         startAt: start.toISOString(),
-        endAt: end.toISOString()
+        endAt: end.toISOString(),
+        enabled: isSignupProTrialEnabled()
     };
 }
 
-/** Grant fields for new signup — null if outside trial window */
+/** Grant fields for new signup — null unless trial is explicitly enabled */
 function getSignupProTrialGrant(now = new Date()) {
     const info = getSignupTrialInfo(now);
     if (!info.active) return null;
@@ -111,15 +128,16 @@ function getSignupProTrialGrant(now = new Date()) {
  * before the Cloud deploy that started granting trial on signup.
  */
 function buildSignupProTrialBackfill(user, now = new Date()) {
+    if (!isSignupProTrialEnabled()) return null;
     if (!user || isAdminUser(user)) return null;
     if (isProActive(user, now)) return null;
 
     const created = user.createdAt ? new Date(user.createdAt) : null;
     if (!created || !Number.isFinite(created.getTime())) return null;
 
-    const start = parseIso(process.env.SIGNUP_PRO_TRIAL_START, DEFAULT_SIGNUP_TRIAL_START);
-    const end = parseIso(process.env.SIGNUP_PRO_TRIAL_END, DEFAULT_SIGNUP_TRIAL_END);
-    const days = Number(process.env.SIGNUP_PRO_TRIAL_DAYS) || DEFAULT_SIGNUP_TRIAL_DAYS;
+    const start = parseIso(trialEnv('SIGNUP_PRO_TRIAL_START', 'SIGNUP_PRO_TRIAL_START'), DEFAULT_SIGNUP_TRIAL_START);
+    const end = parseIso(trialEnv('SIGNUP_PRO_TRIAL_END', 'SIGNUP_PRO_TRIAL_END'), DEFAULT_SIGNUP_TRIAL_END);
+    const days = Number(trialEnv('SIGNUP_PRO_TRIAL_DAYS', 'SIGNUP_PRO_TRIAL_DAYS')) || DEFAULT_SIGNUP_TRIAL_DAYS;
 
     if (created.getTime() < start.getTime() || created.getTime() > end.getTime()) return null;
 
@@ -491,6 +509,7 @@ module.exports = {
     getGameCenterFlags,
     getSignupTrialInfo,
     getSignupProTrialGrant,
+    isSignupProTrialEnabled,
     buildSignupProTrialBackfill,
     parseEntitlements,
     canAccessGameCenter,

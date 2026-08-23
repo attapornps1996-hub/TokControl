@@ -717,21 +717,39 @@
         fetchStreamCreditsGiftGallery();
     }
 
-    function creditsHandleMusicUpload(input) {
+    async function creditsHandleMusicUpload(input) {
         if (!input?.files?.[0]) return;
         const file = input.files[0];
-        if (!file.type.startsWith('audio/')) {
-            showCustomMsg('error', 'ผิดพลาด', 'กรุณาเลือกไฟล์เสียง');
-            return;
-        }
         if (file.size > 4 * 1024 * 1024) {
             showCustomMsg('error', 'ไฟล์ใหญ่เกินไป', 'สูงสุด 4MB');
             input.value = '';
             return;
         }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            streamCreditsSettings.musicData = e.target.result;
+        try {
+            let dataUrl = '';
+            if (window.TokMediaSniff && TokMediaSniff.fileToDataUrl) {
+                const r = await TokMediaSniff.fileToDataUrl(file);
+                if (r.sniff && (r.sniff.kind === 'image' || r.sniff.kind === 'video' || r.sniff.kind === 'json' || r.sniff.kind === 'zip')) {
+                    throw new Error('กรุณาเลือกไฟล์เสียง');
+                }
+                dataUrl = (r.sniff && r.sniff.kind === 'bin' && r.bytes && TokMediaSniff.dataUrlForSlot)
+                    ? TokMediaSniff.dataUrlForSlot(r.bytes, 'sound')
+                    : r.dataUrl;
+            } else {
+                if (file.type && !file.type.startsWith('audio/') && !/\.bin$/i.test(file.name || '')) {
+                    showCustomMsg('error', 'ผิดพลาด', 'กรุณาเลือกไฟล์เสียง');
+                    input.value = '';
+                    return;
+                }
+                dataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = () => reject(new Error('อ่านไฟล์ไม่ได้'));
+                    reader.readAsDataURL(file);
+                });
+                if (window.TokMediaSniff && TokMediaSniff.rewriteDataUrl) dataUrl = TokMediaSniff.rewriteDataUrl(dataUrl);
+            }
+            streamCreditsSettings.musicData = dataUrl;
             streamCreditsSettings.musicUrl = null;
             streamCreditsSettings.myinstantsSlug = null;
             if (!streamCreditsSettings.musicTitle) {
@@ -742,8 +760,9 @@
             saveStreamCreditsSettings();
             updateCreditsMusicStatusUI();
             showCustomMsg('success', 'โหลดเพลงแล้ว', 'กด ▶️ ทดสอบ หรือเล่น Credits ได้เลย');
-        };
-        reader.readAsDataURL(file);
+        } catch (err) {
+            showCustomMsg('error', 'อ่านไฟล์ไม่ได้', err.message || 'กรุณาเลือกไฟล์เสียง');
+        }
         input.value = '';
     }
 

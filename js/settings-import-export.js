@@ -11,6 +11,7 @@
         TOKCONTROL: 'tokcontrol',
         TIKFINITY: 'tikfinity',
         BETTERTOK: 'bettertok',
+        TIKTOEARN: 'tiktoearn',
         UNKNOWN: 'unknown'
     };
 
@@ -56,6 +57,8 @@
             gift: 'gift',
             gifts: 'gift',
             specificgift: 'gift',
+            sticker: 'gift',
+            emote: 'gift',
             like: 'like',
             likes: 'like',
             follow: 'follow',
@@ -71,6 +74,10 @@
             coins: 'coins',
             diamonds: 'coins',
             diamond: 'coins',
+            superchat: 'coins',
+            donate: 'coins',
+            donation: 'coins',
+            newmember: 'subscribe',
             globallikes: 'globallikes',
             totallikes: 'globallikes',
             chat: 'command',
@@ -101,6 +108,226 @@
         };
     }
 
+    function firstNonEmpty() {
+        for (let i = 0; i < arguments.length; i++) {
+            const v = arguments[i];
+            if (v != null && String(v).trim() !== '') return v;
+        }
+        return null;
+    }
+
+    function isDataUrl(s) {
+        return typeof s === 'string' && s.slice(0, 5) === 'data:';
+    }
+
+    function isHttpUrl(s) {
+        return typeof s === 'string' && /^https?:\/\//i.test(s.trim());
+    }
+
+    function isAppUrl(s) {
+        return typeof s === 'string' && (s.charAt(0) === '/' || /^blob:/i.test(s));
+    }
+
+    function isUsableMediaUrl(s) {
+        return isDataUrl(s) || isHttpUrl(s) || isAppUrl(s);
+    }
+
+    function fileBaseName(s) {
+        return String(s || '').replace(/\\/g, '/').split('/').pop().split('?')[0] || '';
+    }
+
+    function getMediaSniff() {
+        if (typeof global !== 'undefined' && global.TokMediaSniff) return global.TokMediaSniff;
+        try { return require('./media-sniff.js'); } catch (_) { return null; }
+    }
+
+    function rewriteMaybeDataUrl(s) {
+        const sniff = getMediaSniff();
+        if (isDataUrl(s) && sniff && sniff.rewriteDataUrl) return sniff.rewriteDataUrl(s);
+        return s;
+    }
+
+    function canonicalizeAction(a) {
+        if (!a || typeof a !== 'object') return a;
+        const soundHref = firstNonEmpty(a.soundData, a.soundData, a.audioData, a.SoundData, a.soundUrl, a.soundUrl, a.audioUrl, a.AudioUrl, a.SoundUrl);
+        if (!a.soundData && isDataUrl(soundHref)) a.soundData = rewriteMaybeDataUrl(soundHref);
+        else if (a.soundData && isDataUrl(a.soundData)) a.soundData = rewriteMaybeDataUrl(a.soundData);
+        if (!a.soundUrl && soundHref && isUsableMediaUrl(soundHref) && !isDataUrl(soundHref)) a.soundUrl = soundHref;
+        if (!a.soundName) {
+            a.soundName = firstNonEmpty(a.soundName, a.SoundFile, a.audioFile, a.file);
+            if (!a.soundName && soundHref && !isDataUrl(soundHref)) a.soundName = fileBaseName(soundHref);
+        }
+        if (a.soundUrl && !isUsableMediaUrl(a.soundUrl)) {
+            if (!a.soundName) a.soundName = fileBaseName(a.soundUrl);
+            a.soundUrl = null;
+        }
+
+        const imageHref = firstNonEmpty(a.imageData, a.imageData, a.pictureData, a.imageUrl, a.imageUrl, a.pictureUrl, a.PictureUrl);
+        if (!a.imageData && isDataUrl(imageHref)) a.imageData = rewriteMaybeDataUrl(imageHref);
+        else if (a.imageData && isDataUrl(a.imageData)) a.imageData = rewriteMaybeDataUrl(a.imageData);
+        if (!a.imageUrl && imageHref && isUsableMediaUrl(imageHref) && !isDataUrl(imageHref)) a.imageUrl = imageHref;
+        if (!a.imageName) {
+            a.imageName = firstNonEmpty(a.imageName, a.PictureFile, a.pictureFile);
+            if (!a.imageName && imageHref && !isDataUrl(imageHref)) a.imageName = fileBaseName(imageHref);
+        }
+        if (a.imageUrl && !isUsableMediaUrl(a.imageUrl)) {
+            if (!a.imageName) a.imageName = fileBaseName(a.imageUrl);
+            a.imageUrl = null;
+        }
+
+        const animHref = firstNonEmpty(a.animationData, a.animationUrl, a.animationUrl, a.AnimationUrl, a.gifUrl);
+        if (!a.animationData && isDataUrl(animHref)) a.animationData = rewriteMaybeDataUrl(animHref);
+        else if (a.animationData && isDataUrl(a.animationData)) a.animationData = rewriteMaybeDataUrl(a.animationData);
+        if (!a.animationUrl && animHref && isUsableMediaUrl(animHref) && !isDataUrl(animHref)) a.animationUrl = animHref;
+        if (!a.animationName) {
+            a.animationName = firstNonEmpty(a.animationName, a.AnimationFile);
+            if (!a.animationName && animHref && !isDataUrl(animHref)) a.animationName = fileBaseName(animHref);
+        }
+        if (a.animationUrl && !isUsableMediaUrl(a.animationUrl)) {
+            if (!a.animationName) a.animationName = fileBaseName(a.animationUrl);
+            a.animationUrl = null;
+        }
+
+        const videoHref = firstNonEmpty(a.videoData, a.videoUrl, a.videoUrl, a.VideoUrl);
+        if (!a.videoData && isDataUrl(videoHref)) a.videoData = rewriteMaybeDataUrl(videoHref);
+        else if (a.videoData && isDataUrl(a.videoData)) a.videoData = rewriteMaybeDataUrl(a.videoData);
+        if (!a.videoUrl && videoHref && isUsableMediaUrl(videoHref) && !isDataUrl(videoHref)) a.videoUrl = videoHref;
+        if (!a.videoName) {
+            a.videoName = firstNonEmpty(a.videoName, a.VideoFile);
+            if (!a.videoName && videoHref && !isDataUrl(videoHref)) a.videoName = fileBaseName(videoHref);
+        }
+        if (a.videoUrl && !isUsableMediaUrl(a.videoUrl)) {
+            if (!a.videoName) a.videoName = fileBaseName(a.videoUrl);
+            a.videoUrl = null;
+        }
+
+        const tts = firstNonEmpty(a.ttsText, a.ttsText, a.textToSpeech, a.TTS);
+        if (!a.ttsText && tts) a.ttsText = String(tts);
+        if (a.soundVolume == null && a.soundVolume != null) a.soundVolume = a.soundVolume;
+        if (a.fadeInOut == null && a.fadeInOut != null) a.fadeInOut = a.fadeInOut;
+        if (a.globalCooldown == null && a.globalCooldown != null) a.globalCooldown = a.globalCooldown;
+        if (a.userCooldown == null && a.userCooldown != null) a.userCooldown = a.userCooldown;
+
+        if (!a.media || typeof a.media !== 'object') a.media = {};
+        if (a.soundData || a.soundUrl || a.soundName) a.media.sound = true;
+        if (a.imageData || a.imageUrl) a.media.picture = true;
+        if (a.animationData || a.animationUrl) a.media.animation = true;
+        if (a.videoData || a.videoUrl) a.media.video = true;
+        if (a.ttsText) a.media.tts = true;
+        if (a.keystroke) a.media.keystroke = true;
+        return a;
+    }
+
+    function canonicalizeSoundRule(rule) {
+        if (!rule || typeof rule !== 'object') return rule;
+        const href = firstNonEmpty(rule.soundData, rule.SoundData, rule.soundUrl, rule.soundUrl, rule.url);
+        if (!rule.soundData && isDataUrl(href)) rule.soundData = rewriteMaybeDataUrl(href);
+        else if (rule.soundData && isDataUrl(rule.soundData)) rule.soundData = rewriteMaybeDataUrl(rule.soundData);
+        if (!rule.soundUrl && href && isUsableMediaUrl(href) && !isDataUrl(href)) rule.soundUrl = href;
+        if (!rule.soundName) {
+            rule.soundName = firstNonEmpty(rule.soundName, rule.SoundFile, rule.file, rule.name);
+            if (!rule.soundName && href && !isDataUrl(href)) rule.soundName = fileBaseName(href);
+        }
+        if (rule.soundUrl && !isUsableMediaUrl(rule.soundUrl)) {
+            if (!rule.soundName) rule.soundName = fileBaseName(rule.soundUrl);
+            rule.soundUrl = null;
+        }
+        return rule;
+    }
+
+    function mediaLookupKeys(name) {
+        const base = fileBaseName(name).toLowerCase();
+        if (!base) return [];
+        const noExt = base.replace(/\.[^.]+$/, '');
+        return noExt && noExt !== base ? [base, noExt] : [base];
+    }
+
+    function attachMediaLibrary(converted, mediaItems) {
+        if (!converted || !Array.isArray(mediaItems) || !mediaItems.length) return converted;
+        const sniff = getMediaSniff();
+        const map = {};
+        mediaItems.forEach((item) => {
+            mediaLookupKeys(item.name).forEach((k) => { if (k) map[k] = item; });
+        });
+        function match(refs) {
+            for (let i = 0; i < (refs || []).length; i++) {
+                const keys = mediaLookupKeys(refs[i]);
+                for (let j = 0; j < keys.length; j++) {
+                    if (map[keys[j]]) return map[keys[j]];
+                }
+            }
+            return null;
+        }
+        function asDataUrl(item, slot) {
+            if (item.dataUrl) return rewriteMaybeDataUrl(item.dataUrl);
+            const info = sniff && item.bytes ? sniff.sniff(item.bytes) : { mime: 'application/octet-stream', kind: 'bin' };
+            let mime = info.mime;
+            if (!info || info.kind === 'bin' || mime === 'application/octet-stream') {
+                mime = slot === 'sound' ? 'audio/mpeg'
+                    : slot === 'video' ? 'video/mp4'
+                    : slot === 'animation' ? 'image/gif'
+                    : 'image/png';
+            }
+            return sniff ? sniff.bytesToDataUrl(item.bytes, mime) : '';
+        }
+        const actions = converted.actionsEvents && converted.actionsEvents.actions;
+        if (actions) {
+            Object.keys(actions).forEach((id) => {
+                const a = actions[id];
+                const refs = a._mediaRefs || {};
+                const soundHit = match([a.soundName, a.soundUrl, a.soundUrl].concat(refs.sound || []));
+                if (soundHit && !a.soundData) {
+                    a.soundData = asDataUrl(soundHit, 'sound');
+                    a.soundName = a.soundName || fileBaseName(soundHit.name);
+                    a.soundUrl = isUsableMediaUrl(a.soundUrl) ? a.soundUrl : null;
+                }
+                const picHit = match([a.imageName, a.imageUrl, a.imageUrl].concat(refs.picture || []));
+                if (picHit && !a.imageData) {
+                    a.imageData = asDataUrl(picHit, 'picture');
+                    a.imageName = a.imageName || fileBaseName(picHit.name);
+                    a.imageUrl = isUsableMediaUrl(a.imageUrl) ? a.imageUrl : null;
+                }
+                const animHit = match([a.animationName, a.animationUrl, a.animationUrl].concat(refs.animation || []));
+                if (animHit && !a.animationData) {
+                    a.animationData = asDataUrl(animHit, 'animation');
+                    a.animationName = a.animationName || fileBaseName(animHit.name);
+                    a.animationUrl = isUsableMediaUrl(a.animationUrl) ? a.animationUrl : null;
+                }
+                const vidHit = match([a.videoName, a.videoUrl, a.videoUrl].concat(refs.video || []));
+                if (vidHit && !a.videoData) {
+                    a.videoData = asDataUrl(vidHit, 'video');
+                    a.videoName = a.videoName || fileBaseName(vidHit.name);
+                    a.videoUrl = isUsableMediaUrl(a.videoUrl) ? a.videoUrl : null;
+                }
+                delete a._mediaRefs;
+            });
+        }
+        const rules = converted.soundAlerts && converted.soundAlerts.rules;
+        if (rules) {
+            Object.keys(rules).forEach((id) => {
+                const r = rules[id];
+                const hit = match([r.soundName, r.soundUrl, r.file, r.SoundFile]);
+                if (hit && !r.soundData) {
+                    r.soundData = asDataUrl(hit, 'sound');
+                    r.soundName = r.soundName || fileBaseName(hit.name);
+                    r.soundUrl = isUsableMediaUrl(r.soundUrl) ? r.soundUrl : null;
+                }
+            });
+        }
+        return converted;
+    }
+
+    function canonicalizeConverted(converted) {
+        if (!converted) return converted;
+        if (converted.actionsEvents) {
+            converted.actionsEvents = normalizeActionsEvents(converted.actionsEvents);
+        }
+        if (converted.soundAlerts) {
+            converted.soundAlerts = normalizeSoundAlerts(converted.soundAlerts);
+        }
+        return converted;
+    }
+
     function normalizeActionsEvents(ae) {
         const out = emptyActionsEvents();
         if (!ae || typeof ae !== 'object') return out;
@@ -109,6 +336,7 @@
         out.events = asMap(ae.events);
         out.timers = asMap(ae.timers);
         Object.values(out.actions).forEach((a) => {
+            canonicalizeAction(a);
             if (!a.media || typeof a.media !== 'object') a.media = {};
             if (a.screen == null) a.screen = 1;
             if (a.duration == null) a.duration = 10;
@@ -145,6 +373,7 @@
         out.playOnOverlay = sa.playOnOverlay !== false;
         out.playMode = sa.playMode || 'queue';
         out.rules = asMap(sa.rules);
+        Object.values(out.rules).forEach(canonicalizeSoundRule);
         return out;
     }
 
@@ -174,6 +403,13 @@
         }
         if (data.actionsEvents || (data.snapshot && data.snapshot.advConf)) {
             return FORMAT.TOKCONTROL;
+        }
+
+        if (
+            data.tiktoearn != null || data.TikToEarn != null || data.app === 'TikToEarn' ||
+            data.event_action != null || data.action_event != null || data.sound_event != null
+        ) {
+            return FORMAT.TIKTOEARN;
         }
 
         // Official TikFinity .tfc decrypted shape
@@ -231,9 +467,10 @@
 
     function convertOfficialTikfinityAction(raw, id) {
         const media = {};
-        if (raw.audioUrl || raw.AudioUrl || raw.soundUrl) media.sound = true;
-        if (raw.animationUrl || raw.AnimationUrl) media.animation = true;
-        if (raw.videoUrl || raw.VideoUrl) media.video = true;
+        if (raw.audioUrl || raw.AudioUrl || raw.soundUrl || raw.audioData || raw.soundData) media.sound = true;
+        if (raw.imageUrl || raw.pictureUrl || raw.imageData) media.picture = true;
+        if (raw.animationUrl || raw.AnimationUrl || raw.animationData) media.animation = true;
+        if (raw.videoUrl || raw.VideoUrl || raw.videoData) media.video = true;
         if (raw.textToSpeech || raw.TTS || raw.tts || raw.message || raw.Message) media.tts = true;
         if (raw.keystrokes || raw.Keystrokes) media.keystroke = true;
         if (!Object.keys(media).length) {
@@ -241,6 +478,10 @@
             else media.sound = true;
         }
         const dyn = raw.dynamicConfig || {};
+        const soundHref = raw.audioUrl || raw.AudioUrl || raw.soundUrl || raw.soundData || raw.audioData || null;
+        const imageHref = raw.imageUrl || raw.pictureUrl || raw.imageData || null;
+        const animHref = raw.animationUrl || raw.AnimationUrl || raw.animationData || null;
+        const videoHref = raw.videoUrl || raw.VideoUrl || raw.videoData || null;
         return {
             id,
             name: String(raw.name || raw.Name || id),
@@ -249,22 +490,35 @@
             enabled: raw.active !== false && raw.Enabled !== false && raw.enabled !== false,
             points: 0,
             pointsMode: 'none',
-            soundVolume: 85,
+            soundVolume: Number(raw.soundVolume || raw.volume || 85) || 85,
             globalCooldown: Number(dyn.cooldown || 0) || 0,
             userCooldown: Number(dyn.userCooldown || 0) || 0,
             fadeInOut: true,
             repeatCombo: false,
             skipOnNext: false,
             media,
-            soundName: raw.soundName || null,
-            soundUrl: raw.audioUrl || raw.AudioUrl || raw.soundUrl || null,
-            imageUrl: raw.imageUrl || null,
-            animationUrl: raw.animationUrl || raw.AnimationUrl || null,
-            videoUrl: raw.videoUrl || raw.VideoUrl || null,
+            soundName: raw.soundName || fileBaseName(soundHref) || null,
+            soundData: isDataUrl(soundHref) ? soundHref : (raw.soundData || raw.audioData || null),
+            soundUrl: soundHref,
+            imageName: raw.imageName || fileBaseName(imageHref) || null,
+            imageData: isDataUrl(imageHref) ? imageHref : (raw.imageData || null),
+            imageUrl: imageHref,
+            animationName: raw.animationName || fileBaseName(animHref) || null,
+            animationData: isDataUrl(animHref) ? animHref : (raw.animationData || null),
+            animationUrl: animHref,
+            videoName: raw.videoName || fileBaseName(videoHref) || null,
+            videoData: isDataUrl(videoHref) ? videoHref : (raw.videoData || null),
+            videoUrl: videoHref,
             ttsText: String(raw.textToSpeech || raw.TTS || raw.tts || raw.message || raw.Message || ''),
             keystroke: raw.keystrokes ? { sequence: String(raw.keystrokes) } : null,
             description: 'Imported from TikFinity',
-            importedFrom: 'tikfinity'
+            importedFrom: 'tikfinity',
+            _mediaRefs: {
+                sound: [soundHref, raw.soundName, raw.SoundFile],
+                picture: [imageHref, raw.imageName, raw.PictureFile],
+                animation: [animHref, raw.animationName, raw.AnimationFile],
+                video: [videoHref, raw.videoName, raw.VideoFile]
+            }
         };
     }
 
@@ -421,8 +675,8 @@
                 threshold: Number(raw.Threshold || raw.threshold || raw.Amount || raw.amount || 1) || 1,
                 volume: Number(raw.Volume || raw.volume || 80) || 80,
                 soundName: raw.SoundFile || raw.soundName || raw.file || raw.name || null,
-                soundUrl: raw.SoundUrl || raw.soundUrl || raw.url || null,
-                soundData: raw.SoundData || raw.soundData || null,
+                soundUrl: raw.SoundUrl || raw.soundUrl || raw.url || raw.audioUrl || null,
+                soundData: raw.SoundData || raw.soundData || raw.audioData || null,
                 builtin: raw.builtin || null,
                 importedFrom: 'tikfinity'
             };
@@ -463,15 +717,27 @@
             skipOnNext: !!(raw.SkipOnNext || raw.skipOnNext),
             media,
             soundName: raw.SoundFile || raw.soundName || raw.sound || null,
-            soundUrl: raw.SoundUrl || raw.soundUrl || null,
+            soundData: raw.SoundData || raw.soundData || raw.audioData || null,
+            soundUrl: raw.SoundUrl || raw.soundUrl || raw.audioUrl || null,
             imageName: raw.PictureFile || raw.imageName || null,
+            imageData: raw.PictureData || raw.imageData || null,
             imageUrl: raw.PictureUrl || raw.imageUrl || raw.image || null,
             animationName: raw.AnimationFile || raw.animationName || null,
+            animationData: raw.AnimationData || raw.animationData || null,
+            animationUrl: raw.AnimationUrl || raw.animationUrl || null,
             videoName: raw.VideoFile || raw.videoName || null,
+            videoData: raw.VideoData || raw.videoData || null,
+            videoUrl: raw.VideoUrl || raw.videoUrl || null,
             ttsText: raw.TtsText || raw.ttsText || raw.TTSText || '',
             keystroke: raw.Keystroke || raw.keystroke || null,
             description: raw.Description || raw.description || 'Imported from TikFinity',
-            importedFrom: 'tikfinity'
+            importedFrom: 'tikfinity',
+            _mediaRefs: {
+                sound: [raw.SoundFile, raw.SoundUrl, raw.soundUrl, raw.audioUrl],
+                picture: [raw.PictureFile, raw.PictureUrl, raw.imageUrl],
+                animation: [raw.AnimationFile, raw.AnimationUrl, raw.animationUrl],
+                video: [raw.VideoFile, raw.VideoUrl, raw.videoUrl]
+            }
         };
     }
 
@@ -569,11 +835,22 @@
             enabled: raw.enabled !== false,
             media,
             soundName: raw.soundName || raw.file || null,
-            soundUrl: raw.soundUrl || raw.url || null,
-            imageUrl: raw.imageUrl || raw.image || null,
+            soundData: raw.soundData || raw.audioData || null,
+            soundUrl: raw.soundUrl || raw.url || raw.audioUrl || null,
+            imageName: raw.imageName || raw.pictureName || null,
+            imageData: raw.imageData || raw.pictureData || null,
+            imageUrl: raw.imageUrl || raw.image || raw.pictureUrl || null,
+            animationUrl: raw.animationUrl || raw.gifUrl || null,
+            videoUrl: raw.videoUrl || null,
             ttsText: raw.ttsText || raw.text || '',
             description: raw.description || 'Imported from BetterTok',
-            importedFrom: 'bettertok'
+            importedFrom: 'bettertok',
+            _mediaRefs: {
+                sound: [raw.soundName, raw.file, raw.soundUrl, raw.url],
+                picture: [raw.imageName, raw.imageUrl, raw.image],
+                animation: [raw.animationUrl, raw.gifUrl],
+                video: [raw.videoUrl]
+            }
         };
     }
 
@@ -629,6 +906,222 @@
                 actionCount: Object.keys(ae.actions).length,
                 eventCount: Object.keys(ae.events).length,
                 soundCount: 0
+            }
+        };
+    }
+
+    const TTE_EVENT_TYPE = {
+        1: 'join',
+        2: 'share',
+        3: 'follow',
+        4: 'like',
+        5: 'gift',
+        6: 'coins',
+        7: 'command',
+        8: 'coins',
+        9: 'subscribe',
+        10: 'subscribe',
+        11: 'gift',
+        12: 'gift',
+        13: 'coins'
+    };
+
+    function tteAbsUrl(s) {
+        const api = global.TikToEarnBin && global.TikToEarnBin.absMediaUrl;
+        if (typeof api === 'function') return api(s);
+        const v = String(s || '').trim();
+        if (!v) return null;
+        if (/^data:|^https?:\/\/|^blob:/i.test(v)) return v;
+        if (v.charAt(0) === '/') return 'https://api.tiktoearn.com' + v;
+        return v;
+    }
+
+    function tteScreenNum(raw) {
+        const s = String((raw && (raw.action_screen || raw.screen || raw.Screen)) || '1');
+        const m = s.match(/(\d+)/);
+        const n = Number(m && m[1]);
+        return n >= 1 ? n : 1;
+    }
+
+    function ttePickRoot(data) {
+        if (!data || typeof data !== 'object') return data;
+        return data.event_action || data.tiktoearn || data.TikToEarn || data.payload || data;
+    }
+
+    function convertTikToEarnAction(raw, id) {
+        const imageHref = tteAbsUrl(firstNonEmpty(
+            raw.action_image, raw.action_img, raw.action_picture, raw.action_gif,
+            raw.overlay_image, raw.image, raw.imageUrl, raw.image_url
+        ));
+        const videoHref = tteAbsUrl(firstNonEmpty(
+            raw.action_video, raw.action_mp4, raw.video, raw.videoUrl, raw.video_url
+        ));
+        const soundHref = tteAbsUrl(firstNonEmpty(
+            raw.action_sound, raw.action_audio, raw.sound, raw.sound_file, raw.sound_url,
+            raw.audioUrl, raw.audio_url
+        ));
+        const ttsOn = String(raw.action_tts_type || '') === '1' || !!(raw.action_tts_text || raw.ttsText);
+        const keyOn = String(raw.action_simulate_type || '') === '1' || !!(raw.action_paramitor || raw.keystroke);
+        const media = {};
+        if (soundHref || isDataUrl(raw.soundData) || isDataUrl(raw.audioData)) media.sound = true;
+        if (imageHref && /\.(gif|webp)(\?|$)/i.test(String(imageHref))) media.animation = true;
+        else if (imageHref) media.picture = true;
+        if (videoHref) media.video = true;
+        if (ttsOn) media.tts = true;
+        if (keyOn) media.keystroke = true;
+        if (!Object.keys(media).length) media.sound = true;
+
+        let keystroke = null;
+        if (keyOn && raw.action_paramitor) {
+            try {
+                const seq = typeof raw.action_paramitor === 'string'
+                    ? JSON.parse(raw.action_paramitor)
+                    : raw.action_paramitor;
+                keystroke = { sequence: seq };
+            } catch (_) {
+                keystroke = { sequence: String(raw.action_paramitor) };
+            }
+        }
+
+        return {
+            id,
+            name: String(raw.action_name || raw.name || raw.event_name || id),
+            screen: tteScreenNum(raw),
+            duration: Number(raw.action_duration || raw.duration || 10) || 10,
+            enabled: raw.enabled !== false && raw.action_status !== 0 && raw.action_status !== '0',
+            points: Number(raw.action_win_point || 0) || 0,
+            pointsMode: String(raw.action_win_tik) === '1' ? 'add' : 'none',
+            soundVolume: Number(raw.action_volume || raw.volume || 85) || 85,
+            globalCooldown: Number(raw.event_delay_sec || 0) || 0,
+            userCooldown: 0,
+            fadeInOut: true,
+            repeatCombo: false,
+            skipOnNext: false,
+            media,
+            soundName: raw.sound_name || fileBaseName(soundHref) || null,
+            soundData: isDataUrl(soundHref) ? soundHref : (raw.soundData || raw.audioData || null),
+            soundUrl: soundHref,
+            imageName: raw.image_name || fileBaseName(imageHref) || null,
+            imageData: isDataUrl(imageHref) ? imageHref : (raw.imageData || null),
+            imageUrl: imageHref,
+            animationName: null,
+            animationData: null,
+            animationUrl: (imageHref && media.animation) ? imageHref : null,
+            videoName: fileBaseName(videoHref) || null,
+            videoData: isDataUrl(videoHref) ? videoHref : null,
+            videoUrl: videoHref,
+            ttsText: String(raw.action_tts_text || raw.ttsText || ''),
+            keystroke,
+            description: 'Imported from TikToEarn',
+            importedFrom: 'tiktoearn',
+            _mediaRefs: {
+                sound: [soundHref, raw.sound_name, raw.sound_file, raw.action_sound],
+                picture: [imageHref, raw.action_image, raw.action_picture],
+                animation: [raw.action_gif],
+                video: [videoHref, raw.action_video]
+            }
+        };
+    }
+
+    function tteTriggerValue(raw, triggerType) {
+        if (triggerType === 'gift') {
+            if (String(raw.event_type) === '11') return '';
+            return String(raw.gift_id || raw.giftId || raw.gift_name || raw.sticker_id || '');
+        }
+        if (triggerType === 'coins') return String(raw.event_min_coins || raw.event_like || raw.value || '');
+        if (triggerType === 'like') return String(raw.event_like || raw.event_min_coins || '');
+        if (triggerType === 'command') {
+            if (Number(raw.event_comment_any) === 1) return '';
+            return String(raw.event_comment_text || raw.value || '');
+        }
+        return String(raw.event_like || raw.value || raw.gift_id || '');
+    }
+
+    function convertFromTikToEarn(data) {
+        const root = ttePickRoot(data) || {};
+        const rows = Array.isArray(root.action_event) ? root.action_event
+            : (Array.isArray(data && data.action_event) ? data.action_event : []);
+        const soundRows = Array.isArray(root.sound_event) ? root.sound_event
+            : (Array.isArray(data && data.sound_event) ? data.sound_event : []);
+
+        const actions = {};
+        const actionIdMap = {};
+        const events = {};
+
+        rows.forEach((raw, i) => {
+            if (!raw || typeof raw !== 'object') return;
+            const oldAct = String(raw.action_id || raw.ActionId || `act_${i}`);
+            if (!actionIdMap[oldAct]) {
+                const newId = uid('act');
+                actionIdMap[oldAct] = newId;
+                actions[newId] = convertTikToEarnAction(raw, newId);
+            }
+            const oldEv = String(raw.event_id || raw.EventId || `ev_${i}`);
+            if (!events[oldEv]) {
+                const ttNum = Number(raw.event_type || raw.eventType || 5);
+                const triggerType = TTE_EVENT_TYPE[ttNum] || normalizeTriggerType(raw.triggerType || 'gift');
+                events[oldEv] = {
+                    id: oldEv,
+                    name: String(raw.event_name || raw.name || (raw.gift_name ? `Gift: ${raw.gift_name}` : oldEv)),
+                    triggerType,
+                    triggerValue: tteTriggerValue(raw, triggerType),
+                    actionIds: [],
+                    actionMode: String(raw.trigger_type) === '2' || String(raw.event_type_action_random) === '1' ? 'random' : 'single',
+                    userFilter: Number(raw.event_who) === 2 ? 'specific' : 'any',
+                    specificUsername: String(raw.event_spacial_id || raw.event_special_id || '').replace(/^@/, ''),
+                    enabled: raw.enabled !== false && raw.event_status !== 0 && raw.event_status !== '0',
+                    importedFrom: 'tiktoearn'
+                };
+            }
+            const mappedAct = actionIdMap[oldAct];
+            if (mappedAct && events[oldEv].actionIds.indexOf(mappedAct) < 0) {
+                events[oldEv].actionIds.push(mappedAct);
+            }
+        });
+
+        const remappedEvents = {};
+        Object.keys(events).forEach((oldId) => {
+            const newId = uid('ev');
+            const ev = events[oldId];
+            ev.id = newId;
+            remappedEvents[newId] = ev;
+        });
+
+        const ae = normalizeActionsEvents({ actions, events: remappedEvents });
+        const sa = emptySoundAlerts();
+        soundRows.forEach((raw, i) => {
+            if (!raw || typeof raw !== 'object') return;
+            const ttNum = Number(raw.event_type || 5);
+            const triggerType = TTE_EVENT_TYPE[ttNum] || 'gift';
+            const href = tteAbsUrl(firstNonEmpty(raw.sound_file, raw.sound_url, raw.sound, raw.file, raw.url));
+            const key = String(raw.sound_id || raw.gift_id || raw.id || ('sa_' + i));
+            sa.rules[key] = {
+                id: key,
+                name: String(raw.sound_name || raw.name || raw.gift_name || key),
+                enabled: raw.enabled !== false,
+                eventType: triggerType,
+                giftId: raw.gift_id || raw.sticker_id || null,
+                giftName: raw.gift_name || null,
+                giftIcon: raw.gift_image || raw.gift_icon || null,
+                threshold: Number(raw.event_min_coins || raw.event_like || 1) || 1,
+                volume: Number(raw.volume || raw.sound_volume || 80) || 80,
+                soundName: raw.sound_name || fileBaseName(href) || null,
+                soundUrl: href,
+                soundData: isDataUrl(href) ? href : (raw.soundData || null),
+                importedFrom: 'tiktoearn'
+            };
+        });
+
+        return {
+            format: FORMAT.TIKTOEARN,
+            actionsEvents: ae,
+            soundAlerts: normalizeSoundAlerts(sa),
+            username: root.tiktok_username || data.sourceChannelId || data.username || null,
+            general: null,
+            meta: {
+                actionCount: Object.keys(ae.actions).length,
+                eventCount: Object.keys(ae.events).length,
+                soundCount: Object.keys(sa.rules).length
             }
         };
     }
@@ -695,7 +1188,7 @@
         return out;
     }
 
-    function decodeImportText(raw) {
+    async function decodeImportText(raw) {
         let text = String(raw || '').replace(/^\uFEFF/, '').trim();
         if (!text) throw new Error('ไฟล์ว่าง');
 
@@ -710,9 +1203,10 @@
             }
         }
 
-        // Already JSON
+        // Already JSON (including TikToEarn AES envelope)
         if (text.startsWith('{') || text.startsWith('[')) {
-            return JSON.parse(text);
+            const parsed = JSON.parse(text);
+            return await unwrapTikToEarn(parsed);
         }
 
         // Base64-wrapped JSON
@@ -757,18 +1251,39 @@
         throw new Error('ไม่ใช่ไฟล์ JSON/.tfc ที่อ่านได้');
     }
 
-    function parseImportFile(jsonText) {
-        const data = (typeof jsonText === 'string' || jsonText instanceof String)
-            ? decodeImportText(jsonText)
-            : jsonText;
+    function looksLikeTikToEarnEnvelope(obj) {
+        const tte = global.TikToEarnBin;
+        if (tte && typeof tte.isEnvelope === 'function') return tte.isEnvelope(obj);
+        if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return false;
+        const alg = String(obj.alg || obj.algorithm || '').toUpperCase();
+        return !!(obj.data && (alg === 'AES-256-CBC' || alg.indexOf('AES-256') === 0));
+    }
+
+    async function unwrapTikToEarn(data) {
+        if (!looksLikeTikToEarnEnvelope(data)) return data;
+        const tte = global.TikToEarnBin;
+        if (tte && typeof tte.decryptEnvelope === 'function') {
+            return await tte.decryptEnvelope(data);
+        }
+        throw new Error((tte && tte.DECRYPT_FAIL_MSG) || 'ไฟล์ TikToEarn .bin นี้เข้ารหัสอยู่ — โหลดโมดูลถอดรหัสไม่สำเร็จ');
+    }
+
+    async function parseImportFile(jsonText) {
+        let data = (typeof jsonText === 'string' || jsonText instanceof String)
+            ? await decodeImportText(jsonText)
+            : await unwrapTikToEarn(jsonText);
         const format = detectFormat(data);
         let converted;
         if (format === FORMAT.TOKCONTROL) converted = convertFromTokControl(data);
         else if (format === FORMAT.TIKFINITY) converted = convertFromTikfinity(data);
         else if (format === FORMAT.BETTERTOK) converted = convertFromBetterTok(data);
+        else if (format === FORMAT.TIKTOEARN) converted = convertFromTikToEarn(data);
         else {
-            // last resort: try TikFinity then BetterTok then TokControl
-            converted = convertFromTikfinity(data);
+            // last resort: try TikToEarn then TikFinity then BetterTok then TokControl
+            converted = convertFromTikToEarn(data);
+            if (!converted.meta.actionCount && !converted.meta.eventCount && !converted.meta.soundCount) {
+                converted = convertFromTikfinity(data);
+            }
             if (!converted.meta.actionCount && !converted.meta.eventCount && !converted.meta.soundCount) {
                 converted = convertFromBetterTok(data);
             }
@@ -781,7 +1296,99 @@
                 converted.format = FORMAT.UNKNOWN;
             }
         }
+        canonicalizeConverted(converted);
         return { format: converted.format || format, data, converted };
+    }
+
+    function looksLikeConfigName(name) {
+        return /\.(json|tfc|tokconfig|txt)$/i.test(name || '') || /tiktoearn/i.test(name || '');
+    }
+
+    async function parseImportFiles(fileList) {
+        const sniffApi = getMediaSniff();
+        const files = Array.from(fileList || []);
+        if (!files.length) throw new Error('ไม่ได้เลือกไฟล์');
+        const expanded = [];
+        for (let i = 0; i < files.length; i++) {
+            const f = files[i];
+            const buf = new Uint8Array(await f.arrayBuffer());
+            const info = sniffApi ? sniffApi.sniff(buf) : { kind: 'bin' };
+            const rel = f.webkitRelativePath || f.name || 'file';
+            if (info.kind === 'zip' || /\.zip$/i.test(f.name || '')) {
+                if (!sniffApi || !sniffApi.unzip) throw new Error('อ่านไฟล์ ZIP ไม่ได้');
+                const entries = await sniffApi.unzip(buf);
+                entries.forEach((e) => {
+                    expanded.push({
+                        name: e.name,
+                        bytes: e.bytes,
+                        sniff: sniffApi.sniff(e.bytes)
+                    });
+                });
+            } else {
+                expanded.push({ name: rel, bytes: buf, sniff: info });
+            }
+        }
+
+        function bytesToImportText(bytes) {
+            if (sniffApi && typeof sniffApi.bytesToText === 'function') return sniffApi.bytesToText(bytes);
+            try { return new TextDecoder('utf-8').decode(bytes); } catch (_) { return ''; }
+        }
+        const configs = [];
+        const media = [];
+        expanded.forEach((item) => {
+            const kind = item.sniff && item.sniff.kind;
+            if (kind === 'json' || kind === 'tfc' || looksLikeConfigName(item.name)) {
+                configs.push(item);
+                return;
+            }
+            if (kind === 'audio' || kind === 'image' || kind === 'video') {
+                media.push(item);
+                return;
+            }
+            if (/\.bin$/i.test(item.name)) {
+                try {
+                    const text = bytesToImportText(item.bytes);
+                    const trimmed = String(text || '').trim();
+                    if (trimmed.charAt(0) === '{' || trimmed.charAt(0) === '[') {
+                        configs.push(item);
+                        return;
+                    }
+                } catch (_) {}
+                media.push(item);
+                return;
+            }
+            try {
+                const text = bytesToImportText(item.bytes);
+                const trimmed = String(text || '').trim();
+                if (trimmed.charAt(0) === '{' || trimmed.charAt(0) === '[') configs.push(item);
+                else media.push(item);
+            } catch (_) {
+                media.push(item);
+            }
+        });
+
+        if (!configs.length) {
+            throw new Error('ไม่พบไฟล์ตั้งค่า (.tfc / .json / TikToEarn .bin) — เลือกไฟล์ config หรือทั้งโฟลเดอร์ที่มีไฟล์สื่อ .bin');
+        }
+
+        let parsed = null;
+        let lastErr = null;
+        for (let i = 0; i < configs.length; i++) {
+            try {
+                const text = bytesToImportText(configs[i].bytes);
+                parsed = await parseImportFile(text);
+                if (parsed && parsed.converted) break;
+            } catch (err) {
+                lastErr = err;
+            }
+        }
+        if (!parsed || !parsed.converted) {
+            throw lastErr || new Error('อ่านไฟล์ตั้งค่าไม่สำเร็จ');
+        }
+        if (media.length) attachMediaLibrary(parsed.converted, media);
+        canonicalizeConverted(parsed.converted);
+        parsed.mediaAttached = media.length;
+        return parsed;
     }
 
     function countExportSections(adv) {
@@ -933,6 +1540,7 @@
         if (format === FORMAT.TIKFINITY) return 'TikFinity';
         if (format === FORMAT.BETTERTOK) return 'BetterTok Desktop';
         if (format === FORMAT.TOKCONTROL) return 'TokControl';
+        if (format === FORMAT.TIKTOEARN) return 'TikToEarn';
         return 'Unknown';
     }
 
@@ -941,11 +1549,13 @@
         deepClone,
         detectFormat,
         parseImportFile,
+        parseImportFiles,
         decodeImportText,
         buildExportPayload,
         countExportSections,
         convertFromTikfinity,
         convertFromBetterTok,
+        convertFromTikToEarn,
         convertFromTokControl,
         normalizeActionsEvents,
         normalizeSoundAlerts,

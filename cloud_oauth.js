@@ -19,9 +19,31 @@ function getOAuthSuccessUrl() {
     return process.env.OAUTH_SUCCESS_URL || 'http://127.0.0.1:3000/auth-success.html';
 }
 
+function isSafeOAuthSuccessUrl(url) {
+    try {
+        const u = new URL(String(url || ''));
+        if (u.protocol !== 'http:' && u.protocol !== 'https:') return false;
+        const host = u.hostname;
+        const okHost = host === '127.0.0.1' || host === 'localhost'
+            || host === 'tokcontrol.com' || host === 'www.tokcontrol.com';
+        if (!okHost) return false;
+        return /auth-success\.html$/i.test(u.pathname);
+    } catch (e) {
+        return false;
+    }
+}
+
 function redirectOAuthSuccess(res, successUrl, token) {
-    const base = String(successUrl || '').split('#')[0];
-    res.redirect(`${base}#token=${encodeURIComponent(token)}`);
+    try {
+        const u = new URL(String(successUrl || getOAuthSuccessUrl()), 'http://127.0.0.1:3000');
+        u.searchParams.set('token', token);
+        u.hash = '';
+        return res.redirect(u.toString());
+    } catch (e) {
+        const base = String(successUrl || getOAuthSuccessUrl()).split('#')[0];
+        const sep = base.includes('?') ? '&' : '?';
+        return res.redirect(`${base}${sep}token=${encodeURIComponent(token)}`);
+    }
 }
 
 function registerCloudOAuthRoutes(app, { db, jwtSecret, buildUserProfile, issueExtras = async () => ({}) }) {
@@ -47,7 +69,8 @@ function registerCloudOAuthRoutes(app, { db, jwtSecret, buildUserProfile, issueE
             });
         }
         const state = crypto.randomBytes(16).toString('hex');
-        oauthLoginStates[state] = { provider: 'google', createdAt: Date.now() };
+        const next = isSafeOAuthSuccessUrl(req.query.next) ? String(req.query.next) : getOAuthSuccessUrl();
+        oauthLoginStates[state] = { provider: 'google', createdAt: Date.now(), successUrl: next };
         res.json({ success: true, url: oauthAuth.getGoogleAuthUrl(state) });
     });
 
@@ -58,18 +81,20 @@ function registerCloudOAuthRoutes(app, { db, jwtSecret, buildUserProfile, issueE
             });
         }
         const state = crypto.randomBytes(16).toString('hex');
-        oauthLoginStates[state] = { provider: 'discord', createdAt: Date.now() };
+        const next = isSafeOAuthSuccessUrl(req.query.next) ? String(req.query.next) : getOAuthSuccessUrl();
+        oauthLoginStates[state] = { provider: 'discord', createdAt: Date.now(), successUrl: next };
         res.json({ success: true, url: oauthAuth.getDiscordAuthUrl(state) });
     });
 
     app.get('/api/auth/google/callback', async (req, res) => {
         cleanupOAuthStates();
         const { code, state, error } = req.query;
-        const successUrl = getOAuthSuccessUrl();
+        const pending = oauthLoginStates[state];
+        const successUrl = pending?.successUrl || getOAuthSuccessUrl();
         if (error) {
             return res.redirect(`${successUrl}?error=${encodeURIComponent(error)}`);
         }
-        const session = oauthLoginStates[state];
+        const session = pending;
         if (!session || session.provider !== 'google') {
             return res.status(400).send('Invalid OAuth state');
         }
@@ -93,11 +118,12 @@ function registerCloudOAuthRoutes(app, { db, jwtSecret, buildUserProfile, issueE
     app.get('/api/auth/discord/callback', async (req, res) => {
         cleanupOAuthStates();
         const { code, state, error } = req.query;
-        const successUrl = getOAuthSuccessUrl();
+        const pending = oauthLoginStates[state];
+        const successUrl = pending?.successUrl || getOAuthSuccessUrl();
         if (error) {
             return res.redirect(`${successUrl}?error=${encodeURIComponent(error)}`);
         }
-        const session = oauthLoginStates[state];
+        const session = pending;
         if (!session || session.provider !== 'discord') {
             return res.status(400).send('Invalid OAuth state');
         }

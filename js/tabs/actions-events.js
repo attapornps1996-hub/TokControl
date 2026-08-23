@@ -85,6 +85,11 @@
         return prefix + '-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
     }
 
+    function decodeAeId(id) {
+        if (id == null || id === '') return id;
+        try { return decodeURIComponent(String(id)); } catch (e) { return String(id); }
+    }
+
     function ensureActionsEventsStore() {
         if (!window.advConf) window.advConf = {};
         if (!advConf.actionsEvents) {
@@ -100,6 +105,12 @@
         if (!ae.actions) ae.actions = {};
         if (!ae.events) ae.events = {};
         if (!ae.timers) ae.timers = {};
+        Object.entries(ae.actions).forEach(([id, a]) => {
+            if (a && typeof a === 'object' && !a.id) a.id = id;
+        });
+        Object.entries(ae.events).forEach(([id, ev]) => {
+            if (ev && typeof ev === 'object' && !ev.id) ev.id = id;
+        });
         Object.values(ae.events).forEach((ev) => {
             if (!ev || ev.actionMode === 'single' || ev.actionMode === 'random') return;
             ev.actionMode = (ev.actionIds || []).length > 1 ? 'random' : 'single';
@@ -269,10 +280,42 @@
         }
     }
 
+    function pickActionMedia(action, dataKeys, urlKeys) {
+        const sniff = window.TokMediaSniff;
+        const fix = (s) => (sniff && sniff.playableSrc) ? sniff.playableSrc(s) : s;
+        const ok = (s) => {
+            if (!s) return false;
+            if (sniff && sniff.isUsableSrc) return sniff.isUsableSrc(s);
+            const t = String(s);
+            return t.slice(0, 5) === 'data:' || /^https?:\/\//i.test(t) || t.charAt(0) === '/' || /^blob:/i.test(t);
+        };
+        let data = null;
+        let url = null;
+        (dataKeys || []).forEach((k) => {
+            if (data || url || !ok(action[k])) return;
+            const v = fix(action[k]);
+            if (String(v).slice(0, 5) === 'data:') data = v;
+            else url = v;
+        });
+        if (!data && !url) {
+            (urlKeys || []).forEach((k) => {
+                if (data || url || !ok(action[k])) return;
+                const v = fix(action[k]);
+                if (String(v).slice(0, 5) === 'data:') data = v;
+                else url = v;
+            });
+        }
+        return { data, url };
+    }
+
     function buildActionPayload(action, meta) {
         const pts = action.points || 0;
         const mode = action.pointsMode || 'none';
         const signedPts = mode === 'remove' ? -Math.abs(pts) : (mode === 'add' ? Math.abs(pts) : 0);
+        const sound = pickActionMedia(action, ['soundData', 'soundData', 'audioData'], ['soundUrl', 'soundUrl', 'audioUrl']);
+        const image = pickActionMedia(action, ['imageData', 'imageData'], ['imageUrl', 'imageUrl', 'pictureUrl']);
+        const anim = pickActionMedia(action, ['animationData'], ['animationUrl', 'animationUrl']);
+        const video = pickActionMedia(action, ['videoData'], ['videoUrl', 'videoUrl']);
         return {
             id: action.id,
             name: action.name,
@@ -280,29 +323,30 @@
             duration: action.duration || 10,
             points: signedPts,
             pointsMode: mode,
-            soundVolume: action.soundVolume != null ? action.soundVolume : 85,
-            globalCooldown: action.globalCooldown || 0,
-            userCooldown: action.userCooldown || 0,
-            fadeInOut: action.fadeInOut !== false,
+            soundVolume: action.soundVolume != null ? action.soundVolume : (action.soundVolume != null ? action.soundVolume : 85),
+            globalCooldown: action.globalCooldown || action.globalCooldown || 0,
+            userCooldown: action.userCooldown || action.userCooldown || 0,
+            fadeInOut: action.fadeInOut != null ? !!action.fadeInOut : action.fadeInOut !== false,
             repeatCombo: !!action.repeatCombo,
             skipOnNext: !!action.skipOnNext,
             media: action.media || {},
             description: getActionDescription(action),
-            soundData: action.soundData || null,
-            soundUrl: action.soundUrl || null,
-            soundName: action.soundName || null,
+            soundData: sound.data || action.soundData || null,
+            soundUrl: sound.url || action.soundUrl || null,
+            soundName: action.soundName || action.soundName || null,
             builtin: action.builtin || null,
             soundboardId: action.soundboardId || null,
             myinstantsSlug: action.myinstantsSlug || null,
-            imageData: action.imageData || null,
-            imageUrl: action.imageUrl || null,
-            imageName: action.imageName || null,
-            animationData: action.animationData || null,
-            animationUrl: action.animationUrl || null,
+            imageData: image.data || action.imageData || null,
+            imageUrl: image.url || action.imageUrl || action.imageUrl || null,
+            imageName: action.imageName || action.imageName || null,
+            animationData: anim.data || action.animationData || null,
+            animationUrl: anim.url || action.animationUrl || action.animationUrl || null,
             animationName: action.animationName || null,
-            videoData: action.videoData || null,
+            videoData: video.data || action.videoData || null,
+            videoUrl: video.url || action.videoUrl || action.videoUrl || null,
             videoName: action.videoName || null,
-            ttsText: action.ttsText || null,
+            ttsText: action.ttsText || action.ttsText || null,
             keystroke: action.keystroke || null,
             meta: meta || {}
         };
@@ -1101,7 +1145,7 @@
         if (!body) return;
         const ae = getAeStore();
         const q = aeSearchFilter;
-        const rows = Object.values(ae.actions).filter((a) => {
+        const rows = Object.entries(ae.actions).filter(([, a]) => {
             if (!q) return true;
             const hay = `${a.name} ${getActionDescription(a)} Screen ${a.screen}`.toLowerCase();
             return hay.includes(q);
@@ -1110,9 +1154,9 @@
             body.innerHTML = `<div class="sa-v2-empty"><div class="sa-v2-empty-icon">${aeIco('zap', 36)}</div>ยังไม่มีแอคชั่น — กด "+ สร้างแอคชั่น" เพื่อเริ่มต้น</div>`;
             return;
         }
-        body.innerHTML = rows.map((a) => {
+        body.innerHTML = rows.map(([id, a]) => {
             const disabled = a.enabled === false;
-            const safeId = escapeHtml(a.id);
+            const safeId = encodeURIComponent(String(a.id || id));
             const pts = a.points || 0;
             const ptsLabel = a.pointsMode === 'remove' ? `−${pts}` : (a.pointsMode === 'add' ? `+${pts}` : '0');
             return `<div class="ae-action-card ${disabled ? 'ae-row-disabled' : ''}">
@@ -1184,7 +1228,7 @@
         if (!body) return;
         const ae = getAeStore();
         const q = aeSearchFilter;
-        const rows = Object.values(ae.events).filter((ev) => {
+        const rows = Object.entries(ae.events).filter(([, ev]) => {
             if (!q) return true;
             const hay = `${getEventDisplayName(ev)} ${getEventTriggerLabel(ev)} ${getEventActionsLabel(ev)} ${getEventUserLabel(ev)}`.toLowerCase();
             return hay.includes(q);
@@ -1193,8 +1237,8 @@
             body.innerHTML = `<div class="sa-v2-empty"><div class="sa-v2-empty-icon">${aeIco('target', 36)}</div>ยังไม่มีอีเวนต์ — กด "+ สร้างอีเวนต์" เพื่อเชื่อม Trigger → Action</div>`;
             return;
         }
-        body.innerHTML = rows.map((ev) => {
-            const safeId = escapeHtml(ev.id);
+        body.innerHTML = rows.map(([id, ev]) => {
+            const safeId = encodeURIComponent(String(ev.id || id));
             const disabled = ev.enabled === false;
             const t = TRIGGER_TYPES[ev.triggerType] || { icon: 'zap', label: ev.triggerType };
             const actions = (ev.actionIds || []).map((id) => ae.actions[id]?.name || id);
@@ -1369,7 +1413,8 @@
             return;
         }
         if (typeof copyToClipboard === 'function') {
-            copyToClipboard(url);
+            copyToClipboard(url, true);
+            if (typeof showCustomMsg === 'function') showCustomMsg('success', 'Copy URL แล้ว', label || 'Overlay URL');
             return;
         }
         const textarea = document.createElement('textarea');
@@ -1572,6 +1617,7 @@
     }
 
     function openActionEditorModal(id) {
+        id = decodeAeId(id);
         if (!aePresetComposerMode && !id && !canAddAction()) {
             if (typeof showProUpgradePrompt === 'function') {
                 showProUpgradePrompt(`Actions — แพ็กฟรีเพิ่มได้สูงสุด ${FREE_ACTIONS_MAX} แอคชั่น`);
@@ -1663,14 +1709,32 @@
         });
     }
 
-    function handleAeActionFileUpload(input, kind) {
+    async function handleAeActionFileUpload(input, kind) {
         const file = input && input.files && input.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
+        input.value = '';
+        try {
+            let dataUrl = '';
+            const sniffApi = window.TokMediaSniff;
+            if (sniffApi && sniffApi.fileToDataUrl) {
+                const r = await sniffApi.fileToDataUrl(file);
+                const slot = kind === 'picture' ? 'picture' : kind;
+                dataUrl = (r.sniff && r.sniff.kind === 'bin' && r.bytes && sniffApi.dataUrlForSlot)
+                    ? sniffApi.dataUrlForSlot(r.bytes, slot)
+                    : (r.dataUrl || '');
+            } else {
+                dataUrl = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result || '');
+                    reader.onerror = () => reject(reader.error || new Error('อ่านไฟล์ไม่ได้'));
+                    reader.readAsDataURL(file);
+                });
+                if (sniffApi && sniffApi.rewriteDataUrl) dataUrl = sniffApi.rewriteDataUrl(dataUrl);
+            }
+            if (!dataUrl) throw new Error('ไฟล์ว่างหรืออ่านไม่ได้');
             const dataKey = kind === 'sound' ? 'soundData' : kind === 'picture' ? 'imageData' : kind === 'animation' ? 'animationData' : 'videoData';
             const nameKey = kind === 'sound' ? 'soundName' : kind === 'picture' ? 'imageName' : kind === 'animation' ? 'animationName' : 'videoName';
-            aeActionDraft[dataKey] = reader.result;
+            aeActionDraft[dataKey] = dataUrl;
             aeActionDraft[nameKey] = file.name;
             if (kind === 'sound') { aeActionDraft.soundUrl = null; aeActionDraft.builtin = null; aeActionDraft.soundboardId = null; aeActionDraft.myinstantsSlug = null; }
             if (!aeActionDraft.media) aeActionDraft.media = {};
@@ -1678,9 +1742,9 @@
             buildAeActionTypeList();
             syncAeUploadPanels();
             updateAeActionFileLabels();
-        };
-        reader.readAsDataURL(file);
-        input.value = '';
+        } catch (err) {
+            if (typeof showCustomMsg === 'function') showCustomMsg('error', 'อ่านไฟล์ไม่ได้', err.message || 'ลองไฟล์อื่น');
+        }
     }
 
     function pickMyInstantsForAction() {
@@ -1743,7 +1807,7 @@
             if (typeof showCustomMsg === 'function') showCustomMsg('error', 'กรุณากรอกชื่อแอคชั่น');
             return;
         }
-        const id = aeEditingActionId || uid('ae');
+        const id = decodeAeId(aeEditingActionId) || uid('ae');
         const mode = document.querySelector('input[name="aePointsMode"]:checked')?.value || 'none';
         const pts = parseInt(ptsEl && ptsEl.value, 10) || 0;
         const saved = {
@@ -1777,7 +1841,7 @@
 
         const ae = getAeStore();
         const prev = ae.actions[id];
-        if (!prev && !canAddAction()) {
+        if (!aeEditingActionId && !canAddAction()) {
             if (typeof showProUpgradePrompt === 'function') {
                 showProUpgradePrompt(`Actions — แพ็กฟรีเพิ่มได้สูงสุด ${FREE_ACTIONS_MAX} แอคชั่น`);
             }
@@ -1797,6 +1861,7 @@
     }
 
     async function removeAction(id) {
+        id = decodeAeId(id);
         if (!(await tcConfirm('ลบแอคชั่นนี้?', { title: 'ลบแอคชั่น', icon: '🗑️', okLabel: 'ลบ' }))) return;
         const ae = getAeStore();
         delete ae.actions[id];
@@ -1814,6 +1879,7 @@
     }
 
     function duplicateAction(id) {
+        id = decodeAeId(id);
         const src = getActionById(id);
         if (!src) return;
         if (!canAddAction()) {
@@ -1829,6 +1895,7 @@
     }
 
     function toggleActionEnabled(id, enabled) {
+        id = decodeAeId(id);
         const a = getActionById(id);
         if (!a) return;
         if (enabled && a.enabled === false && !canEnableAction()) {
@@ -1845,6 +1912,7 @@
     }
 
     async function testAction(id) {
+        id = decodeAeId(id);
         const action = getAeStore().actions[id];
         if (action && action.media && action.media.keystroke) {
             if (typeof showCustomMsg === 'function') {
@@ -1916,6 +1984,7 @@
     }
 
     function openEventEditorModal(id) {
+        id = decodeAeId(id);
         if (!aePresetComposerMode && !id && !canAddEvent()) {
             if (typeof showProUpgradePrompt === 'function') {
                 showProUpgradePrompt(`Events — แพ็กฟรีเพิ่มได้สูงสุด ${FREE_EVENTS_MAX} อีเวนต์`);
@@ -2253,11 +2322,11 @@
         const specificUserEl = document.getElementById('aeEventSpecificUsername');
         const typeEl = document.getElementById('aeEventTriggerType');
         const valEl = document.getElementById('aeEventTriggerValue');
-        const id = aeEditingEventId || uid('ev');
+        const id = decodeAeId(aeEditingEventId) || uid('ev');
         const prev = aePresetComposerMode
             ? aePresetDraft.events[id]
             : getAeStore().events[id];
-        if (!aePresetComposerMode && !prev && !canAddEvent()) {
+        if (!aePresetComposerMode && !aeEditingEventId && !canAddEvent()) {
             if (typeof showProUpgradePrompt === 'function') {
                 showProUpgradePrompt(`Events — แพ็กฟรีเพิ่มได้สูงสุด ${FREE_EVENTS_MAX} อีเวนต์`);
             }
@@ -2332,6 +2401,7 @@
     }
 
     async function removeEvent(id) {
+        id = decodeAeId(id);
         if (!(await tcConfirm('ลบอีเวนต์นี้?', { title: 'ลบอีเวนต์', icon: '🗑️', okLabel: 'ลบ' }))) return;
         const ae = getAeStore();
         delete ae.events[id];
@@ -2341,6 +2411,7 @@
     }
 
     function toggleEventEnabled(id, enabled) {
+        id = decodeAeId(id);
         const ev = getAeStore().events[id];
         if (!ev) return;
         if (enabled && ev.enabled === false && !canEnableEvent()) {

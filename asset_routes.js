@@ -5,6 +5,7 @@
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const MediaSniff = require('./js/media-sniff.js');
 
 function resolveAssetsDir() {
     try {
@@ -21,7 +22,7 @@ function ensureDir(dir) {
 }
 
 function findAssetFile(baseDir, assetId) {
-    const exts = ['.webp', '.webm', '.mp4', '.png', '.jpg', '.jpeg', '.gif', '.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac'];
+    const exts = ['.webp', '.webm', '.mp4', '.png', '.jpg', '.jpeg', '.gif', '.mp3', '.wav', '.ogg', '.m4a', '.aac', '.flac', '.bin'];
     for (const ext of exts) {
         const p = path.join(baseDir, assetId + ext);
         if (fs.existsSync(p)) return p;
@@ -43,7 +44,8 @@ function mimeFromExt(ext) {
         '.ogg': 'audio/ogg',
         '.m4a': 'audio/mp4',
         '.aac': 'audio/aac',
-        '.flac': 'audio/flac'
+        '.flac': 'audio/flac',
+        '.bin': 'application/octet-stream'
     };
     return map[String(ext || '').toLowerCase()] || 'application/octet-stream';
 }
@@ -162,33 +164,59 @@ module.exports = function registerAssetRoutes(app, { getUserId }) {
             let outMime;
             const nameExt = path.extname(String(fileName || '')).toLowerCase();
             const audioExts = { '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.ogg': 'audio/ogg', '.m4a': 'audio/mp4', '.aac': 'audio/aac', '.flac': 'audio/flac' };
-            const isAudio = /^audio\//.test(mime) || !!audioExts[nameExt] || String(purpose || '').includes('sound');
+            const sniffed = (MediaSniff && MediaSniff.sniff) ? MediaSniff.sniff(inputBuffer) : { kind: 'bin', mime: 'application/octet-stream', ext: '.bin' };
+            let kind = sniffed.kind || 'bin';
+            const purposeText = String(purpose || '');
+            if (kind === 'bin') {
+                if (/^audio\//.test(mime) || !!audioExts[nameExt] || purposeText.includes('sound')) kind = 'audio';
+                else if (/^video\//.test(mime)) kind = 'video';
+                else if (/^image\//.test(mime)) kind = 'image';
+            }
+            const isAudio = kind === 'audio' || /^audio\//.test(mime) || !!audioExts[nameExt] || purposeText.includes('sound');
 
-            if (/^video\//.test(mime) && !isAudio) {
-                if (mime.includes('webm')) {
+            if (kind === 'video' || (/^video\//.test(mime) && !isAudio && kind !== 'audio' && kind !== 'image')) {
+                if ((sniffed.ext === '.webm') || mime.includes('webm')) {
                     outExt = '.webm';
                     outBuffer = inputBuffer;
                 } else {
-                    outExt = '.mp4';
+                    outExt = sniffed.ext === '.mp4' ? '.mp4' : '.mp4';
                     outBuffer = inputBuffer;
                 }
-                outMime = mimeFromExt(outExt);
-            } else if (isAudio) {
-                outExt = audioExts[nameExt] ? nameExt : (mime.includes('wav') ? '.wav' : mime.includes('ogg') ? '.ogg' : '.mp3');
+                outMime = sniffed.mime && kind === 'video' ? sniffed.mime : mimeFromExt(outExt);
+            } else if (kind === 'audio' || isAudio) {
+                outExt = (sniffed.kind === 'audio' && sniffed.ext) ? sniffed.ext
+                    : (audioExts[nameExt] ? nameExt : (mime.includes('wav') ? '.wav' : mime.includes('ogg') ? '.ogg' : '.mp3'));
                 outBuffer = inputBuffer;
-                outMime = audioExts[outExt] || (mime.startsWith('audio/') ? mime : 'audio/mpeg');
-            } else {
-                outExt = '.webp';
-                const purposeKey = String(purpose || '').toLowerCase();
-                const pipeline = sharp(inputBuffer).rotate();
-                if (purposeKey === 'cover') {
-                    outBuffer = await pipeline.resize(1920, 720, { fit: 'cover' }).webp({ quality: 82 }).toBuffer();
-                } else if (purposeKey === 'report' || purposeKey === 'spotdiff') {
-                    outBuffer = await pipeline.resize(1920, 1080, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 82 }).toBuffer();
+                outMime = (sniffed.kind === 'audio' && sniffed.mime) ? sniffed.mime
+                    : (audioExts[outExt] || (mime.startsWith('audio/') ? mime : 'audio/mpeg'));
+            } else if (kind === 'image') {
+                if (sniffed.ext === '.gif') {
+                    outExt = '.gif';
+                    outBuffer = inputBuffer;
+                    outMime = 'image/gif';
                 } else {
-                    outBuffer = await pipeline.resize(480, 480, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 78 }).toBuffer();
+                    try {
+                        outExt = '.webp';
+                        const purposeKey = String(purpose || '').toLowerCase();
+                        const pipeline = sharp(inputBuffer).rotate();
+                        if (purposeKey === 'cover') {
+                            outBuffer = await pipeline.resize(1920, 720, { fit: 'cover' }).webp({ quality: 82 }).toBuffer();
+                        } else if (purposeKey === 'report' || purposeKey === 'spotdiff') {
+                            outBuffer = await pipeline.resize(1920, 1080, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 82 }).toBuffer();
+                        } else {
+                            outBuffer = await pipeline.resize(480, 480, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 78 }).toBuffer();
+                        }
+                        outMime = 'image/webp';
+                    } catch (sharpErr) {
+                        outExt = sniffed.ext || nameExt || '.bin';
+                        outBuffer = inputBuffer;
+                        outMime = sniffed.mime || mime || 'application/octet-stream';
+                    }
                 }
-                outMime = 'image/webp';
+            } else {
+                outExt = sniffed.ext || nameExt || '.bin';
+                outBuffer = inputBuffer;
+                outMime = sniffed.mime || mime || 'application/octet-stream';
             }
 
             // Always keep a local copy (Electron offline / local mode)
@@ -247,7 +275,18 @@ module.exports = function registerAssetRoutes(app, { getUserId }) {
             // 1) Local disk first (fast for same machine)
             const filePath = findAssetFile(baseDir, assetId);
             if (filePath) {
-                res.setHeader('Content-Type', mimeFromPath(filePath));
+                let ctype = mimeFromPath(filePath);
+                if (path.extname(filePath).toLowerCase() === '.bin' || ctype === 'application/octet-stream') {
+                    try {
+                        const fd = fs.openSync(filePath, 'r');
+                        const head = Buffer.alloc(64);
+                        const n = fs.readSync(fd, head, 0, 64, 0);
+                        fs.closeSync(fd);
+                        const sniffed = MediaSniff.sniff(head.subarray(0, n));
+                        if (sniffed && sniffed.mime && sniffed.kind !== 'bin') ctype = sniffed.mime;
+                    } catch (_) { /* keep fallback mime */ }
+                }
+                res.setHeader('Content-Type', ctype);
                 res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
                 return fs.createReadStream(filePath).pipe(res);
             }

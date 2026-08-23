@@ -90,7 +90,7 @@
         <div class="sb-toolbar" id="sbToolbar"></div>
         <div class="sb-workspace" id="sbWorkspace"></div>
         <div class="sb-mini" id="sbMini"></div>
-        <input type="file" id="sbFileInput" accept="audio/mpeg,audio/wav,audio/ogg,audio/mp4,audio/webm,audio/aac,.mp3,.wav,.ogg,.m4a,.webm,.aac" multiple hidden>
+        <input type="file" id="sbFileInput" accept="audio/*,.mp3,.wav,.ogg,.m4a,.webm,.aac,.bin,application/octet-stream" multiple hidden>
         ${modalsHtml()}
         `;
     }

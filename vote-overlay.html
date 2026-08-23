@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th" class="tcvo-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TokControl — Vote Overlay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/styles/vote-overlay.css">
+    <script src="/js/vote-overlay-engine.js"></script>
+    <style>
+        html, body, #root { background: transparent !important; margin: 0; padding: 0; overflow: hidden; width: 100%; height: 100%; }
+        body { scrollbar-width: none; }
+        body::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="tcvo-page">
+    <div id="root"></div>
+    <script>
+    (function () {
+        const api = window.TokControlVoteOverlay;
+        const root = document.getElementById('root');
+        const params = new URLSearchParams(location.search);
+        const widget = window.__TC_WIDGET__ || {};
+        let token = params.get('token') || params.get('cid') || widget.cid || '';
+        const accessKey = params.get('key') || params.get('ovt') || '';
+        const customServer = params.get('serverUrl');
+        const w = parseInt(params.get('w'), 10) || 0;
+        const h = parseInt(params.get('h'), 10) || 0;
+        const aspect = (w && h)
+            ? (h > w * 1.2 ? '9-16' : (Math.abs(w - h) < 40 ? '1-1' : (w / h < 1.5 ? '4-3' : '16-9')))
+            : (window.innerHeight > window.innerWidth * 1.15 ? '9-16' : '16-9');
+
+        const engine = api.create(root, { preview: false });
+        engine.setAspect(aspect);
+
+        let socket = null;
+        let destroyed = false;
+        let backoff = [1000, 2000, 5000, 10000, 30000];
+        let attempt = 0;
+        let reconnectTimer = null;
+        let lastPayload = null;
+
+        function keyOk(payload) {
+            const kit = payload && payload.vote && payload.vote.overlayKit;
+            const need = (kit && kit.accessKey) || '';
+            if (!need) return true;
+            return String(accessKey) === String(need);
+        }
+
+        function applyPayload(payload) {
+            if (!payload || !keyOk(payload)) return;
+            lastPayload = payload;
+            if (payload.overlayState) engine.applyState(payload.overlayState);
+            else engine.applyState(api.buildOverlayState(payload));
+        }
+
+        function cleanupSocket() {
+            if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
+            if (!socket) return;
+            socket.removeAllListeners();
+            socket.close();
+            socket = null;
+        }
+
+        async function ensureToken() {
+            if (token) return token;
+            try {
+                const res = await fetch('/api/overlay/session');
+                const data = await res.json();
+                if (data && data.success && data.streamToken) token = data.streamToken;
+            } catch (e) { /* keep last frame */ }
+            return token;
+        }
+
+        async function connect() {
+            if (destroyed) return;
+            cleanupSocket();
+            await ensureToken();
+            socket = io(customServer || undefined, { transports: ['websocket', 'polling'], reconnection: false });
+            socket.on('connect', () => {
+                attempt = 0;
+                engine.setConnection(false);
+                if (token) socket.emit('join_overlay', token);
+            });
+            socket.on('overlay_vote_status', applyPayload);
+            socket.on('disconnect', () => scheduleReconnect());
+            socket.on('connect_error', () => scheduleReconnect());
+        }
+
+        function scheduleReconnect() {
+            if (destroyed) return;
+            engine.setConnection(true);
+            const wait = backoff[Math.min(attempt, backoff.length - 1)];
+            attempt += 1;
+            reconnectTimer = setTimeout(connect, wait);
+        }
+
+        window.addEventListener('beforeunload', () => {
+            destroyed = true;
+            cleanupSocket();
+            engine.destroy();
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && (!socket || !socket.connected)) connect();
+        });
+
+        connect();
+        if (!token) engine.applyState(Object.assign({}, api.MOCK_STATE, { overlayVisible: true, status: 'waiting' }));
+    })();
+    </script>
+</body>
+</html>
