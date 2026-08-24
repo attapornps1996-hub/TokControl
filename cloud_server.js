@@ -215,7 +215,7 @@ app.get('/api/features', (_appReq, appRes) => {
 });
 
 app.get('/api/app/version', (_appReq, appRes) => {
-    let version = '2.1.20';
+    let version = '2.1.21';
     try {
         const pkg = require('./package.json');
         version = pkg.version || version;
@@ -1727,7 +1727,7 @@ app.post('/api/browser/event', (_appReq, appRes) => {
 
 const robloxProfileCache = new Map();
 const ROBLOX_CACHE_MS = 60_000;
-const { extractTikTokOwnerProfile } = require('./tiktok_profile');
+const { extractTikTokOwnerProfile, fillMissingAvatar, resolveStreamerProfile } = require('./tiktok_profile');
 const { resolveTikTokRoomId } = require('./tiktok_room_resolve');
 const tiktokProfileCache = new Map();
 const TIKTOK_PROFILE_CACHE_MS = 60_000;
@@ -1748,36 +1748,37 @@ app.get('/api/tiktok/profile', async (appReq, appRes) => {
             appRes.status(400).json({ error: 'username required' });
             return;
         }
-        if (!WebcastPushConnection) {
-            appRes.status(503).json({ error: 'TikTok connector ยังไม่พร้อม' });
-            return;
-        }
         const cacheKey = username.toLowerCase();
         const cached = tiktokProfileCache.get(cacheKey);
-        if (cached && Date.now() - cached.at < TIKTOK_PROFILE_CACHE_MS) {
+        if (cached && Date.now() - cached.at < TIKTOK_PROFILE_CACHE_MS && cached.data?.avatarUrl) {
             appRes.json(cached.data);
             return;
         }
 
-        const conn = new WebcastPushConnection(username, { enableExtendedGiftInfo: false, fetchRoomInfoOnConnect: false });
-        let roomInfo = null;
+        let profile = { username, displayName: username, avatarUrl: '', followerCount: 0, followingCount: 0 };
         try {
-            roomInfo = await conn.getRoomInfo();
-        } catch (err) {
-            try {
-                const state = await conn.connect();
-                roomInfo = state?.roomInfo || await conn.getRoomInfo().catch(() => null);
-            } catch (e2) {
-                throw err;
-            } finally {
-                try { conn.disconnect(); } catch (_) {}
+            for (const conn of Object.values(activeTikTokConnections || {})) {
+                if (String(conn?.username || '').toLowerCase() !== cacheKey) continue;
+                let ri = null;
+                try { ri = await conn.getRoomInfo(); } catch (e) {}
+                if (ri) profile = extractTikTokOwnerProfile(ri, username);
+                if (!profile.username) profile.username = username;
+                if (conn.avatar && !profile.avatarUrl) profile.avatarUrl = conn.avatar;
+                if (conn.nickname && (!profile.displayName || profile.displayName === username)) {
+                    profile.displayName = conn.nickname;
+                }
+                break;
             }
-        }
+        } catch (e) {}
 
-        const profile = extractTikTokOwnerProfile(roomInfo, username);
+        await fillMissingAvatar(profile, username);
         if (!profile.username) profile.username = username;
-        tiktokProfileCache.set(cacheKey, { at: Date.now(), data: profile });
-        appRes.json(profile);
+        if (profile.avatarUrl) {
+            tiktokProfileCache.set(cacheKey, { at: Date.now(), data: profile });
+            appRes.json(profile);
+            return;
+        }
+        appRes.status(502).json({ error: 'ไม่สามารถดึงโปรไฟล์ TikTok ได้ (อาจออฟไลน์หรือ username ผิด)' });
     } catch (err) {
         console.error('[tiktok/profile]', err?.message || err);
         appRes.status(502).json({ error: 'ไม่สามารถดึงโปรไฟล์ TikTok ได้ (อาจออฟไลน์หรือ username ผิด)' });
@@ -2055,6 +2056,23 @@ io.on('connection', (socket) => {
         if (mode === 'browser') {
             socket.emit('tiktok_status', { connected: true, isLive: false, username, integrationMode: 'browser' });
             io.to(token).emit('tiktok_notification', { type: 'standby', username });
+            resolveStreamerProfile(username, null, '', null).then((profile) => {
+                if (!profile?.avatarUrl) return;
+                const payload = {
+                    connected: true,
+                    isLive: false,
+                    username,
+                    nickname: profile.displayName || username,
+                    displayName: profile.displayName || username,
+                    avatar: profile.avatarUrl,
+                    avatarUrl: profile.avatarUrl,
+                    followerCount: profile.followerCount,
+                    followingCount: profile.followingCount,
+                    integrationMode: 'browser'
+                };
+                socket.emit('tiktok_status', payload);
+                io.to(token).emit('tiktok_status', payload);
+            }).catch(() => {});
             return;
         }
 
@@ -2074,6 +2092,26 @@ io.on('connection', (socket) => {
 
             socket.emit('tiktok_status', { connected: true, isLive: false, username, integrationMode: 'direct' });
             io.to(token).emit('tiktok_notification', { type: 'standby', username });
+            resolveStreamerProfile(username, null, '', tiktokConnect).then((profile) => {
+                if (!profile?.avatarUrl) return;
+                if (activeTikTokConnections[userId] !== tiktokConnect) return;
+                tiktokConnect.avatar = profile.avatarUrl;
+                tiktokConnect.nickname = profile.displayName || username;
+                const payload = {
+                    connected: true,
+                    isLive: !!tiktokConnect.isLive,
+                    username,
+                    nickname: profile.displayName || username,
+                    displayName: profile.displayName || username,
+                    avatar: profile.avatarUrl,
+                    avatarUrl: profile.avatarUrl,
+                    followerCount: profile.followerCount,
+                    followingCount: profile.followingCount,
+                    integrationMode: 'direct'
+                };
+                socket.emit('tiktok_status', payload);
+                io.to(token).emit('tiktok_status', payload);
+            }).catch(() => {});
 
             let retryInterval = null;
             let connectInFlight = false;
@@ -2128,19 +2166,23 @@ io.on('connection', (socket) => {
                     }
                     emitLiveStatus({ roomId: state?.roomId || roomIdHint || null });
                     try {
-                        const roomInfo = await tiktokConnect.getRoomInfo();
-                        const profile = extractTikTokOwnerProfile(roomInfo, username);
-                        const avatar = profile.avatarUrl || roomInfo.owner?.avatar_large?.url_list[0] || '';
-                        const nickname = profile.displayName || roomInfo.owner?.nickname || username;
-                        emitLiveStatus({
-                            nickname,
-                            avatar,
-                            displayName: nickname,
-                            avatarUrl: avatar,
-                            followerCount: profile.followerCount,
-                            followingCount: profile.followingCount,
-                            roomId: state?.roomId || roomIdHint || null
-                        });
+                        const roomInfo = await tiktokConnect.getRoomInfo().catch(() => null);
+                        const profile = await resolveStreamerProfile(username, roomInfo, tiktokConnect.avatar, tiktokConnect);
+                        const avatar = profile.avatarUrl || '';
+                        const nickname = profile.displayName || username;
+                        if (avatar) {
+                            tiktokConnect.avatar = avatar;
+                            tiktokConnect.nickname = nickname;
+                            emitLiveStatus({
+                                nickname,
+                                avatar,
+                                displayName: nickname,
+                                avatarUrl: avatar,
+                                followerCount: profile.followerCount,
+                                followingCount: profile.followingCount,
+                                roomId: state?.roomId || roomIdHint || null
+                            });
+                        }
                     } catch (_) {}
                 })().catch(err => {
                     const msg = String(err?.message || err || '');

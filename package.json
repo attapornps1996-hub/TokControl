@@ -1,7 +1,7 @@
 {
   "name": "pandy-app",
-  "version": "2.1.20",
-  "displayVersion": "2.1.20",
+  "version": "2.1.21",
+  "displayVersion": "2.1.21",
   "main": "main.js",
   "repository": {
     "type": "git",

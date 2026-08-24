@@ -46,6 +46,72 @@
         return '';
     }
 
+    function proxyAeMediaUrl(url) {
+        const raw = String(url || '').trim();
+        if (!raw) return '';
+        if (raw.startsWith('/api/emotes/proxy') || raw.startsWith('data:') || raw.startsWith('/')) return raw;
+        if (window.ChannelEmotes && typeof ChannelEmotes.proxyUrl === 'function' && /^https?:\/\//i.test(raw)) {
+            return ChannelEmotes.proxyUrl(raw);
+        }
+        if (/^https?:\/\//i.test(raw) && /tiktokcdn|byteimg|ibyteimg|musically|tiktokv|bytedance|byteoversea/i.test(raw)) {
+            return '/api/emotes/proxy?url=' + encodeURIComponent(raw);
+        }
+        return raw;
+    }
+
+    function isAeImageUrl(url) {
+        const s = String(url || '').trim();
+        return /^(https?:|data:|\/\/|\/)/i.test(s) && !/dicebear\.com/i.test(s);
+    }
+
+    function resolveAeGiftIcon(giftId, giftName, stored) {
+        if (isAeImageUrl(stored)) return String(stored).trim();
+        if (window.GiftIconHelper && typeof GiftIconHelper.findInCatalog === 'function') {
+            const fromCat = GiftIconHelper.findInCatalog(giftId, giftName);
+            if (fromCat) return fromCat;
+        }
+        const g = (typeof popularGifts !== 'undefined' ? popularGifts : []).find((x) =>
+            String(x.giftId) === String(giftId)
+            || (giftName && String(x.name || x.giftName || '').toLowerCase() === String(giftName).toLowerCase())
+        );
+        const icon = g?.icon || g?.giftIcon || '';
+        return isAeImageUrl(icon) ? icon : '';
+    }
+
+    function resolveAeGiftName(giftId, storedName) {
+        if (storedName && !/^\d{8,}$/.test(String(storedName))) return String(storedName);
+        const g = (typeof popularGifts !== 'undefined' ? popularGifts : []).find((x) => String(x.giftId) === String(giftId));
+        if (g?.name || g?.giftName) return g.name || g.giftName;
+        if (window.GiftIconHelper && typeof GiftIconHelper.getCatalog === 'function') {
+            const hit = GiftIconHelper.getCatalog().find((x) => String(x.giftId) === String(giftId));
+            if (hit?.giftName) return hit.giftName;
+        }
+        return storedName || giftId || '';
+    }
+
+    function resolveAeSticker(emoteId, storedIcon, storedName) {
+        const em = window.ChannelEmotes?.find?.(emoteId) || null;
+        const icon = isAeImageUrl(storedIcon) ? storedIcon : (em?.displayUrl || em?.imageUrl || '');
+        const name = (storedName && !/^\d{10,}$/.test(String(storedName)))
+            ? storedName
+            : (window.ChannelEmotes?.getDisplayName?.(em, emoteId) || em?.name || storedName || emoteId || '');
+        return { icon, name, em };
+    }
+
+    function aeTriggerThumbHtml(ev) {
+        const t = TRIGGER_TYPES[ev.triggerType] || { emoji: '⚡', label: ev.triggerType };
+        let img = '';
+        if (ev.triggerType === 'gift') {
+            img = proxyAeMediaUrl(resolveAeGiftIcon(ev.triggerValue, ev.giftName, ev.giftIcon));
+        } else if (ev.triggerType === 'sticker') {
+            img = proxyAeMediaUrl(resolveAeSticker(ev.triggerValue, ev.emoteIcon, ev.emoteName).icon);
+        }
+        if (img) {
+            return `<img class="ae-trigger-thumb" src="${escapeHtml(img)}" alt="" referrerpolicy="no-referrer" loading="lazy" onerror="this.style.display='none';var f=this.nextElementSibling;if(f)f.style.display='inline';"><span class="ae-trigger-icon ae-keep-emoji" style="display:none">${escapeHtml(t.emoji || '⚡')}</span>`;
+        }
+        return `<span class="ae-trigger-icon ae-keep-emoji">${escapeHtml(t.emoji || '⚡')}</span>`;
+    }
+
     const DEFAULT_KEYSTROKE = {
         sequence: '',
         ctrl: false,
@@ -1183,16 +1249,13 @@
         }).join('');
     }
 
-    function getEventTriggerLabel(ev) {
-        const t = TRIGGER_TYPES[ev.triggerType] || { emoji: '⚡', label: ev.triggerType };
+    function getEventTriggerDetail(ev) {
         let detail = ev.triggerValue || '';
         if (ev.triggerType === 'gift' && detail) {
-            const g = (typeof popularGifts !== 'undefined' ? popularGifts : []).find((x) => String(x.giftId) === detail);
-            if (g) detail = g.name || g.giftName || detail;
+            detail = resolveAeGiftName(detail, ev.giftName);
         }
         if (ev.triggerType === 'sticker' && detail) {
-            const em = window.ChannelEmotes?.find?.(detail) || window.ChannelEmotes?.getList?.()?.find((e) => String(e.id) === detail);
-            if (em) detail = em.name || detail;
+            detail = resolveAeSticker(detail, ev.emoteIcon, ev.emoteName).name;
         }
         if (ev.triggerType === 'like' && detail) detail = `${detail}+ ไลค์ / ครั้ง`;
         if (ev.triggerType === 'totallikes' && detail) {
@@ -1203,6 +1266,12 @@
             const mode = ev.coinFireMode === 'multiply' ? 'คูณตามเหรียญ' : (ev.coinFireMode === 'exact' ? 'ตรงเป๊ะ' : 'ครั้งละ 1');
             detail = `${detail} 🪙 · ${mode}`;
         }
+        return detail;
+    }
+
+    function getEventTriggerLabel(ev) {
+        const t = TRIGGER_TYPES[ev.triggerType] || { emoji: '⚡', label: ev.triggerType };
+        const detail = getEventTriggerDetail(ev);
         return `${t.emoji || ''} ${t.label}${detail ? ': ' + detail : ''}`.trim();
     }
 
@@ -1260,11 +1329,11 @@
                     </div>
                 </div>
                 <div class="ae-event-flow">
-                    <div class="ae-event-trigger-box ae-keep-emoji">
-                        <span class="ae-trigger-icon">${escapeHtml(t.emoji || '⚡')}</span>
+                    <div class="ae-event-trigger-box ae-keep-emoji" data-keep-emoji>
+                        ${aeTriggerThumbHtml(ev)}
                         <div>
-                            <div class="ae-trigger-type">${escapeHtml((t.emoji ? t.emoji + ' ' : '') + t.label)}</div>
-                            <div class="ae-trigger-val">${escapeHtml(getEventTriggerLabel(ev))}</div>
+                            <div class="ae-trigger-type">${escapeHtml(t.label)}</div>
+                            <div class="ae-trigger-val">${escapeHtml(getEventTriggerDetail(ev) || t.label)}</div>
                         </div>
                     </div>
                     <div class="ae-event-arrow">→</div>
@@ -1348,6 +1417,12 @@
         renderAeEventsList();
         startAeTimerLoop();
         saveActionsEventsToServer();
+        if (window.GiftIconHelper && typeof GiftIconHelper.loadGiftCatalog === 'function') {
+            GiftIconHelper.loadGiftCatalog().then(() => renderAeEventsList()).catch(() => {});
+        }
+        if (window.ChannelEmotes && typeof ChannelEmotes.load === 'function') {
+            ChannelEmotes.load().then(() => renderAeEventsList()).catch(() => {});
+        }
     }
 
     async function refreshActionsEventsAfterCatalog() {
@@ -1581,9 +1656,9 @@
             return;
         }
         if (typeof showCustomMsg === 'function') {
-            showCustomMsg('info', 'ทดสอบคีย์', 'จะส่งคีย์ใน 2 วินาที — สลับไปหน้าต่างเกม/แอปเป้าหมาย');
+            showCustomMsg('info', 'ทดสอบคีย์', 'จะส่งคีย์ใน 5 วินาที — สลับไปหน้าต่างเกม/แอปเป้าหมาย');
         }
-        await new Promise((r) => setTimeout(r, 2000));
+        await new Promise((r) => setTimeout(r, 5000));
         await runAeKeystrokes(opts);
     }
 
@@ -1916,9 +1991,9 @@
         const action = getAeStore().actions[id];
         if (action && action.media && action.media.keystroke) {
             if (typeof showCustomMsg === 'function') {
-                showCustomMsg('info', 'ทดสอบคีย์', 'จะส่งคีย์ใน 2 วินาที — สลับไปหน้าต่างเกม/แอปเป้าหมาย');
+                showCustomMsg('info', 'ทดสอบคีย์', 'จะส่งคีย์ใน 5 วินาที — สลับไปหน้าต่างเกม/แอปเป้าหมาย');
             }
-            await new Promise((r) => setTimeout(r, 2000));
+            await new Promise((r) => setTimeout(r, 5000));
         }
         playAction(id, { test: true });
     }
@@ -1976,11 +2051,13 @@
             preview.style.display = 'none';
             return;
         }
-        const g = (typeof popularGifts !== 'undefined' ? popularGifts : []).find((x) => String(x.giftId) === String(val));
-        const name = g?.name || g?.giftName || val;
-        const icon = g?.icon ? `<img src="${escapeHtml(g.icon)}" alt="">` : aeIco('gift', 18);
+        const name = resolveAeGiftName(val, aeEventDraft.giftName);
+        const iconUrl = proxyAeMediaUrl(resolveAeGiftIcon(val, name, aeEventDraft.giftIcon));
+        const icon = iconUrl
+            ? `<img src="${escapeHtml(iconUrl)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">`
+            : aeIco('gift', 18);
         preview.style.display = 'flex';
-        preview.innerHTML = `${icon}<span>${escapeHtml(name)}</span><small>ID: ${escapeHtml(String(val))}</small>`;
+        preview.innerHTML = `${icon}<span>${escapeHtml(name)}</span>`;
     }
 
     function openEventEditorModal(id) {
@@ -2116,13 +2193,12 @@
             preview.innerHTML = '<span class="ae-sticker-empty">ยังไม่ได้เลือกสติกเกอร์</span>';
             return;
         }
-        const em = window.ChannelEmotes?.find?.(val)
-            || (window.ChannelEmotes?.getList?.() || []).find((e) => String(e.id) === String(val) || String(e.name) === String(val));
-        const name = em?.name || val;
-        const img = em?.displayUrl || em?.imageUrl
-            ? `<img src="${escapeHtml(em.displayUrl || em.imageUrl)}" alt="">`
+        const info = resolveAeSticker(val, aeEventDraft.emoteIcon, aeEventDraft.emoteName);
+        const src = proxyAeMediaUrl(info.icon);
+        const img = src
+            ? `<img src="${escapeHtml(src)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">`
             : '💖';
-        preview.innerHTML = `${img}<span>${escapeHtml(name)}</span><small>ID: ${escapeHtml(String(val))}</small>`;
+        preview.innerHTML = `${img}<span>${escapeHtml(info.name)}</span>`;
     }
 
     function onAeEventTriggerTypeChange() {
@@ -2196,11 +2272,13 @@
         }
     }
 
-    function onAeGiftPicked(giftId, giftName) {
+    function onAeGiftPicked(giftId, giftName, giftIcon) {
         if (aeGiftPickerFor === 'event') {
             const valEl = document.getElementById('aeEventTriggerValue');
             if (valEl) valEl.value = giftId;
             aeEventDraft.triggerValue = String(giftId);
+            aeEventDraft.giftName = giftName || resolveAeGiftName(giftId, '');
+            aeEventDraft.giftIcon = giftIcon || resolveAeGiftIcon(giftId, aeEventDraft.giftName, '');
             updateAeEventGiftPreview();
         }
         closeAeGiftPickerModal();
@@ -2215,7 +2293,11 @@
             picker.open({
                 title: '🎁 เลือกของขวัญสำหรับ Events',
                 selectedId,
-                onSelect: (gift) => onAeGiftPicked(String(gift.giftId), gift.giftName || String(gift.giftId))
+                onSelect: (gift) => onAeGiftPicked(
+                    String(gift.giftId),
+                    gift.giftName || String(gift.giftId),
+                    gift.icon || gift.giftIcon || gift.giftPictureUrl || ''
+                )
             });
             return;
         }
@@ -2247,7 +2329,8 @@
         grid.innerHTML = filtered.map((g) => {
             const id = String(g.giftId);
             const name = escapeHtml(g.name || g.giftName || id);
-            const icon = g.icon ? `<img src="${escapeHtml(g.icon)}" alt="" onerror="this.style.display='none'">` : aeIco('gift', 18);
+            const iconUrl = proxyAeMediaUrl(g.icon || g.giftIcon || '');
+            const icon = iconUrl ? `<img src="${escapeHtml(iconUrl)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : aeIco('gift', 18);
             const cost = Number(g.cost || g.diamondCount) || 0;
             return `<button type="button" class="ae-gift-pick ae-keep-emoji" onclick="onAeGiftPicked('${escapeHtml(id)}','${name}')">${icon}<span>${name}</span><small class="ae-gift-pick-cost">${cost} 🪙</small></button>`;
         }).join('') || '<div class="ae-picker-empty">ไม่พบของขวัญ</div>';
@@ -2269,6 +2352,7 @@
             renderAeStickerPickerGrid(document.getElementById('aeStickerPickerSearch')?.value || '');
         }
         if (aeEventDraft.triggerType === 'sticker') updateAeEventStickerPreview();
+        renderAeEventsList();
     });
 
     function closeAeStickerPickerModal() {
@@ -2299,8 +2383,8 @@
         grid.innerHTML = filtered.map((e) => {
             const id = escapeHtml(String(e.id || ''));
             const name = escapeHtml(e.name || id);
-            const src = escapeHtml(e.displayUrl || e.imageUrl || '');
-            const img = src ? `<img src="${src}" alt="" onerror="this.style.display='none'">` : '💖';
+            const src = escapeHtml(proxyAeMediaUrl(e.displayUrl || e.imageUrl || ''));
+            const img = src ? `<img src="${src}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : '💖';
             const kind = e.type === 'sticker' ? 'สติกเกอร์' : 'อิโมจิ';
             return `<button type="button" class="ae-sticker-pick" onclick="onAeStickerPicked('${id}')">${img}<span>${name}</span><small>${kind}</small></button>`;
         }).join('');
@@ -2310,7 +2394,10 @@
         if (aeStickerPickerFor === 'event') {
             const valEl = document.getElementById('aeEventTriggerValue');
             if (valEl) valEl.value = stickerId;
+            const info = resolveAeSticker(stickerId, '', '');
             aeEventDraft.triggerValue = String(stickerId);
+            aeEventDraft.emoteName = info.name || '';
+            aeEventDraft.emoteIcon = info.em?.imageUrl || info.em?.displayUrl || info.icon || '';
             updateAeEventStickerPreview();
         }
         closeAeStickerPickerModal();
@@ -2374,6 +2461,23 @@
         }
         if (nextEvent.triggerType === 'coins' && !nextEvent.triggerValue) nextEvent.triggerValue = '1';
         if (nextEvent.triggerType === 'totallikes' && !nextEvent.triggerValue) nextEvent.triggerValue = '100';
+        if (nextEvent.triggerType === 'gift') {
+            nextEvent.giftName = aeEventDraft.giftName || resolveAeGiftName(nextEvent.triggerValue, nextEvent.giftName);
+            nextEvent.giftIcon = aeEventDraft.giftIcon || resolveAeGiftIcon(nextEvent.triggerValue, nextEvent.giftName, nextEvent.giftIcon);
+            delete nextEvent.emoteIcon;
+            delete nextEvent.emoteName;
+        } else if (nextEvent.triggerType === 'sticker') {
+            const info = resolveAeSticker(nextEvent.triggerValue, aeEventDraft.emoteIcon || nextEvent.emoteIcon, aeEventDraft.emoteName || nextEvent.emoteName);
+            nextEvent.emoteName = info.name;
+            nextEvent.emoteIcon = info.em?.imageUrl || info.icon || nextEvent.emoteIcon || '';
+            delete nextEvent.giftIcon;
+            delete nextEvent.giftName;
+        } else {
+            delete nextEvent.giftIcon;
+            delete nextEvent.giftName;
+            delete nextEvent.emoteIcon;
+            delete nextEvent.emoteName;
+        }
         if (!nextEvent.actionIds.length) {
             if (typeof showCustomMsg === 'function') showCustomMsg('error', 'เลือกอย่างน้อย 1 แอคชั่น');
             return;

@@ -254,6 +254,15 @@
         input:checked + .slider { background: #bc13fe; border-color: #fff; }
         input:checked + .slider:before { transform: translateX(20px); }
         .field-label { font-size: 0.7rem; color: #aaa; margin-bottom: 8px; display: block; font-weight: 800; letter-spacing: 0.04em; font-family: 'Kanit', sans-serif; }
+        .auto-spin-trigger-warn {
+            display: block;
+            color: #ff0050;
+            font-size: 0.75rem;
+            font-weight: 800;
+            font-family: 'Kanit', sans-serif;
+            line-height: 1.4;
+            margin: 0 0 10px;
+        }
 
         .gacha-section {
             background: radial-gradient(circle at center, #1c1c30 0%, transparent 100%);
@@ -594,13 +603,14 @@
                             </div>
                             <div class="wheel-set-block">
                                 <span class="field-label" style="color:#ff0050;">🤖 สุ่มอัตโนมัติเมื่อได้ของขวัญ</span>
-                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
                                     <span style="font-size:0.8rem; color:#aaa; font-family:'Kanit',sans-serif;">Auto Spin on Gift</span>
                                     <label class="switch">
                                         <input type="checkbox" id="wheelAutoDrawToggle" onchange="toggleWheelAutoDraw(this.checked)">
                                         <span class="slider"></span>
                                     </label>
                                 </div>
+                                <span class="auto-spin-trigger-warn">เปิด ถ้าอยากสุ่มทุกทริกเกอร์</span>
                                 <button class="btn-sm" style="width:100%; background:rgba(188,19,254,0.15); border-color:#bc13fe; color:#bc13fe;" onclick="openWheelGiftRules()">🎁 ตั้งค่าแอคชั่นของขวัญ (Gift Rules)</button>
                             </div>
                             <div class="obs-copy-area wheel-set-block" style="flex-direction:column; align-items:stretch;">
@@ -642,10 +652,10 @@
                                     <table style="min-width:600px;">
                     <thead>
                         <tr>
-                                                <th>Mode</th>
+                                                <th>Mode<br><span style="font-size:0.62rem;font-weight:600;color:#888;text-transform:none;">WIN +/−</span></th>
                                                 <th style="text-align:center;">Color</th>
                                                 <th>Images</th>
-                                                <th>Value</th>
+                                                <th>รางวัล<br><span style="font-size:0.62rem;font-weight:600;color:#888;text-transform:none;">ชื่อ หรือตัวเลข</span></th>
                                                 <th>Prob.</th>
                                                 <th></th>
                         </tr>
@@ -981,6 +991,11 @@
         function openWheelGiftRules() {
             try { window.parent.openGiftMappingModal('wheel'); } catch (e) { showToast('เปิดหน้าตั้งค่าของขวัญไม่ได้', 'error'); }
         }
+
+        function getWheelCatalog() {
+            return (wheels || []).map((w) => ({ id: w.id, name: w.name || ('Wheel ' + w.id) }));
+        }
+        window.getWheelCatalog = getWheelCatalog;
 
         function toggleWheelWinLinkFromPage() {
             try { window.parent.postMessage({ type: 'pandy_toggle_wheel_win_link' }, '*'); } catch (e) {}
@@ -2027,7 +2042,7 @@
                             </div>
                         </td>
                         <td>
-                            <input type="text" value="${item.val}" class="input-style" style="width:100%; box-sizing:border-box;" placeholder="e.g. 100 or Sword" onfocus="this.select()" oninput="cleanInput(this, ${idx}, 'val')">
+                            <input type="text" value="${String(item.val ?? '').replace(/"/g, '&quot;')}" class="input-style" style="width:100%; box-sizing:border-box;" placeholder="เช่น 100 หรือ ดาบ" onfocus="this.select()" oninput="cleanInput(this, ${idx}, 'val')">
                         </td>
                         <td>
                             <div style="display:flex; align-items:center; gap:8px;">
@@ -2424,7 +2439,8 @@
                 sessions: 1,
                 drawsPerSpin: 1,
                 winMode: (opts?.winMode === 'plus' || opts?.winMode === 'minus') ? opts.winMode : null,
-                coins: 0
+                coins: 0,
+                wheelId: opts?.wheelId != null && opts.wheelId !== '' ? opts.wheelId : null
             });
             updateWheelQueueUI();
             processWheelQueue();
@@ -2447,6 +2463,13 @@
             const sessionDraws = job.drawsPerSpin ?? getDrawsPerSpin();
             const sessionWinMode = job.winMode;
             const pendingCount = Math.max(1, job.sessions || 1);
+
+            if (job.wheelId != null && job.wheelId !== '') {
+                const found = wheels.find((w) => String(w.id) === String(job.wheelId));
+                if (found && String(activeWheelId) !== String(found.id)) {
+                    switchWheel(found.id);
+                }
+            }
 
             const wheel = wheels.find(w => w.id === activeWheelId);
             if (!wheel || !wheel.items.length) {
@@ -2584,10 +2607,12 @@
                         || (parseInt(e.data.sessions || e.data.count, 10) || 1) * (parseInt(e.data.drawsPerSpin, 10) || 1)
                         || 1
                     ));
+                    const targetWheelId = e.data.wheelId != null && e.data.wheelId !== '' ? e.data.wheelId : null;
                     for (let i = 0; i < rounds; i++) {
                         enqueueWheelTriggerJob({
                             winMode: e.data.winMode,
-                            coins: 0
+                            coins: 0,
+                            wheelId: targetWheelId
                         });
                     }
                 }

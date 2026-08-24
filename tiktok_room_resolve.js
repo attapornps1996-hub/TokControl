@@ -68,6 +68,67 @@ function extractLiveStatusFromHtml(body) {
     return m ? Number(m[1]) : null;
 }
 
+function unescapeTikTokUrl(raw) {
+    return String(raw || '')
+        .replace(/\\u002[fF]/g, '/')
+        .replace(/\\\//g, '/')
+        .replace(/&amp;/g, '&')
+        .trim();
+}
+
+function extractAvatarFromHtml(body) {
+    if (!body) return '';
+    const patterns = [
+        /"avatarLarger"\s*:\s*"(https?:[^"]+)"/,
+        /"avatar_larger"\s*:\s*"(https?:[^"]+)"/,
+        /"avatarMedium"\s*:\s*"(https?:[^"]+)"/,
+        /"avatarThumb"\s*:\s*"(https?:[^"]+)"/,
+        /"avatarLarger"\s*:\s*"([^"]+)"/,
+        /"avatar_large"\s*:\s*\{[^}]{0,400}"url_list"\s*:\s*\[\s*"(https?:[^"]+)"/,
+        /property=["']og:image["'][^>]*content=["']([^"']+)["']/i,
+        /content=["']([^"']+)["'][^>]*property=["']og:image["']/i,
+        /"urlList"\s*:\s*\[\s*"(https?:\/\/[^"]+tiktokcdn[^"]+)"/i
+    ];
+    const found = [];
+    for (const re of patterns) {
+        const m = body.match(re);
+        if (!m?.[1]) continue;
+        const url = unescapeTikTokUrl(m[1]);
+        if (/^https?:\/\//i.test(url) && !/default-avatar|placeholder|dicebear/i.test(url)) found.push(url);
+    }
+    return found.find((u) => /avt-|avatar/i.test(u)) || found[0] || '';
+}
+
+function extractNicknameFromHtml(body) {
+    if (!body) return '';
+    const og = body.match(/property=["']og:title["'][^>]*content=["']([^"']+)["']/i)
+        || body.match(/content=["']([^"']+)["'][^>]*property=["']og:title["']/i);
+    if (og?.[1]) {
+        const name = og[1].replace(/\s+is LIVE.*$/i, '').replace(/\s+กำลังไลฟ์.*$/i, '').split('|')[0].split('(@')[0].trim();
+        if (name && !/^tiktok$/i.test(name)) return name;
+    }
+    const nick = body.match(/"nickname"\s*:\s*"([^"]{1,80})"/);
+    return nick?.[1] ? nick[1].trim() : '';
+}
+
+async function scrapeTikTokPublicProfile(username) {
+    const uniqueId = String(username || '').trim().replace(/^@+/, '');
+    if (!uniqueId) return { avatarUrl: '', displayName: '' };
+    const pages = [
+        `https://www.tiktok.com/@${encodeURIComponent(uniqueId)}/live`,
+        `https://www.tiktok.com/@${encodeURIComponent(uniqueId)}`
+    ];
+    for (const url of pages) {
+        try {
+            const page = await httpGet(url);
+            const avatarUrl = extractAvatarFromHtml(page.body);
+            const displayName = extractNicknameFromHtml(page.body);
+            if (avatarUrl || displayName) return { avatarUrl, displayName };
+        } catch (e) { /* next page */ }
+    }
+    return { avatarUrl: '', displayName: '' };
+}
+
 /**
  * Resolve TikTok webcast roomId without relying solely on Euler/sign fallbacks.
  * Mirrors what older TokControl effectively needed: a real room id before WS connect.
@@ -168,5 +229,7 @@ async function resolveTikTokRoomId(username) {
 
 module.exports = {
     resolveTikTokRoomId,
-    extractRoomIdFromHtml
+    extractRoomIdFromHtml,
+    extractAvatarFromHtml,
+    scrapeTikTokPublicProfile
 };

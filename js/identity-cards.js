@@ -27,7 +27,7 @@
         const raw = String(url || '').trim();
         if (!raw) return raw;
         if (raw.startsWith('data:') || raw.startsWith('/') || raw.includes('dicebear.com') || raw.includes('/api/emotes/proxy')) return raw;
-        if (/tiktokcdn|byteimg|ibyteimg|musically|tiktokv|\.tiktok\.com|bytedance/i.test(raw)) {
+        if (/tiktokcdn|byteimg|ibyteimg|ibytedtos|musically|tiktokv|\.tiktok\.com|bytedance|byteoversea/i.test(raw)) {
             return '/api/emotes/proxy?url=' + encodeURIComponent(raw);
         }
         return raw;

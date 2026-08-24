@@ -430,7 +430,7 @@
                 <img src="assets/tokcontrol-icon.png" alt="TokControl" class="app-topbar-logo">
                 <div class="app-topbar-brand-text">
                     <span class="app-topbar-name">TokControl</span>
-                    <span class="app-topbar-ver" id="topbarVersionLabel">v2.1.17</span>
+                    <span class="app-topbar-ver" id="topbarVersionLabel">v2.1.21</span>
                 </div>
             </div>
             <div class="app-topbar-drag" aria-hidden="true"></div>
@@ -825,7 +825,7 @@
             <button type="button" id="btnSidebarProUpgrade" onclick="purchasePro()" class="sidebar-pro-cta">
                 <span class="nav-icon material-symbols-outlined" aria-hidden="true">workspace_premium</span> สมัคร PRO
             </button>
-            <div class="sidebar-version-label" id="sidebarVersionLabel" onclick="openDownloadPage()" title="เปิดหน้าดาวน์โหลด">TokControl v2.1.20</div>
+            <div class="sidebar-version-label" id="sidebarVersionLabel" onclick="openDownloadPage()" title="เปิดหน้าดาวน์โหลด">TokControl v2.1.21</div>
         </div>
     </div>
 
@@ -859,7 +859,7 @@
                         </button>
                     </div>
                     <div class="dash-stream-identity">
-                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Guest&backgroundColor=bc13fe" id="dashAvatar" class="dash-profile-avatar" alt="">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Guest&backgroundColor=bc13fe" id="dashAvatar" class="dash-profile-avatar" alt="" referrerpolicy="no-referrer">
                         <div>
                             <strong id="dashName">ยังไม่เชื่อมต่อไลฟ์</strong>
                             <span id="dashUid">เชื่อมต่อ TikTok Live เพื่อเริ่มใช้งาน</span>
@@ -3200,7 +3200,7 @@
 
         <!-- R.E.P.O. Event Trigger Modal -->
         <div id="gcRepoTriggerModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.75); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
-            <div class="rp-trig-modal-panel" onclick="event.stopPropagation()">
+            <div class="rp-trig-modal-panel ae-keep-emoji" data-keep-emoji onclick="event.stopPropagation()">
                 <div class="rp-trig-modal-head">
                     <h3 style="margin:0 0 6px; color:#fff; font-family:'Kanit'; font-size:1.1rem;" id="rpTrigModalTitle">ทริกเกอร์อีเวนต์</h3>
                     <p style="margin:0; font-size:0.78rem; color:#8b949e;" id="rpTrigModalSubtitle">ตั้งได้หลายทริกเกอร์ต่อ 1 อีเวนต์ — ของขวัญ / ไลค์ / แชร์ ฯลฯ</p>
@@ -3210,7 +3210,7 @@
                     <div id="rpTrigExistingList" class="rp-trigger-list"></div>
 
                     <span class="field-label" style="font-size:0.82rem; color:#fff; font-weight:800; display:block; margin:14px 0 10px; text-transform:none;">Select event trigger:</span>
-                    <div class="rp-trig-type-grid">
+                    <div class="rp-trig-type-grid ae-keep-emoji" data-keep-emoji>
                         <button type="button" class="trigger-btn active" id="rp-trig-type-gift" onclick="selectRepoTriggerType('gift')"><div class="trigger-icon">🎁</div><div class="trigger-name">Gift</div></button>
                         <button type="button" class="trigger-btn" id="rp-trig-type-coins" onclick="selectRepoTriggerType('coins')"><div class="trigger-icon">🪙</div><div class="trigger-name">Coins</div></button>
                         <button type="button" class="trigger-btn" id="rp-trig-type-like" onclick="selectRepoTriggerType('like')"><div class="trigger-icon">❤️</div><div class="trigger-name">Like</div></button>
@@ -3224,7 +3224,7 @@
                     <div id="rpTrigGiftSection" class="gc-field" style="margin-bottom:14px;">
                         <label>เลือกของขวัญ TikTok</label>
                         <div id="rpTrigSelectedGiftChip" class="gp-selected-chip" style="display:none; margin-bottom:10px;"></div>
-                        <button type="button" class="admin-btn admin-btn-accent" style="width:100%;" onclick="openRepoTriggerGiftPicker()">🎁 เลือกของขวัญจากคลัง</button>
+                        <button type="button" class="admin-btn admin-btn-accent" style="width:100%;" onclick="openRepoTriggerGiftPicker()">เลือกของขวัญ</button>
                         <div style="font-size:0.7rem; color:#666; margin-top:8px; text-align:center;">แสดงของขวัญครบทุกราคา — โหลดทีละชุดไม่ให้ค้าง</div>
                     </div>
 
@@ -3277,14 +3277,14 @@
 
         <!-- Box Control Trigger Modal (REPO-style) -->
         <div id="gcMcTriggerModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.75); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;" onclick="if(event.target===this)closeMcTriggerModal()">
-            <div class="rp-trig-modal-panel" onclick="event.stopPropagation()">
+            <div class="rp-trig-modal-panel ae-keep-emoji" data-keep-emoji onclick="event.stopPropagation()">
                 <div class="rp-trig-modal-head">
                     <h3 style="margin:0 0 6px; color:#fff; font-family:'Kanit'; font-size:1.1rem;">ทริกเกอร์ Box Control</h3>
                     <p style="margin:0; font-size:0.78rem; color:#8b949e;">เลือกประเภทเหตุการณ์ → ตั้งเงื่อนไข → เลือกแอ็กชันในเกม</p>
                 </div>
                 <div class="rp-trig-modal-body">
                     <span class="field-label" style="font-size:0.82rem; color:#fff; font-weight:800; display:block; margin-bottom:10px; text-transform:none;">Select event trigger:</span>
-                    <div class="rp-trig-type-grid" id="mcTrigTypeGrid">
+                    <div class="rp-trig-type-grid ae-keep-emoji" id="mcTrigTypeGrid" data-keep-emoji>
                         <button type="button" class="trigger-btn active" data-mc-type="gift" onclick="selectMcTriggerType('gift')"><div class="trigger-icon">🎁</div><div class="trigger-name">Gift</div></button>
                         <button type="button" class="trigger-btn" data-mc-type="coins" onclick="selectMcTriggerType('coins')"><div class="trigger-icon">🪙</div><div class="trigger-name">Coins</div></button>
                         <button type="button" class="trigger-btn" data-mc-type="random" onclick="selectMcTriggerType('random')"><div class="trigger-icon">🎲</div><div class="trigger-name">สุ่ม</div></button>
@@ -3299,7 +3299,7 @@
                     <div id="mcTrigGiftSection" class="gc-field" style="margin-bottom:14px;">
                         <label>เลือกของขวัญ TikTok</label>
                         <div id="mcTrigSelectedGiftChip" class="gp-selected-chip" style="display:none; margin-bottom:10px;"></div>
-                        <button type="button" class="admin-btn admin-btn-accent" style="width:100%;" onclick="openMcTriggerGiftPicker()">🎁 เลือกของขวัญจากคลัง</button>
+                        <button type="button" class="admin-btn admin-btn-accent" style="width:100%;" onclick="openMcTriggerGiftPicker()">เลือกของขวัญ</button>
                     </div>
 
                     <div class="rp-trig-config-box">
@@ -3354,14 +3354,14 @@
 
         <!-- Shared Map Trigger Modal (Farm / Fish / Tower — same as Box Control) -->
         <div id="gcMapTriggerModal" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(0,0,0,0.75); align-items:center; justify-content:center; padding:20px; box-sizing:border-box;" onclick="if(event.target===this)closeMapTriggerModal()">
-            <div class="rp-trig-modal-panel" onclick="event.stopPropagation()">
+            <div class="rp-trig-modal-panel ae-keep-emoji" data-keep-emoji onclick="event.stopPropagation()">
                 <div class="rp-trig-modal-head">
                     <h3 id="mapTrigTitle" style="margin:0 0 6px; color:#fff; font-family:'Kanit'; font-size:1.1rem;">ทริกเกอร์</h3>
                     <p style="margin:0; font-size:0.78rem; color:#8b949e;">เลือกประเภทเหตุการณ์ → ตั้งเงื่อนไข → เลือกแอ็กชันในเกม</p>
                 </div>
                 <div class="rp-trig-modal-body">
                     <span class="field-label" style="font-size:0.82rem; color:#fff; font-weight:800; display:block; margin-bottom:10px; text-transform:none;">Select event trigger:</span>
-                    <div class="rp-trig-type-grid" id="mapTrigTypeGrid">
+                    <div class="rp-trig-type-grid ae-keep-emoji" id="mapTrigTypeGrid" data-keep-emoji>
                         <button type="button" class="trigger-btn active" data-map-type="gift" onclick="selectMapTriggerType('gift')"><div class="trigger-icon">🎁</div><div class="trigger-name">Gift</div></button>
                         <button type="button" class="trigger-btn" data-map-type="coins" onclick="selectMapTriggerType('coins')"><div class="trigger-icon">🪙</div><div class="trigger-name">Coins</div></button>
                         <button type="button" class="trigger-btn" data-map-type="random" onclick="selectMapTriggerType('random')"><div class="trigger-icon">🎲</div><div class="trigger-name">สุ่ม</div></button>
@@ -3376,7 +3376,7 @@
                     <div id="mapTrigGiftSection" class="gc-field" style="margin-bottom:14px;">
                         <label>เลือกของขวัญ TikTok</label>
                         <div id="mapTrigSelectedGiftChip" class="gp-selected-chip" style="display:none; margin-bottom:10px;"></div>
-                        <button type="button" class="admin-btn admin-btn-accent" style="width:100%;" onclick="openMapTriggerGiftPicker()">🎁 เลือกของขวัญจากคลัง</button>
+                        <button type="button" class="admin-btn admin-btn-accent" style="width:100%;" onclick="openMapTriggerGiftPicker()">เลือกของขวัญ</button>
                     </div>
 
                     <div class="rp-trig-config-box">
@@ -3626,7 +3626,7 @@
                             <span class="gacha-card-title">ควบคุมด่วน</span>
                         </div>
                         <div class="gacha-quick-block">
-                            <span class="gacha-field-label">🤖 สุ่มอัตโนมัติเมื่อได้ของขวัญ</span>
+                            <span class="gacha-field-label gacha-field-label--warn">🤖 สุ่มอัตโนมัติเมื่อได้ของขวัญ</span>
                             <div class="gacha-toggle-row">
                                 <span>Auto Draw on Gift</span>
                                 <label class="switch">
@@ -3634,6 +3634,7 @@
                                     <span class="slider"></span>
                                 </label>
                             </div>
+                            <span class="auto-spin-trigger-warn">เปิด ถ้าอยากสุ่มทุกทริกเกอร์</span>
                             <button type="button" class="gacha-action-btn" onclick="openGiftMappingModal()">🎁 Gift Rules</button>
                         </div>
                         <div class="gacha-quick-block">
@@ -3712,6 +3713,7 @@
                                     <div class="gacha-settings-hint">ตั้งค่าหลักอยู่ที่แท็บ Draw (ควบคุมด่วน) — ใช้แท็บนี้สำหรับระบบควบคุมเพิ่มเติม</div>
                                     <div class="gacha-set-block">
                                         <span class="field-label" style="color:#ff0050;">🤖 สุ่มอัตโนมัติเมื่อได้ของขวัญ</span>
+                                        <span class="auto-spin-trigger-warn">เปิด ถ้าอยากสุ่มทุกทริกเกอร์</span>
                                         <button type="button" class="gacha-action-btn" onclick="openGiftMappingModal()">🎁 ตั้งค่าแอคชั่นของขวัญ (Gift Rules)</button>
                                     </div>
                                     <div class="gacha-set-block">
@@ -8166,27 +8168,45 @@
                 <div id="giftMappingContextBadge" style="display:inline-flex; align-items:center; gap:8px; background:rgba(188,19,254,0.12); border:1px solid rgba(188,19,254,0.35); color:#bc13fe; font-weight:800; font-size:0.8rem; padding:6px 14px; border-radius:20px; margin-bottom:14px; font-family:'Kanit',sans-serif;">
                     🎰 ตั้งค่าสำหรับ: กาชา (Gacha)
                 </div>
-                <span class="field-label" style="font-size: 0.9rem; color:#fff; font-weight:800; display:block; margin-bottom:12px; text-transform:none;">Select event trigger:</span>
-                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px;">
-                    <button class="trigger-btn active" id="trigger-gift" onclick="selectTrigger('gift', '🎁 Gift')"><div class="trigger-icon">🎁</div><div class="trigger-name">Gift</div></button>
-                    <button class="trigger-btn" id="trigger-coins" onclick="selectTrigger('coins', '🪙 Coins')"><div class="trigger-icon">🪙</div><div class="trigger-name">Coins</div></button>
-                    <button class="trigger-btn" id="trigger-like" onclick="selectTrigger('like', '❤️ Like')"><div class="trigger-icon">❤️</div><div class="trigger-name">Like</div></button>
-                    <button class="trigger-btn" id="trigger-globallikes" onclick="selectTrigger('globallikes', '💖 Global Likes')"><div class="trigger-icon">💖</div><div class="trigger-name">Global Likes</div></button>
-                    <button class="trigger-btn" id="trigger-follow" onclick="selectTrigger('follow', '👤 Follow')"><div class="trigger-icon">👤</div><div class="trigger-name">Follow</div></button>
-                    <button class="trigger-btn" id="trigger-subscribe" onclick="selectTrigger('subscribe', '⭐ Subscribe')"><div class="trigger-icon">⭐</div><div class="trigger-name">Subscribe</div></button>
-                    <button class="trigger-btn" id="trigger-share" onclick="selectTrigger('share', '🔗 Share')"><div class="trigger-icon">🔗</div><div class="trigger-name">Share</div></button>
-                    <button class="trigger-btn" id="trigger-join" onclick="selectTrigger('join', '🚪 Join')"><div class="trigger-icon">🚪</div><div class="trigger-name">Join</div></button>
+                <label class="ae-field-label" style="color:#fff; font-size:0.9rem; margin-bottom:12px;">⚡ อะไรเป็นทริกเกอร์?</label>
+                <div class="ae-trigger-tile-grid ae-keep-emoji" id="wheelTriggerChips" style="margin-bottom:16px;">
+                    <button type="button" class="ae-trigger-tile" id="trigger-join" data-val="join" onclick="selectTrigger('join')"><span>👋</span><strong>เข้าห้องไลฟ์</strong></button>
+                    <button type="button" class="ae-trigger-tile" id="trigger-share" data-val="share" onclick="selectTrigger('share')"><span>🔁</span><strong>แชร์ไลฟ์</strong></button>
+                    <button type="button" class="ae-trigger-tile" id="trigger-follow" data-val="follow" onclick="selectTrigger('follow')"><span>➕</span><strong>ติดตาม</strong></button>
+                    <button type="button" class="ae-trigger-tile" id="trigger-like" data-val="like" onclick="selectTrigger('like')"><span>❤️</span><strong>ไลค์</strong></button>
+                    <button type="button" class="ae-trigger-tile" id="trigger-totallikes" data-val="totallikes" onclick="selectTrigger('totallikes')"><span>💯</span><strong>กดไลค์รวม</strong></button>
+                    <button type="button" class="ae-trigger-tile" id="trigger-coins" data-val="coins" onclick="selectTrigger('coins')"><span>🪙</span><strong>เหรียญขั้นต่ำ</strong></button>
+                    <button type="button" class="ae-trigger-tile active" id="trigger-gift" data-val="gift" onclick="selectTrigger('gift')"><span>🎁</span><strong>ของขวัญเฉพาะ</strong></button>
+                    <button type="button" class="ae-trigger-tile" id="trigger-subscribe" data-val="subscribe" onclick="selectTrigger('subscribe')"><span>⭐</span><strong>สมาชิก</strong></button>
                 </div>
                 <div id="giftSelectorSection" style="margin-bottom: 20px;">
                     <div id="gachaSelectedGiftChip" class="gp-selected-chip" style="display:none; margin-bottom:10px;"></div>
-                    <button type="button" class="admin-btn admin-btn-accent" style="width:100%;" onclick="openGachaGiftPicker()">🎁 เลือกของขวัญจากคลัง</button>
+                    <button type="button" class="admin-btn admin-btn-accent" style="width:100%;" onclick="openGachaGiftPicker()">เลือกของขวัญ</button>
                     <div style="font-size:0.72rem; color:#666; margin-top:8px; text-align:center;">แสดงของขวัญครบทุกราคา — โหลดทีละชุดไม่ให้ค้าง</div>
                 </div>
                 <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius:12px; padding:15px; margin-bottom:20px;">
-                    <div style="font-weight:900; color:#bc13fe; margin-bottom:12px; font-size:0.95rem;" id="activeConfiguringTitle">กำหนดเงื่อนไข: ของขวัญ (Gift)</div>
-                    <div id="giftCountConfigRow" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                        <span style="font-size:0.85rem; color:#ccc;">จำนวนครั้ง/ยอดสะสมเพื่อทำแอคชั่น (Threshold):</span>
-                        <input type="number" id="triggerThresholdInput" class="field-ui" value="1" style="width:80px; padding:8px; text-align:center; margin:0;" min="1">
+                    <div style="font-weight:900; color:#bc13fe; margin-bottom:12px; font-size:0.95rem;" id="activeConfiguringTitle">กำหนดเงื่อนไข: ของขวัญเฉพาะ</div>
+                    <div id="giftCountConfigRow" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:12px;">
+                        <span id="triggerThresholdLabel" style="font-size:0.85rem; color:#ccc;">จำนวนครั้ง/ยอดสะสมเพื่อทำแอคชั่น:</span>
+                        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                            <input type="number" id="triggerThresholdInput" class="field-ui" value="1" style="width:80px; padding:8px; text-align:center; margin:0;" min="1">
+                            <span id="triggerThresholdSuffix" class="ae-value-suffix ae-keep-emoji" style="display:none;"></span>
+                        </div>
+                    </div>
+                    <div id="wheelCoinsExtra" class="ae-trigger-extra" style="display:none; margin-bottom:12px;">
+                        <div class="ae-extra-label">โหมดยิงเมื่อถึงเหรียญขั้นต่ำ</div>
+                        <div class="ae-extra-opt-grid" id="wheelEventCoinFireModes">
+                            <button type="button" class="ae-extra-opt active" data-mode="once" onclick="selectWheelCoinFireMode('once')"><strong>ยิง 1 ครั้งต่อของขวัญ</strong><small>เช่น 299 เหรียญ = ยิง 1 ครั้ง</small></button>
+                            <button type="button" class="ae-extra-opt" data-mode="multiply" onclick="selectWheelCoinFireMode('multiply')"><strong>คูณตามจำนวนเหรียญ</strong><small>เช่น ขั้นต่ำ 10 · ของ 299 = ยิง 29 ครั้ง (~150ms)</small></button>
+                            <button type="button" class="ae-extra-opt" data-mode="exact" onclick="selectWheelCoinFireMode('exact')"><strong>ตรงเป๊ะเท่านั้น</strong><small>ยิงเมื่อมูลค่าเหรียญเท่ากับที่ตั้งไว้พอดี</small></button>
+                        </div>
+                    </div>
+                    <div id="wheelTotalLikesExtra" class="ae-trigger-extra" style="display:none; margin-bottom:12px;">
+                        <div class="ae-extra-label">โหมดนับไลค์</div>
+                        <div class="ae-extra-opt-grid" id="wheelEventLikeCountModes">
+                            <button type="button" class="ae-extra-opt active" data-mode="room" onclick="selectWheelLikeCountMode('room')"><strong>ผลรวมในห้องไลฟ์</strong><small>ยิงเมื่อยอดไลค์รวมถึง 100, 200, 300...</small></button>
+                            <button type="button" class="ae-extra-opt" data-mode="user" onclick="selectWheelLikeCountMode('user')"><strong>ต่อคน</strong><small>นับไลค์ของแต่ละผู้ชมแยกกัน</small></button>
+                        </div>
                     </div>
                     <div id="actionDrawsRow" style="display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; align-items:center;">
                         <div><span id="actionDrawsLabel" style="font-size:0.75rem; color:#aaa; display:block; margin-bottom:4px;">🎰 สุ่มการ์ด:</span><input type="number" id="actionDrawsInput" class="field-ui" value="1" style="padding:8px; text-align:center; margin:0;" min="0"></div>
@@ -8196,6 +8216,11 @@
                         <span style="font-size:0.75rem; color:#f1c40f; display:block; margin-bottom:6px; font-weight:800;">🗳️ 1 ของขวัญ = กี่คะแนนโหวต</span>
                         <input type="number" id="voteWeightInput" class="field-ui" value="1" min="1" max="9999" style="width:110px; padding:8px; text-align:center; margin:0;">
                         <span style="font-size:0.72rem; color:#888; margin-left:8px;">คะแนนโหวต ต่อของขวัญ 1 ชิ้น (คูณด้วยจำนวนที่ส่ง)</span>
+                    </div>
+                    <div id="wheelTargetRow" style="display:none; margin-top:12px; background:rgba(0,255,136,0.06); border:1px solid rgba(0,255,136,0.2); border-radius:10px; padding:12px;">
+                        <span style="font-size:0.75rem; color:#00ff88; display:block; margin-bottom:8px; font-weight:800;">🎡 สุ่มวงล้อไหนเมื่อทริกเกอร์นี้ทำงาน</span>
+                        <div class="ae-extra-opt-grid" id="wheelTargetChips"></div>
+                        <span style="font-size:0.72rem; color:#888; display:block; margin-top:8px; line-height:1.4; font-family:'Kanit',sans-serif;">ของขวัญ/อีเวนต์แต่ละเงื่อนไขผูกกับวงล้อได้ 1 วง เช่น กุหลาบ → Main Wheel, Lion → Wheel 2</span>
                     </div>
                     <div id="wheelDrawsPerSpinRow" style="display:none; margin-top:12px; background:rgba(0,255,136,0.06); border:1px solid rgba(0,255,136,0.2); border-radius:10px; padding:12px;">
                         <span style="font-size:0.75rem; color:#00ff88; display:block; margin-bottom:6px; font-weight:800;">🎴 จำนวนใบต่อการหมุน 1 ครั้ง</span>
@@ -8598,7 +8623,7 @@
                 <p class="ae-ks-admin-note">รัน TokControl แบบ Administrator หากเกม/แอปไม่รับคีย์</p>
             </div>
             <div class="sa-modal-foot ae-modal-foot">
-                <button type="button" class="snd-toolbar-btn ae-ks-test-btn" onclick="testAeKeystrokeFromModal()"><svg class="tc-ico tc-ico--filled" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v14l11-7-11-7z"/></svg> ทดสอบ (2 วิ)</button>
+                <button type="button" class="snd-toolbar-btn ae-ks-test-btn" onclick="testAeKeystrokeFromModal()"><svg class="tc-ico tc-ico--filled" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.14v14l11-7-11-7z"/></svg> ทดสอบ (5 วิ)</button>
                 <button type="button" class="snd-toolbar-btn" onclick="closeAeKeystrokeModal()">ยกเลิก</button>
                 <button type="button" class="snd-toolbar-btn snd-toolbar-btn--go" onclick="saveAeKeystrokeFromModal()">✓ Save</button>
             </div>
@@ -9729,7 +9754,7 @@
             }
         }
 
-        let APP_VERSION = '2.1.20';
+        let APP_VERSION = '2.1.21';
         window.APP_VERSION = APP_VERSION;
         let appUpdateState = 'idle';
         let appUpdatePollTimer = null;
@@ -14027,7 +14052,8 @@
                 type: 'pandy_wheel_auto_spin',
                 rounds: Math.max(1, Math.min(20, rounds || 1)),
                 winMode,
-                coins: 0
+                coins: 0,
+                wheelId: (opts && typeof opts === 'object' && opts.wheelId != null && opts.wheelId !== '') ? opts.wheelId : null
             };
             const frame = document.getElementById('randomWinFrame');
             const src = (frame && (frame.getAttribute('src') || '').trim()) || '';
@@ -14061,6 +14087,10 @@
         let activeGiftRulesContext = 'gacha';
         let activeVoteGiftCandidateId = null;
         let activeTriggerType = 'gift';
+        let wheelDraftCoinFireMode = 'once';
+        let wheelDraftLikeCountMode = 'room';
+        let wheelDraftTargetId = '';
+        let giftEventLikeCursors = {};
         let selectedGiftId = null;
         let selectedGiftName = null;
         let popularGifts = [];
@@ -14153,16 +14183,208 @@
 
         function resolveEventRules(eventKey) {
             const mode = getGiftActionMode();
-            if (mode === 'wheel') {
-                return {
-                    gachaRule: null,
-                    wheelRule: (advConf.wheelGiftRules || {})[eventKey] || null
-                };
+            const map = mode === 'wheel' ? (advConf.wheelGiftRules || {}) : (advConf.giftRules || {});
+            const aliases = eventKey === '__event_globallikes' || eventKey === '__event_totallikes'
+                ? ['__event_globallikes', '__event_totallikes']
+                : [eventKey];
+            let rule = null;
+            for (let i = 0; i < aliases.length; i++) {
+                if (map[aliases[i]]) {
+                    rule = map[aliases[i]];
+                    break;
+                }
             }
-            return {
-                gachaRule: (advConf.giftRules || {})[eventKey] || null,
-                wheelRule: null
+            if (mode === 'wheel') {
+                return { gachaRule: null, wheelRule: rule };
+            }
+            return { gachaRule: rule, wheelRule: null };
+        }
+
+        const WHEEL_TRIGGER_META = {
+            join: { title: 'เข้าห้องไลฟ์', emoji: '👋' },
+            share: { title: 'แชร์ไลฟ์', emoji: '🔁' },
+            follow: { title: 'ติดตาม', emoji: '➕' },
+            like: { title: 'ไลค์', emoji: '❤️' },
+            totallikes: { title: 'กดไลค์รวม', emoji: '💯', eventKey: '__event_globallikes' },
+            globallikes: { title: 'กดไลค์รวม', emoji: '💯', eventKey: '__event_globallikes' },
+            coins: { title: 'เหรียญขั้นต่ำ', emoji: '🪙', eventKey: '__event_coins' },
+            gift: { title: 'ของขวัญเฉพาะ', emoji: '🎁' },
+            subscribe: { title: 'สมาชิก', emoji: '⭐' }
+        };
+
+        function normalizeWheelTriggerType(type) {
+            return type === 'globallikes' ? 'totallikes' : type;
+        }
+
+        function wheelTriggerEventKey(type) {
+            const t = normalizeWheelTriggerType(type);
+            if (t === 'totallikes') return '__event_globallikes';
+            return '__event_' + t;
+        }
+
+        function resetGiftEventLikeCursors() {
+            giftEventLikeCursors = {};
+        }
+
+        function giftMapUserKey(user) {
+            return String(user?.uniqueId || user?.nickname || 'viewer').toLowerCase().replace(/^@/, '').trim() || 'viewer';
+        }
+
+        function selectWheelCoinFireMode(mode) {
+            wheelDraftCoinFireMode = mode === 'multiply' || mode === 'exact' ? mode : 'once';
+            document.querySelectorAll('#wheelEventCoinFireModes .ae-extra-opt').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.mode === wheelDraftCoinFireMode);
+            });
+        }
+
+        function selectWheelLikeCountMode(mode) {
+            wheelDraftLikeCountMode = mode === 'user' ? 'user' : 'room';
+            document.querySelectorAll('#wheelEventLikeCountModes .ae-extra-opt').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.mode === wheelDraftLikeCountMode);
+            });
+        }
+
+        function syncWheelTriggerExtrasFromRule(type) {
+            const t = normalizeWheelTriggerType(type);
+            const rules = getActiveGiftRulesMap();
+            const key = t === 'gift' ? null : wheelTriggerEventKey(t);
+            const rule = key ? rules[key] : null;
+            if (t === 'coins') {
+                selectWheelCoinFireMode(rule?.coinFireMode || 'once');
+            }
+            if (t === 'totallikes') {
+                selectWheelLikeCountMode(rule?.likeCountMode || 'room');
+            }
+            const thresholdInput = document.getElementById('triggerThresholdInput');
+            if (thresholdInput && rule && rule.threshold != null) {
+                thresholdInput.value = rule.threshold;
+            } else if (thresholdInput && t === 'gift' && selectedGiftId && rules[selectedGiftId]) {
+                thresholdInput.value = rules[selectedGiftId].threshold || 1;
+            } else if (thresholdInput && t !== 'gift') {
+                thresholdInput.value = t === 'totallikes' ? '100' : '1';
+            }
+            const existing = t === 'gift' && selectedGiftId ? rules[selectedGiftId] : rule;
+            const drawsInput = document.getElementById('actionDrawsInput');
+            if (drawsInput && existing) {
+                drawsInput.value = activeGiftRulesContext === 'wheel'
+                    ? (existing.wheelSpins ?? existing.draws ?? 1)
+                    : (existing.draws ?? 1);
+            }
+            const winSel = document.getElementById('actionWinModeSelect');
+            if (winSel && existing && existing.winMode) winSel.value = existing.winMode;
+            const wheelDraws = document.getElementById('wheelDrawsPerSpinInput');
+            if (wheelDraws && existing && existing.wheelDrawsPerSpin) {
+                wheelDraws.value = existing.wheelDrawsPerSpin;
+            }
+            if (activeGiftRulesContext === 'wheel') {
+                syncWheelDraftTargetFromRule(existing);
+            }
+        }
+
+        function computeCoinFireTimes(rule, coins) {
+            const min = Math.max(1, parseInt(rule?.threshold, 10) || 1);
+            const mode = rule?.coinFireMode || 'once';
+            const value = Number(coins) || 0;
+            if (mode === 'exact') return value === min ? 1 : 0;
+            if (value < min) return 0;
+            return mode === 'multiply' ? Math.floor(value / min) : 1;
+        }
+
+        function computeTotalLikesCrossed(rule, eventKey, likeInc, user) {
+            const n = Math.max(1, parseInt(rule?.threshold, 10) || 100);
+            const mode = rule?.likeCountMode === 'user' ? 'user' : 'room';
+            const uid = giftMapUserKey(user);
+            const cursorKey = mode === 'user' ? `user:${eventKey}:${uid}` : `room:${eventKey}`;
+            const prev = Number(giftEventLikeCursors[cursorKey]) || 0;
+            let next = prev;
+            if (mode === 'room') {
+                const total = Number(user?.totalLikeCount);
+                next = Number.isFinite(total) && total > 0 ? total : prev + (Number(likeInc) || 0);
+            } else {
+                next = prev + (Number(likeInc) || 0);
+            }
+            if (next < prev) {
+                giftEventLikeCursors[cursorKey] = next;
+                return 0;
+            }
+            const crossed = Math.floor(next / n) - Math.floor(prev / n);
+            giftEventLikeCursors[cursorKey] = next;
+            return crossed;
+        }
+
+        function applyMappedGachaOrWheel(gachaRule, wheelRule, times, uid, gachaText, wheelText) {
+            if (!times || times < 1) return false;
+            let fired = false;
+            if (gachaRule && isAppPro('gacha')) {
+                const result = applyGachaRuleAction(gachaRule, times, uid);
+                if (gachaRule.alert !== false && gachaText) {
+                    showCustomMsg('success', gachaText.title, gachaText.body(result));
+                }
+                fired = true;
+            }
+            if (wheelRule) {
+                const result = applyWheelRuleAction(wheelRule, times, uid);
+                if (wheelRule.alert !== false && wheelText) {
+                    showCustomMsg('success', wheelText.title, wheelText.body(result));
+                }
+                fired = true;
+            }
+            return fired;
+        }
+
+        function handleMappedCoinsFromGift(gift) {
+            const coins = (Number(gift?.diamondCount) || 0) * (Number(gift?.repeatCount) || 1);
+            if (coins <= 0) return false;
+            const { gachaRule, wheelRule } = resolveEventRules('__event_coins');
+            const rule = gachaRule || wheelRule;
+            if (!rule) return false;
+            const times = computeCoinFireTimes(rule, coins);
+            const uid = gift?.uniqueId || '';
+            return applyMappedGachaOrWheel(
+                gachaRule,
+                wheelRule,
+                times,
+                uid,
+                {
+                    title: `@${tikTokDisplayHandle(gift)} เหรียญ [กาชา]`,
+                    body: (result) => `มูลค่า ${coins} 🪙 (สุ่ม +${result.totalDraws})`
+                },
+                {
+                    title: `@${tikTokDisplayHandle(gift)} เหรียญ [วงล้อ]`,
+                    body: (result) => `มูลค่า ${coins} 🪙 (สุ่ม ${result.totalRounds} ใบทีละรอบ)`
+                }
+            );
+        }
+
+        function handleMappedTotalLikes(data, likeInc) {
+            const { gachaRule, wheelRule } = resolveEventRules('__event_globallikes');
+            const rule = gachaRule || wheelRule;
+            if (!rule) return;
+            const uid = data?.uniqueId || '';
+            const likeUser = typeof tikTokDisplayHandle === 'function' ? tikTokDisplayHandle(data) : uid;
+            const gachaText = {
+                title: `@${likeUser} กดไลค์รวม [กาชา]`,
+                body: (result) => `ครบเป้าไลค์รวม (สุ่ม +${result.totalDraws})`
             };
+            const wheelText = {
+                title: `@${likeUser} กดไลค์รวม [วงล้อ]`,
+                body: (result) => `ครบเป้าไลค์รวม (สุ่ม ${result.totalRounds} ใบทีละรอบ)`
+            };
+            if (!rule.likeCountMode) {
+                if (gachaRule && isAppPro('gacha')) {
+                    processRuleWithThreshold(gachaTriggerCounters, '__event_globallikes', likeInc, gachaRule, (timesTriggered) => {
+                        applyMappedGachaOrWheel(gachaRule, null, timesTriggered, uid, gachaText, null);
+                    });
+                }
+                if (wheelRule) {
+                    processRuleWithThreshold(wheelTriggerCounters, '__event_globallikes', likeInc, wheelRule, (timesTriggered) => {
+                        applyMappedGachaOrWheel(null, wheelRule, timesTriggered, uid, null, wheelText);
+                    });
+                }
+                return;
+            }
+            const times = computeTotalLikesCrossed(rule, '__event_globallikes', likeInc, data);
+            applyMappedGachaOrWheel(gachaRule, wheelRule, times, uid, gachaText, wheelText);
         }
 
         function applyWinFromWheelJob(data) {
@@ -14254,6 +14476,78 @@
             return activeGiftRulesContext === 'wheel' ? advConf.wheelGiftRules : advConf.giftRules;
         }
 
+        function getLuckyDrawWheelsSync() {
+            try {
+                const frame = document.getElementById('randomWinFrame');
+                const fn = frame && frame.contentWindow && frame.contentWindow.getWheelCatalog;
+                if (typeof fn === 'function') {
+                    const list = fn() || [];
+                    if (Array.isArray(list) && list.length) return list;
+                }
+            } catch (e) {}
+            return [];
+        }
+
+        async function getLuckyDrawWheels() {
+            const live = getLuckyDrawWheelsSync();
+            if (live.length) return live;
+            try {
+                if (window.MediaGuard && typeof MediaGuard.wheelLoad === 'function') {
+                    const loaded = await MediaGuard.wheelLoad();
+                    const profiles = loaded.profiles || [];
+                    const prof = profiles.find((p) => p.id === loaded.activeProfileId) || profiles[0];
+                    return (prof?.wheels || []).map((w) => ({ id: w.id, name: w.name || 'Wheel' }));
+                }
+            } catch (e) {}
+            return [];
+        }
+
+        function resolveWheelGiftTargetName(wheelId, fallbackName) {
+            if (fallbackName) return fallbackName;
+            const hit = getLuckyDrawWheelsSync().find((w) => String(w.id) === String(wheelId));
+            return hit?.name || '';
+        }
+
+        function selectWheelGiftTarget(id) {
+            wheelDraftTargetId = String(id || '');
+            document.querySelectorAll('#wheelTargetChips .ae-extra-opt').forEach((btn) => {
+                btn.classList.toggle('active', String(btn.dataset.wheelId) === wheelDraftTargetId);
+            });
+        }
+
+        async function renderWheelTargetChips(preferredId) {
+            const row = document.getElementById('wheelTargetRow');
+            const chips = document.getElementById('wheelTargetChips');
+            if (!row || !chips) return;
+            if (activeGiftRulesContext !== 'wheel') {
+                row.style.display = 'none';
+                return;
+            }
+            row.style.display = 'block';
+            const list = await getLuckyDrawWheels();
+            if (!list.length) {
+                chips.innerHTML = '<div style="color:#888;font-size:0.75rem;font-family:Kanit,sans-serif;">ยังไม่มีวงล้อ — สร้างวงล้อในแท็บ Wheels ก่อน แล้วเปิด Gift Rules อีกครั้ง</div>';
+                wheelDraftTargetId = '';
+                return;
+            }
+            const pref = String(preferredId || wheelDraftTargetId || list[0].id);
+            const exists = list.some((w) => String(w.id) === pref);
+            wheelDraftTargetId = exists ? pref : String(list[0].id);
+            chips.innerHTML = list.map((w) => {
+                const id = String(w.id);
+                const active = id === wheelDraftTargetId ? ' active' : '';
+                return `<button type="button" class="ae-extra-opt${active}" data-wheel-id="${escapeHtml(id)}" onclick="selectWheelGiftTarget('${escapeHtml(id)}')"><strong>${escapeHtml(w.name || 'Wheel')}</strong><small>สุ่มวงนี้เมื่อทริกเกอร์นี้ทำงาน</small></button>`;
+            }).join('');
+        }
+
+        function syncWheelDraftTargetFromRule(rule) {
+            if (rule && rule.targetWheelId != null && rule.targetWheelId !== '') {
+                renderWheelTargetChips(rule.targetWheelId);
+            } else {
+                renderWheelTargetChips();
+            }
+        }
+
         function closeGiftMappingModal() {
             const ov = document.getElementById('giftMappingModalOverlay');
             if (ov) ov.style.display = 'none';
@@ -14274,6 +14568,7 @@
             const voteWeightRow = document.getElementById('voteWeightRow');
             const actionDrawsRow = document.getElementById('actionDrawsRow');
             const winModeRow = document.getElementById('actionWinModeRow');
+            const wheelTargetRow = document.getElementById('wheelTargetRow');
             if (!badge || !drawsLabel) return;
             if (activeGiftRulesContext === 'wheel') {
                 badge.innerHTML = '🎡 ตั้งค่าสำหรับ: วงล้อ (Wheel)';
@@ -14283,10 +14578,12 @@
                 drawsLabel.textContent = '🎡 จำนวนครั้งหมุนวงล้อ:';
                 if (wheelDrawsRow) wheelDrawsRow.style.display = 'block';
                 if (wheelWinLinkRow) wheelWinLinkRow.style.display = 'block';
+                if (wheelTargetRow) wheelTargetRow.style.display = 'block';
                 if (voteWeightRow) voteWeightRow.style.display = 'none';
                 if (actionDrawsRow) actionDrawsRow.style.display = 'grid';
                 if (winModeRow) winModeRow.style.display = 'block';
                 updateWheelWinLinkUI();
+                renderWheelTargetChips();
             } else if (activeGiftRulesContext === 'vote_candidate') {
                 const c = getCandidateById(activeVoteGiftCandidateId);
                 badge.innerHTML = `🗳️ ทริกเกอร์โหวต: ${escapeHtml(c?.name || 'ผู้แข่ง')}`;
@@ -14295,6 +14592,7 @@
                 badge.style.color = '#f1c40f';
                 if (wheelDrawsRow) wheelDrawsRow.style.display = 'none';
                 if (wheelWinLinkRow) wheelWinLinkRow.style.display = 'none';
+                if (wheelTargetRow) wheelTargetRow.style.display = 'none';
                 if (voteWeightRow) voteWeightRow.style.display = 'block';
                 if (actionDrawsRow) actionDrawsRow.style.display = 'none';
                 if (winModeRow) winModeRow.style.display = 'none';
@@ -14306,6 +14604,7 @@
                 drawsLabel.textContent = '🎰 สุ่มการ์ด:';
                 if (wheelDrawsRow) wheelDrawsRow.style.display = 'none';
                 if (wheelWinLinkRow) wheelWinLinkRow.style.display = 'none';
+                if (wheelTargetRow) wheelTargetRow.style.display = 'none';
                 if (voteWeightRow) voteWeightRow.style.display = 'none';
                 if (actionDrawsRow) actionDrawsRow.style.display = 'grid';
                 if (winModeRow) winModeRow.style.display = 'block';
@@ -14336,7 +14635,8 @@
                 triggerWheelAutoSpin({
                     rounds: Math.min(totalRounds, 20),
                     winMode: rule.winMode && rule.winMode !== 'none' ? rule.winMode : null,
-                    coins: 0
+                    coins: 0,
+                    wheelId: rule.targetWheelId || null
                 });
             }
             return { totalSpins, totalCoins: 0, drawsPerSpin, totalRounds };
@@ -14366,23 +14666,60 @@
         }
 
         function selectTrigger(type, title) {
+            type = normalizeWheelTriggerType(type);
             activeTriggerType = type;
-            document.querySelectorAll('.trigger-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`trigger-${type}`).classList.add('active');
-            
-            document.getElementById('activeConfiguringTitle').innerText = `กำหนดเงื่อนไข: ${title}`;
-            
+            const meta = WHEEL_TRIGGER_META[type] || { title: type, emoji: '' };
+            const displayTitle = title || `${meta.emoji} ${meta.title}`.trim();
+
+            document.querySelectorAll('#wheelTriggerChips .ae-trigger-tile').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.val === type);
+            });
+
+            const titleEl = document.getElementById('activeConfiguringTitle');
+            if (titleEl) titleEl.innerText = `กำหนดเงื่อนไข: ${displayTitle}`;
+
             const selectorSec = document.getElementById('giftSelectorSection');
             const countRow = document.getElementById('giftCountConfigRow');
-            
-            if (type === 'gift') {
-                selectorSec.style.display = 'block';
-                countRow.style.display = 'flex';
-                updateGachaSelectedGiftChip();
-            } else {
-                selectorSec.style.display = 'none';
-                countRow.style.display = 'flex';
+            const coinsExtra = document.getElementById('wheelCoinsExtra');
+            const likesExtra = document.getElementById('wheelTotalLikesExtra');
+            const thresholdLabel = document.getElementById('triggerThresholdLabel');
+            const thresholdSuffix = document.getElementById('triggerThresholdSuffix');
+            const thresholdInput = document.getElementById('triggerThresholdInput');
+
+            if (selectorSec) selectorSec.style.display = type === 'gift' ? 'block' : 'none';
+            if (countRow) countRow.style.display = 'flex';
+            const showCoinModes = type === 'coins' && activeGiftRulesContext !== 'vote_candidate';
+            const showLikeModes = type === 'totallikes' && activeGiftRulesContext !== 'vote_candidate';
+            if (coinsExtra) coinsExtra.style.display = showCoinModes ? 'block' : 'none';
+            if (likesExtra) likesExtra.style.display = showLikeModes ? 'block' : 'none';
+
+            if (thresholdLabel) {
+                if (type === 'totallikes') thresholdLabel.textContent = 'ยิงทุกๆ N ไลค์';
+                else if (type === 'coins') thresholdLabel.textContent = 'เหรียญขั้นต่ำ';
+                else if (type === 'like') thresholdLabel.textContent = 'จำนวนไลค์ในครั้งนั้น';
+                else if (type === 'gift') thresholdLabel.textContent = 'จำนวนครั้ง/ยอดสะสมเพื่อทำแอคชั่น:';
+                else thresholdLabel.textContent = 'จำนวนครั้งเพื่อทำแอคชั่น:';
             }
+            if (thresholdSuffix) {
+                if (type === 'coins') {
+                    thresholdSuffix.style.display = 'inline';
+                    thresholdSuffix.textContent = '🪙 เหรียญ';
+                } else if (type === 'totallikes') {
+                    thresholdSuffix.style.display = 'inline';
+                    thresholdSuffix.textContent = '💯 ไลค์';
+                } else if (type === 'like') {
+                    thresholdSuffix.style.display = 'inline';
+                    thresholdSuffix.textContent = '❤️ ไลค์';
+                } else {
+                    thresholdSuffix.style.display = 'none';
+                    thresholdSuffix.textContent = '';
+                }
+            }
+            if (thresholdInput && type === 'totallikes' && (!thresholdInput.value || thresholdInput.value === '1')) {
+                thresholdInput.value = '100';
+            }
+            if (type === 'gift') updateGachaSelectedGiftChip();
+            syncWheelTriggerExtrasFromRule(type);
         }
 
         function renderGiftCatalog(list, opts = {}) {
@@ -14433,7 +14770,11 @@
             selectedGiftId = id;
             selectedGiftName = name;
             updateGachaSelectedGiftChip();
-            document.getElementById('activeConfiguringTitle').innerText = `กำหนดเงื่อนไข: 🎁 ของขวัญ ${name}`;
+            document.getElementById('activeConfiguringTitle').innerText = `กำหนดเงื่อนไข: 🎁 ของขวัญเฉพาะ ${name}`;
+            if (activeGiftRulesContext === 'wheel') {
+                const existing = (advConf.wheelGiftRules || {})[id];
+                syncWheelDraftTargetFromRule(existing);
+            }
         }
 
         function updateGachaSelectedGiftChip() {
@@ -14533,17 +14874,19 @@
             
             let ruleKey = "";
             let ruleName = "";
+            const triggerType = normalizeWheelTriggerType(activeTriggerType);
+            const triggerMeta = WHEEL_TRIGGER_META[triggerType] || { title: triggerType };
             
-            if (activeTriggerType === 'gift') {
+            if (triggerType === 'gift') {
                 if (!selectedGiftId) {
-                    showCustomMsg('error', 'ผิดพลาด', 'กรุณาเลือกของขวัญจากแคตตาล็อกก่อนครับ');
+                    showCustomMsg('error', 'ผิดพลาด', 'กรุณาเลือกของขวัญจากคลังก่อนครับ');
                     return;
                 }
                 ruleKey = selectedGiftId;
                 ruleName = `ของขวัญ: ${selectedGiftName}`;
             } else {
-                ruleKey = `__event_${activeTriggerType}`;
-                ruleName = `อีเวนต์: ${activeTriggerType.toUpperCase()}`;
+                ruleKey = wheelTriggerEventKey(triggerType);
+                ruleName = `อีเวนต์: ${triggerMeta.title}`;
             }
             
             const winMode = document.getElementById('actionWinModeSelect').value || 'none';
@@ -14557,13 +14900,26 @@
                     ruleData.wheelSpins = actionCount;
                     ruleData.wheelDrawsPerSpin = Math.max(1, Math.min(20, parseInt(document.getElementById('wheelDrawsPerSpinInput')?.value) || 1));
                     ruleData.draws = 0;
+                    const wheelsList = getLuckyDrawWheelsSync();
+                    const wid = wheelDraftTargetId || (wheelsList[0] ? wheelsList[0].id : '');
+                    const wname = (wheelsList.find((w) => String(w.id) === String(wid)) || {}).name || '';
+                    ruleData.targetWheelId = wid !== '' && wid != null ? wid : null;
+                    ruleData.targetWheelName = wname;
                 } else {
                     ruleData.draws = actionCount;
                     ruleData.wheelSpins = 0;
                     ruleData.wheelDrawsPerSpin = 0;
                 }
+                if (triggerType === 'coins') ruleData.coinFireMode = wheelDraftCoinFireMode || 'once';
+                if (triggerType === 'totallikes') ruleData.likeCountMode = wheelDraftLikeCountMode || 'room';
             }
+            const prevRule = rulesMap[ruleKey];
+            if (prevRule && triggerType !== 'coins') ruleData.coinFireMode = prevRule.coinFireMode;
+            if (prevRule && triggerType !== 'totallikes') ruleData.likeCountMode = prevRule.likeCountMode;
             rulesMap[ruleKey] = ruleData;
+            if (triggerType === 'totallikes' && rulesMap.__event_totallikes && ruleKey !== '__event_totallikes') {
+                delete rulesMap.__event_totallikes;
+            }
 
             if (activeGiftRulesContext === 'vote_candidate' && activeVoteGiftCandidateId && activeTriggerType === 'gift') {
                 const vs = ensureVoteStore();
@@ -14577,7 +14933,9 @@
             }
             
             const ctxLabel = activeGiftRulesContext === 'wheel' ? 'วงล้อ' : activeGiftRulesContext === 'vote_candidate' ? 'โหวต' : 'กาชา';
-            const extraMsg = activeGiftRulesContext === 'vote_candidate' ? ` (1 ชิ้น = +${voteWeight} คะแนนโหวต)` : '';
+            const extraMsg = activeGiftRulesContext === 'vote_candidate'
+                ? ` (1 ชิ้น = +${voteWeight} คะแนนโหวต)`
+                : (activeGiftRulesContext === 'wheel' && ruleData.targetWheelName ? ` → สุ่ม ${ruleData.targetWheelName}` : '');
             showCustomMsg('success', 'บันทึกเงื่อนไขสำเร็จ', `ตั้งค่าแอคชั่น ${ctxLabel} สำหรับ ${ruleName} เรียบร้อยแล้ว${extraMsg}`);
             renderConfiguredRules();
             if (activeGiftRulesContext === 'vote_candidate') {
@@ -15980,8 +16338,15 @@
                 const actionCount = isWheel ? (rule.wheelSpins ?? rule.draws ?? 0) : (rule.draws || 0);
                 const drawsPerSpin = isWheel ? (rule.wheelDrawsPerSpin || 1) : 0;
                 const actionLabel = isWheel
-                    ? `<span style="color:#00ff88; margin-left:8px;">🎡 หมุน ${actionCount}× (${drawsPerSpin} ใบ/ครั้ง)</span>`
+                    ? `<span style="color:#00ff88; margin-left:8px;">🎡 ${escapeHtml(resolveWheelGiftTargetName(rule.targetWheelId, rule.targetWheelName) || 'วงล้อที่เปิดอยู่')} · หมุน ${actionCount}× (${drawsPerSpin} ใบ/ครั้ง)</span>`
                     : `<span style="color:#bc13fe; margin-left:8px;">🎰 สุ่ม +${actionCount}</span>`;
+                let extraModeLabel = '';
+                if (key === '__event_globallikes' || key === '__event_totallikes') {
+                    extraModeLabel = `<span style="color:#ff6b9a; margin-left:8px;">💯 ${rule.likeCountMode === 'user' ? 'ต่อคน' : 'รวมห้อง'}</span>`;
+                } else if (key === '__event_coins') {
+                    const coinMode = rule.coinFireMode === 'multiply' ? 'คูณตามเหรียญ' : (rule.coinFireMode === 'exact' ? 'ตรงเป๊ะ' : 'ครั้งละ 1');
+                    extraModeLabel = `<span style="color:#f1c40f; margin-left:8px;">🪙 ${coinMode}</span>`;
+                }
                 let winModeLabel = '';
                 if (rule.winMode === 'plus') winModeLabel = '<span style="color:#2ecc71; margin-left:8px;">🏆 WIN +</span>';
                 else if (rule.winMode === 'minus') winModeLabel = '<span style="color:#ff4757; margin-left:8px;">🏆 WIN -</span>';
@@ -15991,6 +16356,7 @@
                             <span style="font-weight:900; color:#fff;">${displayName}</span>
                             <span style="color:#aaa; margin-left:8px;">(สะสม: ${rule.threshold || 1})</span>
                             ${actionLabel}
+                            ${extraModeLabel}
                             ${winModeLabel}
                         </div>
                         <div style="display:flex; gap:6px;">
@@ -17034,11 +17400,12 @@
             ensureGiftRulesStores();
             if (context === 'wheel') {
                 advConf.giftActionMode = 'wheel';
+                if (typeof ensureRandomWinFrameLoaded === 'function') ensureRandomWinFrameLoaded();
             }
             updateGiftActionModeUI();
             updateGiftModalContextUI();
             document.getElementById('giftMappingModalOverlay').style.display = 'flex';
-            selectTrigger('gift', '🎁 Gift');
+            selectTrigger('gift');
             renderConfiguredRules();
             await ensureGiftCatalogLoaded();
             if (activeGiftTab === 'settings') {
@@ -17255,10 +17622,9 @@
                     } else if (!connectedTikTok.nickname) {
                         connectedTikTok.nickname = data.username;
                     }
-                    if (data.avatar) {
-                        connectedTikTok.avatar = data.avatar;
-                    } else if (!connectedTikTok.avatar) {
-                        connectedTikTok.avatar = `https://api.dicebear.com/7.x/initials/svg?seed=${data.username}`;
+                    applyConnectedTikTokAvatar(data.avatarUrl || data.avatar || data.profilePictureUrl || '');
+                    if (!isRealTikTokAvatar(connectedTikTok.avatar) && data.username) {
+                        refreshTikTokHostProfile(data.username);
                     }
                     if (data.followerCount != null) connectedTikTok.followerCount = data.followerCount;
                     if (data.followingCount != null) connectedTikTok.followingCount = data.followingCount;
@@ -17278,6 +17644,7 @@
                     
                     if (!wasAlreadyConnected) {
                         if (typeof resetAeLikeCursors === 'function') resetAeLikeCursors();
+                        if (typeof resetGiftEventLikeCursors === 'function') resetGiftEventLikeCursors();
                         logToDashboard(`🟢 เชื่อมต่อกับช่อง @${data.username} สำเร็จ!`, '#2ecc71');
                         if (data.isLive) {
                             showCustomMsg('success', 'เชื่อมต่อไลฟ์สำเร็จ', `กำลังตรวจจับแชทและของขวัญจากช่อง @${data.username} แบบ Real-time`);
@@ -17393,7 +17760,9 @@
                 handleGameModFromGift(gift);
                 handleSongRequestSkipFromGift(gift);
 
-                if (!gachaRule && !wheelRule) {
+                const coinsMapped = handleMappedCoinsFromGift(gift);
+                const coinRulePair = resolveEventRules('__event_coins');
+                if (!gachaRule && !wheelRule && !coinsMapped && !coinRulePair.gachaRule && !coinRulePair.wheelRule) {
                     const totalCoins = gift.diamondCount * gift.repeatCount;
                     if (autoDrawOnGift && totalCoins > 0 && isAppPro('gacha')) {
                         let remainingDraws = totalCoins;
@@ -17508,9 +17877,10 @@
                         }
                     });
                 }
+                const totalLikeCount = Number(data.totalLikeCount || data.totalLike || data.totalLikes) || liveStats.likes;
+                handleMappedTotalLikes(Object.assign({}, data, { totalLikeCount }), likeInc);
                 handleSoundAlertForEvent('__event_like', likeInc, data);
                 if (typeof handleActionsEventsForEvent === 'function') {
-                    const totalLikeCount = Number(data.totalLikeCount || data.totalLike || data.totalLikes) || liveStats.likes;
                     handleActionsEventsForEvent('like', likeInc, Object.assign({}, data, { totalLikeCount }));
                 }
                 if (typeof dispatchGameModLiveEvent === 'function') {
@@ -17979,6 +18349,66 @@
         }
         function closeCustomMsgModal() {}
 
+        function isRealTikTokAvatar(url) {
+            const u = String(url || '').trim();
+            if (!u) return false;
+            if (/dicebear\.com/i.test(u)) return false;
+            if (/^https?:\/\//i.test(u)) return true;
+            if (u.startsWith('/api/emotes/proxy')) return true;
+            if (u.startsWith('data:image/')) return true;
+            return false;
+        }
+
+        function proxyTikTokAvatarUrl(url) {
+            const raw = String(url || '').trim();
+            if (!raw) return raw;
+            if (window.IdentityCards && typeof IdentityCards.proxyCdnUrl === 'function') {
+                return IdentityCards.proxyCdnUrl(raw);
+            }
+            if (raw.startsWith('data:') || raw.startsWith('/') || /dicebear\.com/i.test(raw) || raw.includes('/api/emotes/proxy')) return raw;
+            if (/tiktokcdn|byteimg|ibyteimg|ibytedtos|musically|tiktokv|\.tiktok\.com|bytedance|byteoversea/i.test(raw)) {
+                return '/api/emotes/proxy?url=' + encodeURIComponent(raw);
+            }
+            return raw;
+        }
+
+        function applyConnectedTikTokAvatar(url) {
+            if (!isRealTikTokAvatar(url)) return false;
+            connectedTikTok.avatar = proxyTikTokAvatarUrl(url);
+            return true;
+        }
+
+        function refreshTikTokHostProfile(username, attempt) {
+            const u = String(username || '').replace(/^@+/, '').trim();
+            if (!u) return;
+            const n = attempt || 0;
+            if (n === 0 && window._ttHostProfileKey === u.toLowerCase() && Date.now() - (window._ttHostProfileAt || 0) < 4000) return;
+            window._ttHostProfileKey = u.toLowerCase();
+            window._ttHostProfileAt = Date.now();
+            const apply = (profile) => {
+                if (!profile || profile.error) {
+                    if (n < 3) setTimeout(() => refreshTikTokHostProfile(u, n + 1), 2000 * (n + 1));
+                    return;
+                }
+                if (!connectedTikTok.connected) return;
+                if (String(connectedTikTok.username || '').toLowerCase() !== u.toLowerCase()) return;
+                if (profile.displayName) connectedTikTok.nickname = profile.displayName;
+                if (profile.followerCount != null) connectedTikTok.followerCount = profile.followerCount;
+                if (profile.followingCount != null) connectedTikTok.followingCount = profile.followingCount;
+                if (applyConnectedTikTokAvatar(profile.avatarUrl || profile.avatar || '')) {
+                    updateProfileUI();
+                    return;
+                }
+                if (n < 3) setTimeout(() => refreshTikTokHostProfile(u, n + 1), 2000 * (n + 1));
+            };
+            fetch('/api/tiktok/profile?username=' + encodeURIComponent(u))
+                .then((r) => r.json())
+                .then(apply)
+                .catch(() => {
+                    if (n < 3) setTimeout(() => refreshTikTokHostProfile(u, n + 1), 2000 * (n + 1));
+                });
+        }
+
         function updateProfileUI() {
             // โลโก้โปรไฟล์แดชบอร์ดหลัก
             const dashAvatar = document.getElementById('dashAvatar');
@@ -17998,7 +18428,20 @@
             if (connectedTikTok.connected) {
                 const profileNickname = connectedTikTok.nickname ? connectedTikTok.nickname : `@${connectedTikTok.username}`;
                 
-                if (dashAvatar) dashAvatar.src = connectedTikTok.avatar;
+                if (dashAvatar) {
+                    const src = isRealTikTokAvatar(connectedTikTok.avatar)
+                        ? proxyTikTokAvatarUrl(connectedTikTok.avatar)
+                        : `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(connectedTikTok.username || 'live')}`;
+                    dashAvatar.referrerPolicy = 'no-referrer';
+                    dashAvatar.onerror = function () {
+                        const cur = String(this.getAttribute('src') || '');
+                        const raw = String(connectedTikTok.avatar || '');
+                        if (cur.includes('/api/emotes/proxy') || raw.includes('/api/emotes/proxy') || !isRealTikTokAvatar(raw)) return;
+                        this.onerror = null;
+                        this.src = '/api/emotes/proxy?url=' + encodeURIComponent(raw);
+                    };
+                    dashAvatar.src = src;
+                }
                 if (dashName) dashName.innerText = profileNickname;
                 if (dashUid) dashUid.innerText = `TIKTOK LIVE: @${connectedTikTok.username}`;
                 
@@ -27192,6 +27635,86 @@
             return `${meta.icon} ${meta.label} ×${t.multiplier}`;
         }
 
+        function formatRepoTriggerChipText(tr) {
+            const t = normalizeRepoTrigger(tr);
+            if (!t) return '?';
+            const meta = REPO_TRIGGER_TYPE_META[t.type] || { label: t.type };
+            if (t.type === 'gift') {
+                const thresholdLabel = t.giftThreshold > 1 ? ` (สะสม ${t.giftThreshold} ชิ้น)` : '';
+                return `${t.giftName || t.giftId || 'ของขวัญ'}${thresholdLabel} ×${t.multiplier}`;
+            }
+            if (t.type === 'coins') return `${t.minCoins}-${t.maxCoins} 🪙 ×${t.multiplier}`;
+            if (t.type === 'like' || t.type === 'globallikes') return `${t.threshold} ครั้ง ×${t.multiplier}`;
+            return `${meta.label} ×${t.multiplier}`;
+        }
+
+        function resolveRepoGiftIconUrl(tr) {
+            const t = normalizeRepoTrigger(tr) || tr;
+            if (!t) return '';
+            if (window.GiftIconHelper) {
+                return GiftIconHelper.resolveGiftIcon({
+                    giftId: t.giftId,
+                    giftName: t.giftName,
+                    giftIcon: t.giftIcon,
+                    icon: t.icon || t.giftIcon
+                });
+            }
+            const raw = String(t.giftIcon || t.icon || '').trim();
+            if (/^(https?:|data:|\/\/|\/)/i.test(raw)) return raw.startsWith('//') ? `https:${raw}` : raw;
+            const pool = typeof popularGifts !== 'undefined' ? popularGifts : [];
+            const g = pool.find((x) =>
+                String(x.giftId) === String(t.giftId)
+                || (t.giftName && String(x.giftName || '').toLowerCase() === String(t.giftName).toLowerCase())
+            );
+            return g?.icon || '';
+        }
+
+        function repoTriggerGiftImgHtml(tr, size) {
+            const t = normalizeRepoTrigger(tr);
+            const sz = size || 28;
+            if (t && t.type === 'gift') {
+                const url = resolveRepoGiftIconUrl(t);
+                if (window.GiftIconHelper) {
+                    return GiftIconHelper.giftIconImgHtml(url, 'rp-trig-gift-thumb', sz, t.giftName || '');
+                }
+                if (url) {
+                    return `<img class="rp-trig-gift-thumb" src="${escapeHtml(url)}" alt="" width="${sz}" height="${sz}" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'">`;
+                }
+                return `<span class="rp-trig-gift-fallback" aria-hidden="true">🎁</span>`;
+            }
+            const meta = REPO_TRIGGER_TYPE_META[t?.type] || { icon: '⚡' };
+            return `<span class="rp-trig-gift-fallback" aria-hidden="true">${meta.icon}</span>`;
+        }
+
+        function renderRepoExistingTriggerList(triggers) {
+            const listEl = document.getElementById('rpTrigExistingList');
+            if (!listEl) return;
+            const items = (triggers || []).map(normalizeRepoTrigger).filter(Boolean);
+            if (!items.length) {
+                listEl.innerHTML = '<div style="color:#6e7681;font-size:0.78rem;padding:8px;">ยังไม่มีทริกเกอร์ — เพิ่มได้หลายอันต่ออีเวนต์</div>';
+                return;
+            }
+            listEl.innerHTML = items.map((tr) => `
+                <div class="rp-trigger-chip">
+                    <div class="rp-trigger-chip-main">
+                        ${repoTriggerGiftImgHtml(tr, 32)}
+                        <span>${escapeHtml(formatRepoTriggerChipText(tr))}</span>
+                    </div>
+                    <button type="button" class="rp-btn-delete" style="width:24px;height:24px;font-size:0.75rem;" onclick="deleteRepoTrigger('${tr.id}')">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function renderRepoTriggerGiftStrip(triggers) {
+            const items = (triggers || []).map(normalizeRepoTrigger).filter(Boolean);
+            if (!items.length) return '';
+            const extra = items.length > 8 ? `<span class="rp-trig-strip-more">+${items.length - 8}</span>` : '';
+            const thumbs = items.slice(0, 8).map((tr) =>
+                `<span class="rp-trig-strip-item" title="${escapeHtml(formatRepoTriggerLabel(tr))}">${repoTriggerGiftImgHtml(tr, 22)}</span>`
+            ).join('');
+            return `<div class="rp-trig-gift-strip" aria-label="ทริกเกอร์ที่ตั้งไว้">${thumbs}${extra}</div>`;
+        }
+
         function toggleRepoRandomExpand(id) {
             if (rpRandomExpanded.has(id)) rpRandomExpanded.delete(id);
             else rpRandomExpanded.add(id);
@@ -29460,6 +29983,7 @@
                                 onChange: `setRepoRandomWeight('${re.id}', this.value)`
                             })}
                         </div>
+                        ${renderRepoTriggerGiftStrip(re.triggers)}
                         <button type="button" class="rp-random-expand-btn" onclick="toggleRepoRandomExpand('${re.id}')">
                             <span class="rp-random-expand-chevron">${expanded ? '▼' : '▸'}</span>
                             <span class="rp-random-expand-label">ตั้งเรทรายไอเทม</span>
@@ -29664,6 +30188,7 @@
                                 <button type="button" class="rp-btn-delete" title="ลบ">✕</button>
                             </div>
                         </div>
+                        ${renderRepoTriggerGiftStrip(normalized.triggers)}
                         <div class="rp-custom-mode-row">
                             <span class="rp-mode-label">โหมด</span>
                             <div class="rp-mode-toggle" role="group" aria-label="โหมดอีเวนต์">
@@ -29939,17 +30464,18 @@
             const giftThresholdEl = document.getElementById('rpTrigGiftThreshold');
             if (giftThresholdEl) giftThresholdEl.value = '1';
             selectRepoTriggerType('gift');
-
-            const listEl = document.getElementById('rpTrigExistingList');
-            listEl.innerHTML = triggers.length ? triggers.map(tr => `
-                <div class="rp-trigger-chip">
-                    <span>${escapeHtml(formatRepoTriggerLabel(tr))}</span>
-                    <button type="button" class="rp-btn-delete" style="width:24px;height:24px;font-size:0.75rem;" onclick="deleteRepoTrigger('${tr.id}')">✕</button>
-                </div>
-            `).join('') : '<div style="color:#6e7681;font-size:0.78rem;padding:8px;">ยังไม่มีทริกเกอร์ — เพิ่มได้หลายอันต่ออีเวนต์</div>';
-
+            renderRepoExistingTriggerList(triggers);
             document.getElementById('gcRepoTriggerModal').style.display = 'flex';
             updateRepoTriggerGiftChip();
+            if (typeof ensureGiftCatalogLoaded === 'function') {
+                ensureGiftCatalogLoaded().then(() => {
+                    if (document.getElementById('gcRepoTriggerModal')?.style.display !== 'flex') return;
+                    if (!rpTriggerContext || rpTriggerContext.type !== type || rpTriggerContext.id !== id) return;
+                    renderRepoExistingTriggerList(triggers);
+                    if (typeof renderRepoRandomEvents === 'function') renderRepoRandomEvents();
+                    if (typeof renderRepoCustomEvents === 'function') renderRepoCustomEvents();
+                }).catch(() => {});
+            }
         }
 
         function updateRepoTriggerGiftChip() {
@@ -30006,6 +30532,7 @@
                 trigger.giftId = String(rpTrigSelectedGiftId);
                 trigger.giftName = rpTrigSelectedGiftName || '';
                 trigger.giftThreshold = Math.max(1, parseInt(document.getElementById('rpTrigGiftThreshold')?.value, 10) || 1);
+                trigger.giftIcon = resolveRepoGiftIconUrl(trigger);
             } else if (rpTrigActiveType === 'coins') {
                 trigger.minCoins = Math.max(1, parseInt(document.getElementById('rpTrigMinCoins').value, 10) || 1);
                 trigger.maxCoins = Math.max(trigger.minCoins, parseInt(document.getElementById('rpTrigMaxCoins').value, 10) || 10);
@@ -30285,6 +30812,7 @@
                             <button type="button" class="rp-btn-triggers" onclick="openRepoTriggerModal('voiceTroll','${escapeHtml(rule.id)}')">TRIGGERS${trigCount ? ` (${trigCount})` : ''}</button>
                             <button type="button" class="rp-btn-delete" title="ลบ" onclick="deleteRepoVoiceTrollRule('${escapeHtml(rule.id)}')">✕</button>
                         </div>
+                        ${renderRepoTriggerGiftStrip(rule.triggers)}
                     </div>
                 `;
             }).join('') || '<p class="rp-custom-empty">ยังไม่มีกฎ — กดเพิ่มกฎด้านล่าง</p>';

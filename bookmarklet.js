@@ -459,10 +459,10 @@
     observer.observe(chatContainer, { childList: true, subtree: true });
     window.PandyObserver = observer;
     
-    sendEvent("browser_connected", { status: "connected", avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${streamerUsername}` });
+    sendEvent("browser_connected", { status: "connected" });
 
     let avatarFound = false;
-    const findAvatarInterval = setInterval(() => {
+    const trySendHostAvatar = () => {
         try {
             const isLiveNow = window.location.pathname.includes('/live');
             let hostDisplayName = streamerUsername;
@@ -484,39 +484,49 @@
                 }
             }
 
-            let avatarImg = document.querySelector('[data-e2e="live-host-avatar"]') ||
+            let avatarImg = document.querySelector('[data-e2e="live-host-avatar"] img') ||
+                            document.querySelector('[data-e2e="live-host-avatar"]') ||
                             document.querySelector('[data-e2e="user-avatar"] img') || 
                             document.querySelector('img[class*="avatar"]') || 
                             document.querySelector('img[class*="Avatar"]');
+            const imgSrc = avatarImg && (avatarImg.src || avatarImg.getAttribute('src'));
                             
-            if (avatarImg && avatarImg.src && avatarImg.src.startsWith('http')) {
+            if (imgSrc && imgSrc.startsWith('http') && !imgSrc.includes('dicebear')) {
                 avatarFound = true;
-                clearInterval(findAvatarInterval);
-                sendEvent("browser_connected", { status: "connected", avatar: avatarImg.src, nickname: hostDisplayName, isLive: isLiveNow });
-                return;
+                sendEvent("browser_connected", { status: "connected", avatar: imgSrc, nickname: hostDisplayName, isLive: isLiveNow });
+                return true;
             }
 
             const ogImage = document.querySelector('meta[property="og:image"]');
-            if (ogImage && ogImage.content && ogImage.content.startsWith('http')) {
+            if (ogImage && ogImage.content && ogImage.content.startsWith('http') && !ogImage.content.includes('dicebear')) {
                 avatarFound = true;
-                clearInterval(findAvatarInterval);
                 sendEvent("browser_connected", { status: "connected", avatar: ogImage.content, nickname: hostDisplayName, isLive: isLiveNow });
-                return;
+                return true;
             }
 
             const imgs = Array.from(document.querySelectorAll('img'));
             let fallbackImg = imgs.find(img => img.src && 
                 (img.src.includes('tiktokcdn') || img.src.includes('byteoversea') || img.src.includes('ibytedtos') || img.src.includes('avatar') || img.className.includes('avatar')) && 
-                img.width >= 40
+                img.width >= 40 && !img.src.includes('dicebear')
             );
             
             if (fallbackImg && fallbackImg.src) {
                 avatarFound = true;
-                clearInterval(findAvatarInterval);
                 sendEvent("browser_connected", { status: "connected", avatar: fallbackImg.src, nickname: hostDisplayName, isLive: isLiveNow });
+                return true;
             }
         } catch (e) {}
-    }, 2000);
+        return false;
+    };
+
+    trySendHostAvatar();
+    const findAvatarInterval = setInterval(() => {
+        if (avatarFound) {
+            clearInterval(findAvatarInterval);
+            return;
+        }
+        if (trySendHostAvatar()) clearInterval(findAvatarInterval);
+    }, 1500);
     
     setTimeout(() => { clearInterval(findAvatarInterval); }, 30000);
 

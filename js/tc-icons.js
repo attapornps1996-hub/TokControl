@@ -146,7 +146,7 @@
     function shouldSkip(el) {
         if (!el || el.nodeType !== 1) return true;
         if (SKIP.has(el.tagName)) return true;
-        if (el.closest && el.closest('.tc-ico-skip,[data-no-icon-replace],code,pre,textarea,.dash-comment-list,.dash-gift-feed,.chat-bubble,.ov-root,#overlayRoot,.live-chat,#dashboardView,#dashDetailModalOverlay,.dash-detail-overlay,[data-keep-emoji],#unifiedGiftPickerOverlay,#aeStickerPickerOverlay,.adm-gifts-list,.ae-trigger-tile,.ae-keep-emoji,.gp-item-cost')) return true;
+        if (el.closest && el.closest('.tc-ico-skip,[data-no-icon-replace],code,pre,textarea,.dash-comment-list,.dash-gift-feed,.chat-bubble,.ov-root,#overlayRoot,.live-chat,#dashboardView,#dashDetailModalOverlay,.dash-detail-overlay,[data-keep-emoji],#unifiedGiftPickerOverlay,#aeStickerPickerOverlay,.adm-gifts-list,.ae-trigger-tile,.ae-keep-emoji,.ae-trigger-thumb,.gp-item-cost,.rp-trig-type-grid,.rp-trig-modal-panel,.trigger-icon,.rp-trig-gift-fallback,.rp-trig-gift-strip')) return true;
         return false;
     }
 

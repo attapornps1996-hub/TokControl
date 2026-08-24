@@ -1677,7 +1677,7 @@ async function processBrowserEvent(type, data) {
                 activeTiktokSessions[sessionKey].isLive = liveStatusVal;
                 activeTiktokSessions[sessionKey].tiktokUsername = data.username;
                 activeTiktokSessions[sessionKey].nickname = data.nickname || data.username;
-                activeTiktokSessions[sessionKey].avatar = data.avatar || '';
+                activeTiktokSessions[sessionKey].avatar = data.avatar || activeTiktokSessions[sessionKey].avatar || '';
             }
             io.to(session.token).emit('tiktok_status', { 
                 connected: true, 
@@ -1685,23 +1685,43 @@ async function processBrowserEvent(type, data) {
                 username: data.username, 
                 nickname: data.nickname, 
                 avatar: data.avatar, 
+                avatarUrl: data.avatar,
                 integrationMode: 'browser' 
             });
+            if (!data.avatar || /dicebear\.com/i.test(String(data.avatar))) {
+                attachHydratedHostProfile(io, null, session.token, {
+                    username: data.username,
+                    existingAvatar: data.avatar,
+                    isLive: liveStatusVal,
+                    integrationMode: 'browser'
+                });
+            }
             if (liveStatusVal && data.username && session.userId) {
                 fetchGiftGalleryBackground(session.userId, data.username, session.token);
             }
         } else if (type === 'browser_live_status') {
             const sessionKey = (data.username || '').toLowerCase();
-            if (sessionKey && activeTiktokSessions[sessionKey]) {
-                activeTiktokSessions[sessionKey].isLive = !!data.isLive;
-                activeTiktokSessions[sessionKey].tiktokUsername = data.username;
+            const sess = sessionKey ? activeTiktokSessions[sessionKey] : null;
+            if (sess) {
+                sess.isLive = !!data.isLive;
+                sess.tiktokUsername = data.username;
             }
             io.to(session.token).emit('tiktok_status', { 
                 connected: true, 
                 isLive: data.isLive, 
-                username: data.username, 
+                username: data.username,
+                nickname: sess?.nickname || data.nickname || data.username,
+                avatar: sess?.avatar || data.avatar || '',
+                avatarUrl: sess?.avatar || data.avatar || '',
                 integrationMode: 'browser' 
             });
+            if (!(sess?.avatar) && data.username) {
+                attachHydratedHostProfile(io, null, session.token, {
+                    username: data.username,
+                    isLive: !!data.isLive,
+                    integrationMode: 'browser'
+                });
+            }
             if (data.isLive && data.username && session.userId) {
                 fetchGiftGalleryBackground(session.userId, data.username, session.token);
             }
@@ -1756,11 +1776,51 @@ app.post('/api/browser/event', async (appReq, appRes) => {
     }
 });
 
-const { extractTikTokOwnerProfile } = require('./tiktok_profile');
+const { extractTikTokOwnerProfile, fillMissingAvatar, resolveStreamerProfile } = require('./tiktok_profile');
 const { resolveTikTokRoomId } = require('./tiktok_room_resolve');
 
 const tiktokProfileCache = new Map();
 const TIKTOK_PROFILE_CACHE_MS = 60_000;
+
+function emitTikTokStatusToClient(ioRef, socketRef, token, payload) {
+    if (token) ioRef.to(token).emit('tiktok_status', payload);
+    if (socketRef) socketRef.emit('tiktok_status', payload);
+}
+
+function attachHydratedHostProfile(ioRef, socketRef, token, opts) {
+    const username = String(opts?.username || '').replace(/^@+/, '').trim();
+    if (!username) return;
+    const connection = opts.connection || null;
+    const userId = opts.userId;
+    resolveStreamerProfile(username, opts.roomInfo || null, connection?.avatar || opts.existingAvatar || '', connection)
+        .then((profile) => {
+            if (!profile?.avatarUrl) return;
+            if (userId && connection && activeTikTokConnections[userId] && activeTikTokConnections[userId] !== connection) return;
+            if (connection) {
+                connection.avatar = profile.avatarUrl;
+                connection.nickname = profile.displayName || connection.nickname || username;
+            }
+            const sessionKey = username.toLowerCase();
+            if (activeTiktokSessions[sessionKey]) {
+                activeTiktokSessions[sessionKey].avatar = profile.avatarUrl;
+                activeTiktokSessions[sessionKey].nickname = profile.displayName || username;
+            }
+            emitTikTokStatusToClient(ioRef, socketRef, token, {
+                connected: true,
+                isLive: !!(connection?.isLive || opts.isLive),
+                username,
+                nickname: profile.displayName || username,
+                displayName: profile.displayName || username,
+                avatar: profile.avatarUrl,
+                avatarUrl: profile.avatarUrl,
+                followerCount: profile.followerCount,
+                followingCount: profile.followingCount,
+                integrationMode: opts.integrationMode || 'direct',
+                roomId: opts.roomId || connection?.roomId || null
+            });
+        })
+        .catch(() => {});
+}
 
 app.get('/api/tiktok/profile', async (appReq, appRes) => {
     try {
@@ -1769,37 +1829,37 @@ app.get('/api/tiktok/profile', async (appReq, appRes) => {
             appRes.status(400).json({ error: 'username required' });
             return;
         }
-        if (!TikTokLiveConnection) {
-            appRes.status(503).json({ error: 'TikTok connector ยังไม่พร้อม' });
-            return;
-        }
         const cacheKey = username.toLowerCase();
         const cached = tiktokProfileCache.get(cacheKey);
-        if (cached && Date.now() - cached.at < TIKTOK_PROFILE_CACHE_MS) {
+        if (cached && Date.now() - cached.at < TIKTOK_PROFILE_CACHE_MS && cached.data?.avatarUrl) {
             appRes.json(cached.data);
             return;
         }
 
-        const conn = new TikTokLiveConnection(username, { enableExtendedGiftInfo: false, fetchRoomInfoOnConnect: false });
-        let roomInfo = null;
+        let profile = { username, displayName: username, avatarUrl: '', followerCount: 0, followingCount: 0 };
         try {
-            roomInfo = await conn.getRoomInfo();
-        } catch (err) {
-            // Offline rooms may still resolve via connect+roomInfo
-            try {
-                const state = await conn.connect();
-                roomInfo = state?.roomInfo || await conn.getRoomInfo().catch(() => null);
-            } catch (e2) {
-                throw err;
-            } finally {
-                try { conn.disconnect(); } catch (_) {}
+            for (const conn of Object.values(activeTikTokConnections || {})) {
+                if (String(conn?.username || '').toLowerCase() !== cacheKey) continue;
+                let ri = null;
+                try { ri = await conn.getRoomInfo(); } catch (e) {}
+                if (ri) profile = extractTikTokOwnerProfile(ri, username);
+                if (!profile.username) profile.username = username;
+                if (conn.avatar && !profile.avatarUrl) profile.avatarUrl = conn.avatar;
+                if (conn.nickname && (!profile.displayName || profile.displayName === username)) {
+                    profile.displayName = conn.nickname;
+                }
+                break;
             }
-        }
+        } catch (e) {}
 
-        const profile = extractTikTokOwnerProfile(roomInfo, username);
+        await fillMissingAvatar(profile, username);
         if (!profile.username) profile.username = username;
-        tiktokProfileCache.set(cacheKey, { at: Date.now(), data: profile });
-        appRes.json(profile);
+        if (profile.avatarUrl) {
+            tiktokProfileCache.set(cacheKey, { at: Date.now(), data: profile });
+            appRes.json(profile);
+            return;
+        }
+        appRes.status(502).json({ error: 'ไม่สามารถดึงโปรไฟล์ TikTok ได้ (อาจออฟไลน์หรือ username ผิด)' });
     } catch (err) {
         console.error('[tiktok/profile]', err?.message || err);
         appRes.status(502).json({ error: 'ไม่สามารถดึงโปรไฟล์ TikTok ได้ (อาจออฟไลน์หรือ username ผิด)' });
@@ -5058,6 +5118,12 @@ io.on('connection', (socket) => {
                 fromCache: true
             });
             emitTeamMembersSynced(token, userId, username);
+            attachHydratedHostProfile(io, socket, token, {
+                username,
+                userId,
+                isLive: false,
+                integrationMode: 'browser'
+            });
             return;
         }
 
@@ -5091,6 +5157,13 @@ io.on('connection', (socket) => {
                 fromCache: true
             });
             emitTeamMembersSynced(token, userId, username);
+            attachHydratedHostProfile(io, socket, token, {
+                username,
+                userId,
+                connection: tiktokConnect,
+                isLive: false,
+                integrationMode: 'direct'
+            });
 
             let retryInterval = null;
             let connectInFlight = false;
@@ -5125,6 +5198,17 @@ io.on('connection', (socket) => {
                 io.to(token).emit('tiktok_status', successStatus);
                 socket.emit('tiktok_status', successStatus);
                 io.to(token).emit('tiktok_notification', { type: 'connected', username });
+                if (!avatar || /dicebear\.com/i.test(String(avatar))) {
+                    attachHydratedHostProfile(io, socket, token, {
+                        username,
+                        userId,
+                        connection: tiktokConnect,
+                        roomInfo,
+                        isLive: true,
+                        integrationMode: 'direct',
+                        roomId: state?.roomId || tiktokConnect.roomId || null
+                    });
+                }
                 return successStatus;
             };
 
